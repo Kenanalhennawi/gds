@@ -1,258 +1,364 @@
-import { uniq } from "./utils.js";
+import { cleanSpaces, splitLines, uniq, upper } from "./utils.js";
 
-/**
- * Parse pasted GDS history / EDIFACT-ish blocks into structured hints
- * so the UI can auto-explain important parts.
- */
-export const parseHistory = (raw) => {
-  const rawStr = (raw || "").toString();
-  const lines = rawStr
-    .replace(/\r/g, "")
-    .split("\n")
-    .map((l) => l.replace(/\s+$/g, ""))
-    .filter((l) => l.trim().length > 0);
-  const text = rawStr.replace(/\s+/g, " ").trim();
-  if (!text) return null;
+function parseEnvelope(line) {
+  const m = line.match(/^(QP|QK|QD)\s+([A-Z0-9]+)\s*$/);
+  if (!m) return null;
+  return { envelope: m[1], family: m[2] };
+}
 
-  const out = {
-    kind: null,
-    header: null,
-    airlineContext: null,
-    office: null,
-    recordRef: null,
-    pax: null,
-    segments: [],
-    ssr: [],
-    osi: [],
-    fare: [],
-    edifact: { segments: [], messageTypes: [], ticketNumbers: [] },
-    queueLogic: [],
-    seatAvailability: null,
+function parseDotHeader(line) {
+  const m = line.match(/^\.(\S+)(?:\s+(.+))?$/);
+  if (!m) return null;
+  const a = m[1];
+  const b = cleanSpaces(m[2] || "");
+  return { record: a, extra: b || null };
+}
+
+function parseHDQLine(line) {
+  const m = line.match(/^(HDQ[A-Z0-9]{0,4})\s+(.+)$/);
+  if (!m) return null;
+  return { key: m[1], value: cleanSpaces(m[2]) };
+}
+
+function parsePax(line) {
+  const m = line.match(/^\d+([A-Z0-9' -]+)\/([A-Z0-9' -]+)(.*)$/);
+  if (!m) return null;
+  const last = cleanSpaces(m[1]);
+  const first = cleanSpaces(m[2] + cleanSpaces(m[3] || ""));
+  const name = cleanSpaces(`${last}/${first}`);
+  return { name };
+}
+
+function parseSSR(line) {
+  const m = line.match(/^SSR\s+([A-Z0-9]{3,4})\s+(.+)$/);
+  if (!m) return null;
+  const type = m[1];
+  const rest = cleanSpaces(m[2]);
+  const carrier = (rest.match(/^([A-Z0-9]{2})\b/) || [])[1] || null;
+  return { type, carrier, raw: rest, line };
+}
+
+function parseOSI(line) {
+  const m = line.match(/^OSI\s+(.+)$/);
+  if (!m) return null;
+  const rest = cleanSpaces(m[1]);
+  const carrier = (rest.match(/^([A-Z0-9]{2})\b/) || [])[1] || null;
+  return { carrier, raw: rest, line };
+}
+
+function parseSegment(line) {
+  const s = cleanSpaces(line);
+
+  const cs = s.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z])\/([A-Z0-9]{2})(\d{1,4})([A-Z])(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2})(\d+)(.*)$/);
+  if (cs) {
+    const tail = cleanSpaces(cs[12] || "");
+    const extra = parseSegmentTail(tail);
+    return {
+      marketingCarrier: cs[1],
+      marketingFlight: cs[2],
+      marketingClass: cs[3],
+      operatingCarrier: cs[4],
+      operatingFlight: cs[5],
+      operatingClass: cs[6],
+      date: cs[7],
+      from: cs[8],
+      to: cs[9],
+      status: cs[10],
+      qty: Number(cs[11]),
+      ...extra,
+      raw: s,
+      kind: "codeshare",
+    };
+  }
+
+  const st = s.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z])(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2})(\d+)(.*)$/);
+  if (st) {
+    const tail = cleanSpaces(st[9] || "");
+    const extra = parseSegmentTail(tail);
+    return {
+      carrier: st[1],
+      flight: st[2],
+      cls: st[3],
+      date: st[4],
+      from: st[5],
+      to: st[6],
+      status: st[7],
+      qty: Number(st[8]),
+      ...extra,
+      raw: s,
+      kind: "standard",
+    };
+  }
+
+  return null;
+}
+
+function parseSegmentTail(tail) {
+  if (!tail) return {};
+  const out = { times: null, suffix: null, dayOffset: null };
+
+  const t1 = tail.match(/^\/(\d{3,4})\s+(\d{3,4})(?:\/(\d))?$/);
+  if (t1) {
+    out.times = { dep: t1[1], arr: t1[2] };
+    if (t1[3]) out.dayOffset = Number(t1[3]);
+    return out;
+  }
+
+  const t2 = tail.match(/^\/(\d{4})(\d{4})(?:\/(\d))?(?:\s+(\.\d+\.)|(\.\d+\.))?$/);
+  if (t2) {
+    out.times = { dep: t2[1], arr: t2[2] };
+    if (t2[3]) out.dayOffset = Number(t2[3]);
+    out.suffix = cleanSpaces(t2[4] || t2[5] || "") || null;
+    return out;
+  }
+
+  const t3 = tail.match(/^\/(\d{4})(\d{4})(?:\/(\d))?\s*(\.\d+\.)?$/);
+  if (t3) {
+    out.times = { dep: t3[1], arr: t3[2] };
+    if (t3[3]) out.dayOffset = Number(t3[3]);
+    out.suffix = cleanSpaces(t3[4] || "") || null;
+    return out;
+  }
+
+  const suf = tail.match(/^(\.\d+\.|\.\d+\.)$/);
+  if (suf) {
+    out.suffix = suf[1];
+    return out;
+  }
+
+  return { tail };
+}
+
+function isMessageInfoStart(line) {
+  return upper(line).includes("M E S S A G E    I N F O R M A T I O N");
+}
+
+function parseMessageInfo(lines, startIdx) {
+  let i = startIdx;
+  const info = {
+    reason: null,
+    time: null,
+    confirmation: null,
+    systemCode: null,
+    recordLocator: null,
+    flights: [],
+    raw: [],
   };
 
-  // Parse verbose GDS blocks like "SEATS NOT AVAILABLE" (Galileo/1G style)
-  // Keep this independent from whitespace-normalized parsing.
-  const parseSeatAvailability = () => {
-    if (!/SEATS\s+NOT\s+AVAILABLE/i.test(rawStr)) return null;
+  function readKV(l) {
+    const m = l.match(/^\s*([A-Za-z ]+):\s*(.+)\s*$/);
+    if (!m) return null;
+    return { k: cleanSpaces(m[1]), v: cleanSpaces(m[2]) };
+  }
 
-    const info = {
-      reason: null,
-      time: null,
-      confirmation: null,
-      systemCode: null,
-      recordLocator: null,
-      flights: [],
-    };
+  for (; i < lines.length; i++) {
+    const l = lines[i];
+    info.raw.push(l);
+    const up = upper(l);
 
-    const reason = rawStr.match(/Message Reason:\s*(.+)/i);
-    if (reason) info.reason = reason[1].trim();
-    const time = rawStr.match(/Message Time:\s*(.+)/i);
-    if (time) info.time = time[1].trim();
-    const conf = rawStr.match(/Confirmation #:\s*(.+)/i);
-    if (conf) info.confirmation = conf[1].trim();
-    const sys = rawStr.match(/System Code:\s*(.+)/i);
-    if (sys) info.systemCode = sys[1].trim();
-    const rloc = rawStr.match(/Record Locator:\s*(.+)/i);
-    if (rloc) info.recordLocator = rloc[1].trim();
+    const kv = readKV(l);
+    if (kv) {
+      const k = upper(kv.k);
+      if (k === "MESSAGE REASON") info.reason = kv.v;
+      else if (k === "MESSAGE TIME") info.time = kv.v;
+      else if (k === "CONFIRMATION #") info.confirmation = kv.v;
+      else if (k === "SYSTEM CODE") info.systemCode = kv.v;
+      else if (k === "RECORD LOCATOR") info.recordLocator = kv.v;
+      continue;
+    }
 
-    // Split on repeated seat blocks
-    const blocks = rawStr.split(/\*{3,}\s*\n\*{3,}\s*\n\*{3,}[\s\S]*?\*{5,}\s*\n\s*\*{2,}\s*S\s*E\s*A\s*T\s*S[\s\S]*?\*{2,}\s*\n/);
-    // Above split is unreliable across variants; fallback to scanning sections.
-
-    const sections = rawStr.split(/\*{2,}\s*S\s*E\s*A\s*T\s*S\s+N\s*O\s*T\s+\s*A\s*V\s*A\s*I\s*L\s*A\s*B\s*L\s*E\s*\*{2,}/i);
-    // sections[0] is header; subsequent contain per-flight details
-    sections.slice(1).forEach((sec) => {
-      const carrier = sec.match(/Carrier Code:\s*([A-Z0-9]{2})/i)?.[1] || null;
-      const flightNumber = sec.match(/Flight Number:\s*([0-9]{1,4})/i)?.[1] || null;
-      const origin = sec.match(/Origin:\s*([A-Z]{3})/i)?.[1] || null;
-      const destination = sec.match(/Destination:\s*([A-Z]{3})/i)?.[1] || null;
-      const flightDate = sec.match(/Flight Date:\s*([0-9]{1,2}[A-Z]{3})/i)?.[1] || null;
-      const fareClass = sec.match(/Fare Class:\s*([A-Z])/i)?.[1] || null;
-      const seatsAvailable = sec.match(/Seats Available:\s*([0-9]+)/i)?.[1] || null;
-      const seatsRequested = sec.match(/Seats Requested:\s*([0-9]+)/i)?.[1] || null;
-      const fareAmount = sec.match(/Fare Amount:\s*([0-9]+(?:\.[0-9]+)?)/i)?.[1] || null;
-      const fareBasisCode = sec.match(/Fare Basis Code:\s*([A-Z0-9]+)/i)?.[1] || null;
-      const logicalFlightId = sec.match(/Logical Flight ID:\s*([0-9]+)/i)?.[1] || null;
-      const currencyCode = sec.match(/Currency Code:\s*([A-Z]{3})/i)?.[1] || null;
-      const directionalOrigin = sec.match(/Directional Origin:\s*([A-Z]{3})/i)?.[1] || null;
-
-      // Only add if it looks like a real flight block
-      if (carrier && (flightNumber || origin || destination)) {
-        info.flights.push({
-          carrier,
-          flightNumber,
-          origin,
-          destination,
-          flightDate,
-          fareClass,
-          seatsAvailable: seatsAvailable ? Number(seatsAvailable) : null,
-          seatsRequested: seatsRequested ? Number(seatsRequested) : null,
-          fareAmount: fareAmount ? Number(fareAmount) : null,
-          fareBasisCode,
-          logicalFlightId,
-          currencyCode,
-          directionalOrigin,
-        });
+    if (up.includes("F L I G H T") && up.includes("I N F O R M A T I O N")) {
+      const flight = { carrier: null, flightNumber: null, origin: null, destination: null, flightDate: null, fareClass: null, seatsAvailable: null, seatsRequested: null, fareAmount: null, fareBasis: null, currency: null, logicalFlightId: null, directionalOrigin: null };
+      let j = i + 1;
+      for (; j < lines.length; j++) {
+        const z = lines[j];
+        info.raw.push(z);
+        const kv2 = readKV(z);
+        if (kv2) {
+          const k2 = upper(kv2.k);
+          if (k2 === "CARRIER CODE") flight.carrier = kv2.v;
+          else if (k2 === "FLIGHT NUMBER") flight.flightNumber = kv2.v;
+          else if (k2 === "ORIGIN") flight.origin = kv2.v;
+          else if (k2 === "DESTINATION") flight.destination = kv2.v;
+          else if (k2 === "FLIGHT DATE") flight.flightDate = kv2.v;
+          else if (k2 === "FARE CLASS") flight.fareClass = kv2.v;
+          else if (k2 === "SEATS AVAILABLE") flight.seatsAvailable = kv2.v;
+          else if (k2 === "SEATS REQUESTED") flight.seatsRequested = kv2.v;
+          else if (k2 === "FARE AMOUNT") flight.fareAmount = kv2.v;
+          else if (k2 === "FARE BASIS CODE") flight.fareBasis = kv2.v;
+          else if (k2 === "LOGICAL FLIGHT ID") flight.logicalFlightId = kv2.v;
+          else if (k2 === "DIRECTIONAL ORIGIN") flight.directionalOrigin = kv2.v;
+          else if (k2 === "CURRENCY CODE") flight.currency = kv2.v;
+          continue;
+        }
+        if (upper(z).includes("*****") && upper(z).includes("S E A T S")) break;
+        if (upper(z).includes("A C T U A L") && upper(z).includes("G D S")) break;
       }
-    });
+      info.flights.push(flight);
+      i = j - 1;
+      continue;
+    }
 
-    // De-dupe same carrier/flight/date blocks
-    const seen = new Set();
-    info.flights = info.flights.filter((f) => {
-      const k = `${f.carrier}-${f.flightNumber}-${f.flightDate}-${f.origin}-${f.destination}`;
-      if (seen.has(k)) return false;
-      seen.add(k);
-      return true;
-    });
-
-    if (!info.reason && !info.flights.length) return null;
-    return info;
-  };
-
-  out.seatAvailability = parseSeatAvailability();
-
-  const hd = text.match(/\bHD[A-Z]{2,6}[A-Z0-9]{0,2}\b/);
-  if (hd) {
-    out.kind = "GDS_HISTORY";
-    out.header = hd[0];
-    if (out.header.startsWith("HDQ"))
-      out.queueLogic.push({
-        code: "HDQ",
-        meaning: "Queue-related history (line produced under queue workflow).",
-      });
-    if (out.header.includes("RM"))
-      out.queueLogic.push({
-        code: "RM",
-        meaning: "Record message snapshot (multiple logical elements inside one line).",
-      });
-    const m = out.header.match(/^HD[A-Z]{2,6}([A-Z0-9]{2})$/);
-    if (m) out.airlineContext = m[1];
-    if (out.airlineContext)
-      out.queueLogic.push({
-        code: out.airlineContext,
-        meaning:
-          "Carrier/context tag carried in history header (implementation-specific).",
-      });
+    if (upper(l).includes("A C T U A L") && upper(l).includes("G D S")) break;
+    if (upper(l).startsWith("QK ") || upper(l).startsWith("QP ") || upper(l).startsWith("QD ")) break;
+    if (upper(l).startsWith("HDQ")) break;
   }
 
-  // EDIFACT envelope detection (minimal, generic)
-  if (text.includes("UNB+") || text.includes("UNH+")) {
-    out.kind = out.kind || "EDIFACT";
-    const segs = [];
-    (text.match(/\bUNB\b|\bUNH\b|\bUNT\b|\bUNZ\b|\bORG\b|\bTKT\b|\bMSG\b/g) || []).forEach(
-      (s) => {
-        if (!segs.includes(s)) segs.push(s);
+  return { info, nextIndex: i };
+}
+
+export function parseHistory(input) {
+  const lines = splitLines(input);
+  const messages = [];
+
+  let current = null;
+
+  function pushCurrent() {
+    if (!current) return;
+    current.pax = uniq(current.pax);
+    current.segments = uniq(current.segments);
+    current.ssrs = uniq(current.ssrs);
+    current.osis = uniq(current.osis);
+    current.tokens = uniq(current.tokens);
+    current.blocks = uniq(current.blocks);
+    current.messageInfos = uniq(current.messageInfos);
+    current.raw = current.raw || [];
+    messages.push(current);
+    current = null;
+  }
+
+  function ensureCurrent() {
+    if (!current) {
+      current = {
+        envelope: null,
+        family: null,
+        record: null,
+        recordExtra: null,
+        markers: [],
+        hdq: [],
+        pax: [],
+        segments: [],
+        ssrs: [],
+        osis: [],
+        tokens: [],
+        blocks: [],
+        messageInfos: [],
+        raw: [],
+      };
+    }
+  }
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+
+    if (isMessageInfoStart(line)) {
+      ensureCurrent();
+      const { info, nextIndex } = parseMessageInfo(lines, i);
+      current.messageInfos.push(info);
+      i = nextIndex;
+      continue;
+    }
+
+    const env = parseEnvelope(line);
+    if (env) {
+      pushCurrent();
+      ensureCurrent();
+      current.envelope = env.envelope;
+      current.family = env.family;
+      current.raw.push(line);
+      continue;
+    }
+
+    const dot = parseDotHeader(line);
+    if (dot) {
+      ensureCurrent();
+      current.record = dot.record;
+      current.recordExtra = dot.extra;
+      current.raw.push(line);
+      continue;
+    }
+
+    const hdq = parseHDQLine(line);
+    if (hdq) {
+      ensureCurrent();
+      current.hdq.push(hdq);
+      current.raw.push(line);
+      continue;
+    }
+
+    const pax = parsePax(line);
+    if (pax) {
+      ensureCurrent();
+      current.pax.push(pax);
+      current.raw.push(line);
+      continue;
+    }
+
+    const seg = parseSegment(line);
+    if (seg) {
+      ensureCurrent();
+      current.segments.push(seg);
+      current.tokens.push(upper(seg.status));
+      current.tokens.push(upper(`${seg.status}${seg.qty}`));
+      if (seg.kind === "codeshare") {
+        current.tokens.push(upper(seg.marketingCarrier));
+        current.tokens.push(upper(seg.operatingCarrier));
+      } else {
+        current.tokens.push(upper(seg.carrier));
       }
-    );
-    out.edifact.segments = segs;
-    out.edifact.messageTypes = uniq(text.match(/\b[A-Z]{3,6}REQ\b/g) || []);
-    const tkt = (text.match(/\bTKT\+([0-9]{10,14})/g) || [])
-      .map((x) => x.replace("TKT+", "").split(/[^\d]/)[0])
-      .filter(Boolean);
-    out.edifact.ticketNumbers = uniq(tkt);
+      current.raw.push(line);
+      continue;
+    }
+
+    const ssr = parseSSR(line);
+    if (ssr) {
+      ensureCurrent();
+      current.ssrs.push(ssr);
+      current.tokens.push(upper(`SSR ${ssr.type}`));
+      current.tokens.push(upper(ssr.type));
+      if (ssr.carrier) current.tokens.push(upper(ssr.carrier));
+      current.raw.push(line);
+      continue;
+    }
+
+    const osi = parseOSI(line);
+    if (osi) {
+      ensureCurrent();
+      current.osis.push(osi);
+      current.tokens.push("OSI");
+      if (osi.carrier) current.tokens.push(upper(osi.carrier));
+      current.raw.push(line);
+      continue;
+    }
+
+    const marker = line.match(/^(TRL|AKA|NAR|DVD|ASC|NCO)\b/);
+    if (marker) {
+      ensureCurrent();
+      current.markers.push(marker[1]);
+      current.tokens.push(marker[1]);
+      current.raw.push(line);
+      continue;
+    }
+
+    const tokenLike = line.match(/\b(HK|UC|UN|TK|XX|HX|DK|CS|CH|SS|LK|RR|RQ)\d+/g);
+    if (tokenLike) {
+      ensureCurrent();
+      for (const t of tokenLike) current.tokens.push(upper(t));
+      current.raw.push(line);
+      continue;
+    }
+
+    if (line) {
+      ensureCurrent();
+      current.raw.push(line);
+    }
   }
 
-  // Record reference like //1141D8A... etc
-  const ref = text.match(/\/\/([A-Z0-9]{10,})/);
-  if (ref) out.recordRef = ref[1];
+  pushCurrent();
 
-  // PAX in typical host history: 1SURNAME/GIVEN TITLE
-  const pax = text.match(
-    /\b\d([A-Z][A-Z0-9' -]{1,30})\/([A-Z][A-Z0-9' -]{1,30})\s+(MR|MRS|MS|MISS|CHD|INF)\b/
-  );
-  if (pax)
-    out.pax = {
-      surname: pax[1].trim(),
-      given: pax[2].trim(),
-      title: pax[3].trim(),
-    };
+  const allTokens = uniq(messages.flatMap((m) => m.tokens || []));
+  const allRecords = uniq(messages.map((m) => m.record).filter(Boolean));
+  const allPax = uniq(messages.flatMap((m) => (m.pax || []).map((p) => p.name)).filter(Boolean));
 
-  // Office / sign-in patterns (best-effort, generic)
-  const officeA = text.match(/\.[A-Z0-9]{4,10}\b/);
-  const officeB = text.match(/\b[A-Z]{3}[0-9]A\b/);
-  const officeC = text.match(/\b[A-Z]{3}\/1A\b/);
-  const officeParts = [];
-  if (officeA) officeParts.push(officeA[0]);
-  if (officeB) officeParts.push(officeB[0]);
-  if (officeC) officeParts.push(officeC[0]);
-  if (officeParts.length) out.office = officeParts.join(" ");
-
-  // Segment pattern: XX1234Y01JAN AAABBB HK1
-  // Segment parsing (line-based, supports codeshare like FZ1263M/EK2474B24JAN)
-  // Examples:
-  //   FZ641L02APR DXBADD HK1/0035 0350
-  //   FZ1263M/EK2474B24JAN DXBVNO CH1
-  //   FZ010W24JAN DOHDXB DK5/19002110 .1.
-  //   FZ010W24JAN DOHDXB HK4.4.
-  let m;
-  const segLineRe =
-    /^([A-Z0-9]{2})(\d{1,4})([A-Z])(?:\/([A-Z0-9]{2})(\d{1,4})([A-Z]))?(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2})(\d)(?:\.(\d)\.)?(.*)$/;
-  lines.forEach((line) => {
-    const s = line.trim();
-    const mm = s.match(segLineRe);
-    if (!mm) return;
-
-    const status = `${mm[10]}${mm[11]}`;
-    const shareQty = mm[12] ? Number(mm[12]) : null;
-    const rest = (mm[13] || "").trim();
-
-    // Time patterns usually appear after status: /1735 2240 or /1955 0125/1
-    const t = rest.match(/\/(\d{3,4})\s+(\d{3,4})(?:\/(\d))?/);
-    const depTime = t ? t[1] : null;
-    const arrTime = t ? t[2] : null;
-    const dayOffset = t && t[3] ? Number(t[3]) : null;
-
-    // Some DK lines carry vendor timestamps like /19002110 and sometimes .1. segment markers.
-    const vendorStamp = rest.match(/\/(\d{6,8})/)?.[1] || null;
-
-    out.segments.push({
-      marketing: {
-        carrier: mm[1],
-        flight: mm[2],
-        bookingClass: mm[3],
-      },
-      operating: mm[4]
-        ? {
-            carrier: mm[4],
-            flight: mm[5],
-            bookingClass: mm[6],
-          }
-        : null,
-      date: mm[7],
-      from: mm[8],
-      to: mm[9],
-      status,
-      requestedQty: Number(mm[11]),
-      shareQty,
-      depTime,
-      arrTime,
-      dayOffset,
-      vendorStamp,
-      rawTail: rest || null,
-    });
-  });
-
-  // SSR types
-  const ssrRe = /\bSSR\s+([A-Z]{3,4})\b/g;
-  const ssrTypes = [];
-  while ((m = ssrRe.exec(text)) !== null) ssrTypes.push(`SSR ${m[1]}`);
-  out.ssr = uniq(ssrTypes);
-
-  // OSI lines (best-effort: keep short, prevent giant dumps)
-  if (/\bOSI\b/.test(text)) {
-    const osiLines = [];
-    const parts = text.split(/\bOSI\b/).slice(1);
-    parts.forEach((p) => {
-      const s = ("OSI" + p).trim();
-      if (s.length > 3) osiLines.push(s.substring(0, 220));
-    });
-    out.osi = uniq(osiLines);
-  }
-
-  // Fare tokens hints
-  const fareTokens = [];
-  (text.match(/\bNUC\b|\bROE\b|\bXT\b/g) || []).forEach((x) => fareTokens.push(x));
-  if (fareTokens.length) out.fare = uniq(fareTokens);
-
-  return out;
-};
+  return { messages, tokens: allTokens, records: allRecords, pax: allPax };
+}
