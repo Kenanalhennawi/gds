@@ -1,55 +1,38 @@
-import { n } from "./utils.js";
+import { cleanSpaces, fuzzyScore, tokenizeForSearch, upper } from "./utils.js";
 
-export const createSearchEngine = ({ getFuzzy }) => {
-  const score = (m, term) => {
-    if (!term) return 1;
-    const s = n(`${m.code} ${m.title} ${m.meaning} ${m.trigger} ${m.category} ${m.standard}`);
-    if (s.includes(term)) return 100;
-    if (!getFuzzy()) return 0;
-    const parts = term.split(/\s+/).filter(Boolean);
-    let hit = 0;
-    for (const p of parts) if (s.includes(p)) hit++;
-    return hit > 0 ? Math.min(60, hit * 20) : 0;
-  };
+export function createSearchEngine(kb) {
+  const items = Array.isArray(kb) ? kb : [];
 
-  const existsCode = (data, code) => {
-    const up = (code || "").toString().trim().toUpperCase();
-    if (!up) return false;
-    return data.some((m) => (m.code || "").toString().toUpperCase() === up);
-  };
+  const indexed = items.map((it, i) => {
+    const code = upper(it.code || it.id || "");
+    const title = cleanSpaces(it.title || it.meaning || it.name || "");
+    const body = cleanSpaces([it.meaning, it.description, it.trigger, it.notes, it.standard, it.category, it.example].filter(Boolean).join(" "));
+    const blob = upper([code, title, body].join(" "));
+    return { i, it, code, title, body, blob };
+  });
 
-  const bestItemForTerm = (data, term) => {
-    const t = n(term || "").trim();
-    if (!t) return null;
-    let best = null;
-    let bestS = -1;
-    for (const m of data) {
-      const s = score(m, t);
-      if (s > bestS) {
-        bestS = s;
-        best = m;
-        if (bestS >= 100) break;
+  function search(q, limit = 10) {
+    const query = cleanSpaces(q);
+    if (!query) return [];
+    const toks = tokenizeForSearch(query);
+
+    const scored = [];
+    for (const row of indexed) {
+      let s = 0;
+      s += fuzzyScore(row.code, query) * 2.2;
+      s += fuzzyScore(row.title, query) * 1.6;
+      s += fuzzyScore(row.body, query) * 1.0;
+
+      for (const t of toks) {
+        if (!t) continue;
+        if (row.blob.includes(t)) s += Math.min(90, 30 + t.length * 2);
       }
-    }
-    if (bestS <= 0) return null;
-    return { item: best, score: bestS };
-  };
-
-  const runSearch = ({ data, activeStandard, term }) => {
-    let list = data;
-    if (activeStandard !== "ALL") list = list.filter((m) => m.standard === activeStandard);
-
-    if (term) {
-      const scored = list
-        .map((m) => ({ m, s: score(m, term) }))
-        .filter((x) => x.s > 0)
-        .sort((a, b) => b.s - a.s)
-        .map((x) => x.m);
-      list = scored;
+      if (s > 0) scored.push({ score: s, item: row.it });
     }
 
-    return list;
-  };
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, Math.max(1, Math.min(50, limit)));
+  }
 
-  return { score, existsCode, bestItemForTerm, runSearch };
-};
+  return { search };
+}
