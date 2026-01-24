@@ -15,7 +15,7 @@ export const detectTokens = (text) => {
   (up.match(/\bSSR\s+[A-Z]{3,4}\b/g) || []).forEach(add);
   (up.match(/\bOSI\b/g) || []).forEach(add);
   (up.match(/\bNUC\b|\bROE\b|\bXT\b/g) || []).forEach(add);
-  (up.match(/\bHK\d\b|\bHL\d\b|\bUC\d\b|\bUN\d\b|\bNO\d\b|\bTK\d\b|\bLK\d\b|\bRR\d\b|\bRQ\d\b/g) || []).forEach(add);
+  (up.match(/\bHK\d\b|\bHL\d\b|\bUC\d\b|\bUN\d\b|\bNO\d\b|\bTK\d\b|\bLK\d\b|\bRR\d\b|\bRQ\d\b|\bDK\d\b|\bCS\d\b|\bCH\d\b|\bCK\d\b|\bSS\d\b|\bXX\d\b|\bHX\d\b/g) || []).forEach(add);
   (up.match(/\bHD[A-Z]{2,6}[A-Z0-9]{0,2}\b/g) || []).forEach(add);
   return t;
 };
@@ -44,7 +44,7 @@ export const extractCandidates = (token) => {
   (up.match(/\bTKCREQ\b/g) || []).forEach(add);
   (up.match(/\bNUC\b|\bROE\b|\bXT\b/g) || []).forEach(add);
 
-  const status = up.match(/\b(HK|HL|UC|UN|NO|TK|RR|RQ|LK)(\d)\b/);
+  const status = up.match(/\b(HK|HL|UC|UN|NO|TK|RR|RQ|LK|DK|CS|CH|CK|SS|XX|HX)(\d)\b/);
   if (status) add(`${status[1]}${status[2]}`);
 
   const seg = up.match(
