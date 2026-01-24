@@ -64,11 +64,39 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   if (parsed.segments?.length) {
     const seg = parsed.segments
       .map((s) => {
-        const token = `${s.carrier}${s.flight}${s.bookingClass}${s.date} ${s.from}${s.to} ${s.status}`;
+        const mkt = s.marketing ? `${s.marketing.carrier}${s.marketing.flight}${s.marketing.bookingClass}` : "";
+        const op = s.operating ? `/${s.operating.carrier}${s.operating.flight}${s.operating.bookingClass}` : "";
+        const times = s.depTime && s.arrTime ? ` ${s.depTime}-${s.arrTime}${s.dayOffset ? `(+${s.dayOffset})` : ""}` : "";
+        const token = `${mkt}${op}${s.date} ${s.from}${s.to} ${s.status}${times}`;
         return wrapToken(token);
       })
       .join("<br>");
     add("Segments", seg);
+  }
+
+  if (parsed.seatAvailability) {
+    const sa = parsed.seatAvailability;
+    const head = [
+      sa.reason ? `<div><b>Reason:</b> ${esc(sa.reason)}</div>` : "",
+      sa.time ? `<div><b>Message time:</b> ${esc(sa.time)}</div>` : "",
+      sa.confirmation ? `<div><b>Confirmation #:</b> ${wrapToken(sa.confirmation)}</div>` : "",
+      sa.systemCode ? `<div><b>System:</b> ${wrapToken(sa.systemCode)}</div>` : "",
+      sa.recordLocator ? `<div><b>Record locator:</b> ${wrapToken(sa.recordLocator)}</div>` : "",
+    ]
+      .filter(Boolean)
+      .join("");
+
+    const flights = (sa.flights || [])
+      .map((f) => {
+        const k = `${f.carrier}${f.flightNumber || ""} ${f.origin}-${f.destination} ${f.flightDate} ${f.fareClass}`;
+        const v = `Avail ${f.seatsAvailable} / Req ${f.seatsRequested}${f.currencyCode ? ` (${f.currencyCode})` : ""}`;
+        return `<div style="margin-top:6px">${wrapToken(k)}<div class="small muted">${esc(v)}${
+          f.fareBasisCode ? ` • ${esc(f.fareBasisCode)}` : ""
+        }</div></div>`;
+      })
+      .join("");
+
+    add("Seat availability", `<div>${head}${flights}</div>`);
   }
 
   if (parsed.ssr?.length) add("SSR types", parsed.ssr.map((s) => wrapToken(s)).join(" "));
