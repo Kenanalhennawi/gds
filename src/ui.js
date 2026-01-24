@@ -1,215 +1,174 @@
-import { cleanSpaces, safeStr, upper } from "./utils.js";
+import { esc, wrapToken } from "./utils.js";
 
-function el(tag, attrs = {}, children = []) {
-  const n = document.createElement(tag);
-  for (const [k, v] of Object.entries(attrs || {})) {
-    if (k === "class") n.className = v;
-    else if (k === "text") n.textContent = v;
-    else if (k === "html") n.innerHTML = v;
-    else n.setAttribute(k, v);
+export const ensureVisible = (el, container) => {
+  if (!el || !container) return;
+  const r = el.getBoundingClientRect();
+  const c = container.getBoundingClientRect();
+  if (r.top < c.top) container.scrollTop -= c.top - r.top + 12;
+  else if (r.bottom > c.bottom) container.scrollTop += r.bottom - c.bottom + 12;
+};
+
+export const renderDetect = ({ detectChips, detectEmpty, q, search }, tokens) => {
+  detectChips.innerHTML = "";
+  if (!tokens.length) {
+    detectEmpty.style.display = "block";
+    return;
   }
-  for (const c of children || []) {
-    if (c === null || c === undefined) continue;
-    if (typeof c === "string") n.appendChild(document.createTextNode(c));
-    else n.appendChild(c);
+  detectEmpty.style.display = "none";
+  tokens.forEach((t) => {
+    const b = document.createElement("button");
+    b.className = "detect-chip";
+    b.type = "button";
+    b.textContent = t;
+    b.onclick = () => {
+      q.value = t;
+      search(true);
+      q.focus();
+      q.select();
+    };
+    detectChips.appendChild(b);
+  });
+};
+
+export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
+  explainBody.innerHTML = "";
+  if (
+    !parsed ||
+    (!parsed.kind &&
+      !parsed.header &&
+      !parsed?.edifact?.segments?.length &&
+      !parsed?.segments?.length &&
+      !parsed?.ssr?.length)
+  ) {
+    explainEmpty.style.display = "block";
+    return;
   }
-  return n;
-}
+  explainEmpty.style.display = "none";
 
-function pill(text) {
-  return el("span", { class: "pill", text: text });
-}
+  const rows = [];
+  const add = (k, v) => {
+    if (v === null || v === undefined) return;
+    if (Array.isArray(v) && v.length === 0) return;
+    if (typeof v === "string" && !v.trim()) return;
+    rows.push([k, v]);
+  };
 
-function badge(text, kind) {
-  return el("span", { class: `badge badge--${kind}`, text });
-}
+  add("Detected type", parsed.kind || "—");
+  add("Header", parsed.header ? wrapToken(parsed.header) : "—");
+  add("Airline context", parsed.airlineContext ? wrapToken(parsed.airlineContext) : "—");
+  add("Office / sign-in", parsed.office || "—");
+  add("Record reference", parsed.recordRef ? wrapToken(parsed.recordRef) : "—");
+  if (parsed.envelopes?.length) add("Envelopes", parsed.envelopes.map((x) => wrapToken(x)).join(" "));
+  if (parsed.actions?.length) add("Action codes", parsed.actions.map((x) => wrapToken(x)).join(" "));
+  if (parsed.statuses?.length) add("Segment statuses", parsed.statuses.map((x) => wrapToken(x)).join(" "));
+  if (parsed.ticketNumbers?.length) add("Ticket numbers", parsed.ticketNumbers.map((s) => wrapToken(s)).join(" "));
 
-function keyRow(k, v) {
-  return el("div", { class: "row" }, [
-    el("div", { class: "row__left" }, [el("span", { class: "tag", text: k })]),
-    el("div", { class: "small", text: safeStr(v) || "-" }),
-  ]);
-}
+  if (parsed.pax) add("Passenger", `${esc(parsed.pax.surname)}/${esc(parsed.pax.given)} ${esc(parsed.pax.title)}`);
 
-function segStatusKind(code) {
-  const c = upper(code || "");
-  if (c.startsWith("HK")) return "ok";
-  if (c.startsWith("SS") || c.startsWith("DK") || c.startsWith("CS") || c.startsWith("CH")) return "warn";
-  if (c.startsWith("UC") || c.startsWith("UN") || c.startsWith("XX") || c.startsWith("HX")) return "bad";
-  if (c.startsWith("TK") || c.startsWith("LK")) return "warn";
-  return "warn";
-}
+  if (parsed.segments?.length) {
+    const seg = parsed.segments
+      .map((s) => {
+        const mkt = `${s.carrier}${s.flight}${s.bookingClass}${s.date}`;
+        const op = s.operatingCarrier ? `${s.operatingCarrier}${s.operatingFlight}${s.operatingClass}` : "";
+        const loc = `${s.from}${s.to}`;
+        const st = s.status || "";
+        const pax = s.paxCount ? `/${s.paxCount}` : "";
+        const t = s.depTime || s.arrTime ? ` ${s.depTime || ""}→${s.arrTime || ""}${s.dayOffset ? `(+${s.dayOffset})` : ""}` : "";
+        const cs = op ? ` (${op})` : "";
+        return `${wrapToken(mkt)} ${wrapToken(loc)} ${wrapToken(st + pax)}${cs ? ` ${wrapToken(cs.trim())}` : ""}${t ? ` ${wrapToken(t.trim())}` : ""}`;
+      })
+      .join("<br>");
+    add("Segments", seg);
+  }
 
-function renderSegments(segments) {
-  if (!segments || !segments.length) return el("div", { class: "small", text: "No segments detected." });
-  const table = el("table", { class: "table" });
-  const thead = el("thead");
-  thead.appendChild(el("tr", {}, [
-    el("th", { text: "Route" }),
-    el("th", { text: "Date" }),
-    el("th", { text: "Flight" }),
-    el("th", { text: "Class" }),
-    el("th", { text: "Status" }),
-    el("th", { text: "Qty" }),
-    el("th", { text: "Times" }),
-  ]));
-  table.appendChild(thead);
+  if (parsed.ssr?.length) add("SSR types", parsed.ssr.map((s) => wrapToken(s)).join(" "));
+  if (parsed.ssrLines?.length)
+    add(
+      "SSR lines",
+      parsed.ssrLines
+        .slice(0, 40)
+        .map((s) => wrapToken(s))
+        .join("<br>") + (parsed.ssrLines.length > 40 ? "<br>..." : "")
+    );
+  if (parsed.osi?.length) add("OSI", parsed.osi.map((s) => wrapToken(s)).join("<br>"));
+  if (parsed.ticketNumbers?.length) add("Ticket numbers", parsed.ticketNumbers.map((s) => wrapToken(s)).join(" "));
+  if (parsed.statusTokens?.length) add("Status tokens", parsed.statusTokens.map((s) => wrapToken(s)).join(" "));
+  if (parsed.edifact?.segments?.length)
+    add("EDIFACT segments", parsed.edifact.segments.map((s) => wrapToken(s)).join(" "));
+  if (parsed.edifact?.messageTypes?.length)
+    add("EDIFACT message types", parsed.edifact.messageTypes.map((s) => wrapToken(s)).join(" "));
+  if (parsed.edifact?.ticketNumbers?.length)
+    add("Ticket numbers", parsed.edifact.ticketNumbers.map((s) => wrapToken(s)).join(" "));
+  if (parsed.fare?.length) add("Fare tokens", parsed.fare.map((s) => wrapToken(s)).join(" "));
 
-  const tbody = el("tbody");
-  for (const s of segments) {
-    const route = `${safeStr(s.from)}→${safeStr(s.to)}`;
-    const date = safeStr(s.date) || "-";
+  if (parsed.queueLogic?.length) {
+    const ql = parsed.queueLogic.map((x) => `<div>${wrapToken(x.code)} ${esc(x.meaning)}</div>`).join("");
+    add("Queue logic", ql);
+  }
 
-    let flight = "-";
-    let cls = "-";
-    if (s.kind === "codeshare") {
-      flight = `${safeStr(s.marketingCarrier)}${safeStr(s.marketingFlight)}/${safeStr(s.operatingCarrier)}${safeStr(s.operatingFlight)}`;
-      cls = `${safeStr(s.marketingClass)}/${safeStr(s.operatingClass)}`;
-    } else {
-      flight = `${safeStr(s.carrier)}${safeStr(s.flight)}`;
-      cls = safeStr(s.cls);
+  if (parsed.diagnostics?.seatsNotAvailable) {
+    const d = parsed.diagnostics.seatsNotAvailable;
+    const lines = [];
+    if (d.reason) lines.push(`<div><b>Reason</b> ${esc(d.reason)}</div>`);
+    if (d.time) lines.push(`<div><b>Time</b> ${esc(d.time)}</div>`);
+    if (d.confirmation) lines.push(`<div><b>Confirmation</b> ${esc(d.confirmation)}</div>`);
+    if (d.systemCode) lines.push(`<div><b>System</b> ${esc(d.systemCode)}</div>`);
+    if (d.recordLocator) lines.push(`<div><b>Record Locator</b> ${esc(d.recordLocator)}</div>`);
+    if (d.flights?.length) {
+      const f = d.flights
+        .map((x) => {
+          const base = `${x.carrier || ""}${x.flightNumber || ""} ${x.origin || ""}-${x.destination || ""} ${x.flightDate || ""} ${x.fareClass || ""}`.trim();
+          const seats = x.seatsAvailable !== undefined && x.seatsRequested !== undefined ? `Seats ${x.seatsAvailable}/${x.seatsRequested}` : "";
+          const amt = x.fareAmount ? `${x.fareAmount} ${x.currencyCode || ""}`.trim() : "";
+          return `<div>${wrapToken(base)} ${esc(seats)} ${esc(amt)}</div>`;
+        })
+        .join("");
+      lines.push(`<div style="margin-top:8px"><b>Flights</b>${f}</div>`);
     }
-
-    const st = `${safeStr(s.status)}${safeStr(s.qty)}`;
-    const stKind = segStatusKind(st);
-    const times = s.times ? `${safeStr(s.times.dep)}-${safeStr(s.times.arr)}${s.dayOffset ? `+${s.dayOffset}` : ""}` : (safeStr(s.tail) || "");
-
-    tbody.appendChild(el("tr", {}, [
-      el("td", { text: route }),
-      el("td", { text: date }),
-      el("td", { text: flight }),
-      el("td", { text: cls }),
-      el("td", {}, [badge(st, stKind)]),
-      el("td", { text: String(s.qty || "") }),
-      el("td", { text: times || "-" }),
-    ]));
-  }
-  table.appendChild(tbody);
-  return table;
-}
-
-function renderSSRs(ssrs) {
-  if (!ssrs || !ssrs.length) return el("div", { class: "small", text: "No SSRs detected." });
-  const list = el("div", { class: "list" });
-  for (const s of ssrs) {
-    list.appendChild(el("div", { class: "row" }, [
-      el("div", { class: "row__left" }, [
-        el("span", { class: "tag", text: `SSR ${safeStr(s.type)}` }),
-        s.carrier ? el("span", { class: "tag", text: safeStr(s.carrier) }) : null,
-      ]),
-      el("div", { class: "small", text: safeStr(s.raw) }),
-    ]));
-  }
-  return list;
-}
-
-function renderOSIs(osis) {
-  if (!osis || !osis.length) return el("div", { class: "small", text: "No OSIs detected." });
-  const list = el("div", { class: "list" });
-  for (const o of osis) {
-    list.appendChild(el("div", { class: "row" }, [
-      el("div", { class: "row__left" }, [
-        el("span", { class: "tag", text: "OSI" }),
-        o.carrier ? el("span", { class: "tag", text: safeStr(o.carrier) }) : null,
-      ]),
-      el("div", { class: "small", text: safeStr(o.raw) }),
-    ]));
-  }
-  return list;
-}
-
-function renderMessageInfos(msgInfos) {
-  if (!msgInfos || !msgInfos.length) return el("div", { class: "small", text: "No diagnostic blocks detected." });
-
-  const wrap = el("div", { class: "list" });
-
-  for (const mi of msgInfos) {
-    const head = el("div", { class: "card" }, [
-      el("div", { class: "card__title", text: "MESSAGE INFORMATION" }),
-      el("div", { class: "tags" }, [
-        mi.reason ? el("span", { class: "tag", text: mi.reason }) : null,
-        mi.systemCode ? el("span", { class: "tag", text: `SYS ${mi.systemCode}` }) : null,
-        mi.recordLocator ? el("span", { class: "tag", text: `RLOC ${mi.recordLocator}` }) : null,
-        mi.confirmation ? el("span", { class: "tag", text: `CNF ${mi.confirmation}` }) : null,
-      ].filter(Boolean)),
-      el("div", { class: "kv" }, [
-        el("div", { html: `<b>Time:</b> ${safeStr(mi.time || "-")}` }),
-      ]),
-    ]);
-
-    wrap.appendChild(head);
-
-    if (mi.flights && mi.flights.length) {
-      const table = el("table", { class: "table" });
-      const thead = el("thead");
-      thead.appendChild(el("tr", {}, [
-        el("th", { text: "Flight" }),
-        el("th", { text: "Route" }),
-        el("th", { text: "Date" }),
-        el("th", { text: "Class" }),
-        el("th", { text: "Seats" }),
-        el("th", { text: "Fare" }),
-        el("th", { text: "Basis" }),
-      ]));
-      table.appendChild(thead);
-
-      const tbody = el("tbody");
-      for (const f of mi.flights) {
-        const flt = `${safeStr(f.carrier || "")}${safeStr(f.flightNumber || "")}`.trim() || "-";
-        const route = `${safeStr(f.origin || "-")}→${safeStr(f.destination || "-")}`;
-        const seats = `${safeStr(f.seatsAvailable ?? "-")}/${safeStr(f.seatsRequested ?? "-")}`;
-        const fare = `${safeStr(f.fareAmount ?? "-")} ${safeStr(f.currency ?? "")}`.trim();
-        tbody.appendChild(el("tr", {}, [
-          el("td", { text: flt }),
-          el("td", { text: route }),
-          el("td", { text: safeStr(f.flightDate || "-") }),
-          el("td", { text: safeStr(f.fareClass || "-") }),
-          el("td", { text: seats }),
-          el("td", { text: fare || "-" }),
-          el("td", { text: safeStr(f.fareBasis || "-") }),
-        ]));
-      }
-      table.appendChild(tbody);
-      wrap.appendChild(table);
-    }
-
-    if (mi.raw && mi.raw.length) {
-      wrap.appendChild(el("div", { class: "card" }, [
-        el("div", { class: "card__title", text: "Raw Diagnostic Text" }),
-        el("div", { class: "pre", text: mi.raw.join("\n") }),
-      ]));
-    }
+    add("Diagnostics", lines.join(""));
   }
 
-  return wrap;
-}
+  const grid = document.createElement("div");
+  grid.className = "explain-grid";
+  rows.forEach(([k, v]) => {
+    const kk = document.createElement("div");
+    kk.className = "explain-k";
+    kk.textContent = k;
+    const vv = document.createElement("div");
+    vv.className = "explain-v";
+    vv.innerHTML = typeof v === "string" ? v : esc(JSON.stringify(v));
+    grid.appendChild(kk);
+    grid.appendChild(vv);
+  });
+  explainBody.appendChild(grid);
+};
 
-export function renderParsed(parsed) {
-  const root = el("div", { class: "list" });
-  const messages = parsed.messages || [];
+export const renderResults = ({ results, stats, activeId, onSelect }, list) => {
+  results.innerHTML = "";
+  stats.textContent = `${list.length} results`;
+  list.forEach((m, i) => {
+    const d = document.createElement("div");
+    d.className = "result" + (m.id === activeId ? " is-active" : "");
+    d.setAttribute("role", "listitem");
+    d.setAttribute("tabindex", "-1");
+    d.dataset.index = String(i);
+    d.innerHTML = `<div class="code">${esc(m.code)} (${esc(m.standard)})</div><div>${esc(m.title || "")}</div>`;
+    d.onclick = () => onSelect(i);
+    results.appendChild(d);
+  });
+};
 
-  if (!messages.length) {
-    root.appendChild(el("div", { class: "small", text: "No messages detected. Paste logs and click Parse." }));
-    return root;
-  }
-
-  for (const m of messages) {
-    const titleParts = [];
-    if (m.envelope) titleParts.push(pill(m.envelope));
-    if (m.family) titleParts.push(pill(m.family));
-    if (m.record) titleParts.push(pill(m.record));
-    if (m.markers && m.markers.length) for (const x of m.markers) titleParts.push(pill(x));
-
-    const metaParts = [];
-    if (m.recordExtra) metaParts.push(`Ref: ${m.recordExtra}`);
-    const hdqMain = (m.hdq || []).find((x) => upper(x.key).startsWith("HDQF"));
-    if (hdqMain) metaParts.push(`Ctx: ${hdqMain.value}`);
-
-    const msgEl = el("div", { class: "msg" }, [
-      el("div", { class: "msg__head" }, [
-        el("div", { class: "msg__title" }, titleParts.length ? titleParts : [pill("MSG")]),
-        el("div", { class: "msg__meta", text: metaParts.join(" · ") }),
-      ]),
-      el("div", { class: "msg__body" }, [
-        el("div", { class: "grid" }, [
-          el("div", {
+export const renderDetails = ({ details }, m) => {
+  details.innerHTML = `
+    <div class="big-code">${esc(m.code || "")}</div>
+    <div class="muted">${esc(m.standard || "")}</div>
+    <div class="kv">
+      <div>Title</div><div>${esc(m.title || "")}</div>
+      <div>Meaning</div><div>${esc(m.meaning || "")}</div>
+      <div>Trigger</div><div>${esc(m.trigger || "")}</div>
+      <div>Direction</div><div>${esc(m.direction || "")}</div>
+      <div>Category</div><div>${esc(m.category || "")}</div>
+      <div>Source</div><div>${esc(m.source || "")}</div>
+    </div>
+  `;
+};
