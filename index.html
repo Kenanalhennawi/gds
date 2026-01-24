@@ -1,56 +1,76 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GDS History Reader</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand__logo">GDS</div>
-      <div class="brand__meta">
-        <div class="brand__title">History Reader</div>
-        <div class="brand__sub">QP/QK/QD · HDQRM · SSR/OSI · Seats Not Available</div>
-      </div>
-    </div>
-    <div class="topbar__actions">
-      <button id="btnTheme" class="btn btn--ghost" type="button">Theme</button>
-      <button id="btnParse" class="btn" type="button">Parse</button>
-    </div>
-  </header>
-
-  <main class="layout">
-    <section class="panel">
-      <div class="panel__head">
-        <div class="panel__title">Input</div>
-        <div class="panel__hint">Paste raw logs (with or without control characters)</div>
-      </div>
-      <textarea id="input" class="input" spellcheck="false"></textarea>
-
-      <div class="split">
-        <div class="panel__head panel__head--inline">
-          <div class="panel__title">Search Knowledge Base</div>
-          <div class="panel__hint">Search codes (HK, UC, SSR DOCS, ADTK, TRL, etc.)</div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GDS Codes Explorer (Modular v2)</title>
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="top">
+        <div>
+          <div class="brand">GDS Codes Explorer</div>
+          <div class="sub">Search, detect, and explain Amadeus/Galileo/Sabre-style history lines</div>
         </div>
-        <div class="searchRow">
-          <input id="search" class="search" placeholder="Search…" />
-          <button id="btnClear" class="btn btn--ghost" type="button">Clear</button>
+        <div class="right">
+          <input id="q" class="search" placeholder="Search code (e.g. SSR, TKNE, QP, TRL, HK, DK) or meaning..." autocomplete="off" />
         </div>
-      </div>
-      <div id="searchResults" class="searchResults"></div>
-    </section>
+      </header>
 
-    <section class="panel">
-      <div class="panel__head">
-        <div class="panel__title">Parsed Output</div>
-        <div id="summary" class="panel__hint"></div>
-      </div>
-      <div id="output" class="output"></div>
-    </section>
-  </main>
+      <main class="grid">
+        <section class="panel">
+          <div class="panel-h">
+            <div class="h">Codes</div>
+            <div class="muted" id="stats">0 results</div>
+          </div>
+          <div class="results" id="results" role="list"></div>
+        </section>
 
-  <script type="module" src="src/main.js"></script>
-</body>
+        <section class="panel">
+          <div class="panel-h">
+            <div class="h">Details</div>
+            <div class="muted">Selected code meaning</div>
+          </div>
+          <div class="details" id="details">
+            <div class="big-code">—</div>
+            <div class="muted">Pick a result</div>
+          </div>
+        </section>
+
+        <section class="panel span2">
+          <div class="panel-h">
+            <div class="h">Paste History / EDIFACT</div>
+            <div class="muted">Detect tokens + parse segments</div>
+          </div>
+          <div class="paste">
+            <textarea id="history" placeholder="Paste PNR history / EDIFACT / queue text here..."></textarea>
+            <div class="row">
+              <button id="btnDetect" class="btn">Detect</button>
+              <button id="btnExplain" class="btn">Explain</button>
+              <button id="btnClear" class="btn ghost">Clear</button>
+            </div>
+
+            <div class="card">
+              <div class="h">Detected tokens</div>
+              <div class="muted" id="detectEmpty">Nothing detected yet</div>
+              <div class="chips" id="detectChips"></div>
+            </div>
+
+            <div class="card">
+              <div class="h">Parsed summary</div>
+              <div class="muted" id="explainEmpty">Click Explain after pasting text</div>
+              <div id="explainBody"></div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="foot">
+        <div class="muted">Offline-ready. Data + parsing in browser only.</div>
+      </footer>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+  </body>
 </html>
