@@ -1,283 +1,323 @@
-import { n } from "./utils.js";
-import { detectTokens, pickBestCandidate } from "./tokens.js";
-import { parseHistory } from "./historyParser.js";
-import { createSearchEngine } from "./searchEngine.js";
-import { setTheme, toggleTheme } from "./theme.js";
-import { ensureVisible, renderDetect, renderExplain, renderResults, renderDetails } from "./ui.js";
+:root{
+  --bg:#0b0f14;
+  --panel:#0f1621;
+  --panel2:#0c121b;
+  --text:#e7eefc;
+  --muted:#9bb0d0;
+  --border:rgba(255,255,255,.08);
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  --accent:#ff7a18;
+  --accent2:#ffd5b3;
+  --ok:#42d392;
+  --warn:#ffcc66;
+  --bad:#ff5a6a;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Apple Color Emoji","Segoe UI Emoji";
+}
 
-const els = {
-  q: document.getElementById("q"),
-  results: document.getElementById("results"),
-  details: document.getElementById("details"),
-  stats: document.getElementById("stats"),
-  detectChips: document.getElementById("detectChips"),
-  detectEmpty: document.getElementById("detectEmpty"),
-  explainBody: document.getElementById("explainBody"),
-  explainEmpty: document.getElementById("explainEmpty"),
-  chips: [...document.querySelectorAll(".chip")],
-  toggleFuzzy: document.getElementById("toggleFuzzy"),
-  toggleAutoSelect: document.getElementById("toggleAutoSelect"),
-  themeToggle: document.getElementById("themeToggle"),
-  themeToggleLabel: document.getElementById("themeToggleLabel"),
-  help: document.getElementById("helpModal"),
-  btnClear: document.getElementById("btnClear"),
-  btnHelp: document.getElementById("btnHelp"),
-  btnCloseHelp: document.getElementById("btnCloseHelp"),
-  year: document.getElementById("year"),
-};
+[data-theme="light"]{
+  --bg:#f6f8fc;
+  --panel:#ffffff;
+  --panel2:#f3f6fb;
+  --text:#0b1220;
+  --muted:#56657f;
+  --border:rgba(0,0,0,.08);
+  --shadow:0 10px 30px rgba(16,24,40,.12);
+  --accent:#ff6a00;
+  --accent2:#ffe3cd;
+}
 
-const state = {
-  data: [],
-  activeStandard: "ALL",
-  activeId: null,
-  fuzzy: true,
-  autoOpen: true,
-  currentList: [],
-  activeIndex: -1,
-};
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--sans);
+  background:radial-gradient(1200px 600px at 15% 0%, rgba(255,122,24,.12), transparent 55%),
+             radial-gradient(900px 500px at 85% 10%, rgba(66,211,146,.09), transparent 50%),
+             var(--bg);
+  color:var(--text);
+}
 
-const engine = createSearchEngine({ getFuzzy: () => state.fuzzy });
+.topbar{
+  position:sticky;
+  top:0;
+  z-index:10;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+  background:rgba(10,14,20,.7);
+  backdrop-filter:blur(12px);
+}
 
-const selectIndex = (idx) => {
-  if (!state.currentList.length) return;
-  const i = Math.max(0, Math.min(state.currentList.length - 1, idx));
-  state.activeIndex = i;
-  state.activeId = state.currentList[i].id;
+[data-theme="light"] .topbar{
+  background:rgba(246,248,252,.8);
+}
 
-  renderDetails({ details: els.details }, state.currentList[i]);
-  renderResults(
-    {
-      results: els.results,
-      stats: els.stats,
-      activeId: state.activeId,
-      onSelect: (index) => selectIndex(index),
-    },
-    state.currentList
-  );
+.brand{display:flex;align-items:center;gap:12px}
+.brand__logo{
+  width:44px;height:44px;border-radius:14px;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg, rgba(255,122,24,.95), rgba(255,213,179,.65));
+  color:#1a0f07;
+  font-weight:900;
+  box-shadow:var(--shadow);
+}
+.brand__title{font-weight:800;letter-spacing:.2px}
+.brand__sub{font-size:12px;color:var(--muted);margin-top:2px}
 
-  const el = els.results.querySelector(`.result[data-index="${i}"]`);
-  ensureVisible(el, els.results);
-};
+.topbar__actions{display:flex;gap:10px}
 
-const search = (fromTokenClick = false) => {
-  const text = els.q.value.trim();
+.btn{
+  border:1px solid var(--border);
+  background:linear-gradient(135deg, rgba(255,122,24,.95), rgba(255,122,24,.55));
+  color:#1a0f07;
+  padding:10px 14px;
+  border-radius:14px;
+  font-weight:800;
+  cursor:pointer;
+  box-shadow:var(--shadow);
+}
 
-  renderDetect({ detectChips: els.detectChips, detectEmpty: els.detectEmpty, q: els.q, search }, detectTokens(text));
-  renderExplain({ explainBody: els.explainBody, explainEmpty: els.explainEmpty }, parseHistory(text));
+.btn--ghost{
+  background:transparent;
+  color:var(--text);
+  box-shadow:none;
+}
 
-  const term = n(text);
-  const list = engine.runSearch({ data: state.data, activeStandard: state.activeStandard, term });
+.btn:active{transform:translateY(1px)}
 
-  state.currentList = list;
+.layout{
+  display:grid;
+  grid-template-columns:1fr 1.2fr;
+  gap:14px;
+  padding:14px;
+  max-width:1400px;
+  margin:0 auto;
+}
 
-  if (!state.currentList.length) {
-    state.activeId = null;
-    state.activeIndex = -1;
-    renderResults(
-      { results: els.results, stats: els.stats, activeId: state.activeId, onSelect: (index) => selectIndex(index) },
-      []
-    );
-    els.stats.textContent = "0 results";
-    return;
-  }
+@media(max-width:1100px){
+  .layout{grid-template-columns:1fr}
+}
 
-  if (state.autoOpen && !fromTokenClick) {
-    const keepIndex =
-      state.activeIndex >= 0 &&
-      state.activeIndex < state.currentList.length &&
-      state.activeId === state.currentList[state.activeIndex]?.id;
+.panel{
+  background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
 
-    if (!keepIndex) selectIndex(0);
-    else {
-      renderDetails({ details: els.details }, state.currentList[state.activeIndex]);
-      renderResults(
-        { results: els.results, stats: els.stats, activeId: state.activeId, onSelect: (index) => selectIndex(index) },
-        state.currentList
-      );
-    }
-  } else {
-    if (state.activeId) {
-      const idx = state.currentList.findIndex((x) => x.id === state.activeId);
-      state.activeIndex = idx >= 0 ? idx : -1;
-    }
-    renderResults(
-      { results: els.results, stats: els.stats, activeId: state.activeId, onSelect: (index) => selectIndex(index) },
-      state.currentList
-    );
-    if (state.activeIndex >= 0 && state.activeIndex < state.currentList.length)
-      renderDetails({ details: els.details }, state.currentList[state.activeIndex]);
-  }
-};
+[data-theme="light"] .panel{
+  background:linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.01));
+}
 
-const openByBestCandidate = (rawToken) => {
-  const best = pickBestCandidate(rawToken, {
-    existsCode: (code) => engine.existsCode(state.data, code),
-    bestItemForTerm: (term) => engine.bestItemForTerm(state.data, term),
-  });
+.panel__head{
+  padding:14px 16px;
+  border-bottom:1px solid var(--border);
+  background:var(--panel2);
+}
 
-  els.q.value = best.term;
-  search(true);
+.panel__head--inline{border-bottom:0;background:transparent;padding:14px 16px 8px 16px}
 
-  if (best.item) {
-    const idx = state.currentList.findIndex((x) => x.id === best.item.id);
-    if (idx >= 0) {
-      selectIndex(idx);
-      els.q.focus();
-      els.q.select();
-      return;
-    }
-  }
+.panel__title{font-weight:900}
+.panel__hint{font-size:12px;color:var(--muted);margin-top:4px}
 
-  if (state.currentList.length) selectIndex(0);
-  els.q.focus();
-  els.q.select();
-};
+.input{
+  width:100%;
+  min-height:360px;
+  resize:vertical;
+  border:0;
+  outline:none;
+  padding:16px;
+  font-family:var(--mono);
+  font-size:12.5px;
+  line-height:1.5;
+  background:transparent;
+  color:var(--text);
+}
 
-const resetPanels = () => {
-  els.detectChips.innerHTML = "";
-  els.detectEmpty.style.display = "block";
-  els.explainBody.innerHTML = "";
-  els.explainEmpty.style.display = "block";
-};
+.split{border-top:1px solid var(--border)}
 
-const wireUI = () => {
-  els.chips.forEach((c) => {
-    c.onclick = () => {
-      els.chips.forEach((x) => x.classList.remove("is-active"));
-      c.classList.add("is-active");
-      state.activeStandard = c.dataset.standard;
-      state.activeIndex = -1;
-      state.activeId = null;
-      search();
-    };
-  });
+.searchRow{
+  display:flex;
+  gap:10px;
+  padding:0 16px 14px 16px;
+}
 
-  els.btnClear.onclick = () => {
-    els.q.value = "";
-    resetPanels();
-    state.activeId = null;
-    state.activeIndex = -1;
-    search();
-    els.q.focus();
-  };
+.search{
+  flex:1;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:14px;
+  outline:none;
+}
 
-  els.q.addEventListener("input", () => search());
+.searchResults{
+  padding:0 16px 16px 16px;
+  display:grid;
+  gap:10px;
+}
 
-  els.toggleFuzzy.addEventListener("change", () => {
-    state.fuzzy = !!els.toggleFuzzy.checked;
-    search();
-  });
+.resultCard{
+  border:1px solid var(--border);
+  border-radius:16px;
+  background:rgba(255,255,255,.02);
+  padding:12px 12px;
+}
 
-  els.toggleAutoSelect.addEventListener("change", () => {
-    state.autoOpen = !!els.toggleAutoSelect.checked;
-    search();
-  });
+.resultCard__top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+}
 
-  els.year.textContent = new Date().getFullYear();
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid var(--border);
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:900;
+  font-family:var(--mono);
+  font-size:12px;
+  background:rgba(255,255,255,.03);
+}
 
-  els.btnHelp.onclick = () => els.help.showModal();
-  els.btnCloseHelp.onclick = () => els.help.close();
-  els.themeToggle.onclick = () => toggleTheme({ themeToggleLabel: els.themeToggleLabel });
+.badge--ok{border-color:rgba(66,211,146,.3);color:var(--ok)}
+.badge--warn{border-color:rgba(255,204,102,.3);color:var(--warn)}
+.badge--bad{border-color:rgba(255,90,106,.3);color:var(--bad)}
 
-  document.querySelectorAll(".example-pill").forEach((b) => {
-    b.onclick = () => {
-      els.q.value = b.dataset.example || "";
-      search();
-      els.q.focus();
-    };
-  });
+.kv{margin-top:8px;color:var(--muted);font-size:12px}
+.kv b{color:var(--text);font-weight:900}
 
-  els.explainBody.addEventListener("click", (e) => {
-    const el = e.target?.closest?.("code[data-token]");
-    if (!el) return;
-    const token = (el.getAttribute("data-token") || "").trim();
-    if (!token) return;
-    openByBestCandidate(token);
-  });
+.output{padding:14px 16px;display:grid;gap:12px}
 
-  document.addEventListener("keydown", (e) => {
-    const key = e.key;
+.msg{
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:rgba(255,255,255,.02);
+  overflow:hidden;
+}
 
-    if (key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey) {
-      const tag = (document.activeElement?.tagName || "").toLowerCase();
-      if (tag !== "input" && tag !== "textarea") {
-        e.preventDefault();
-        els.q.focus();
-        els.q.select();
-        return;
-      }
-    }
+.msg__head{
+  padding:12px 14px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:flex-start;
+}
 
-    if (key === "Escape") {
-      if (els.help.open) {
-        els.help.close();
-        return;
-      }
-      if (document.activeElement === els.q && els.q.value.trim()) {
-        e.preventDefault();
-        els.q.value = "";
-        search();
-        return;
-      }
-      if (document.activeElement !== els.q) {
-        e.preventDefault();
-        els.q.focus();
-        els.q.select();
-        return;
-      }
-    }
+.msg__title{
+  font-weight:900;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
 
-    const tag = (document.activeElement?.tagName || "").toLowerCase();
-    const inText = tag === "input" || tag === "textarea";
+.pill{
+  font-family:var(--mono);
+  font-size:12px;
+  padding:6px 10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:rgba(255,255,255,.03);
+}
 
-    if ((key === "ArrowDown" || key === "ArrowUp") && state.currentList.length) {
-      e.preventDefault();
-      if (state.activeIndex < 0) state.activeIndex = 0;
-      const next = key === "ArrowDown" ? state.activeIndex + 1 : state.activeIndex - 1;
-      selectIndex(next);
-      return;
-    }
+.msg__meta{
+  font-size:12px;
+  color:var(--muted);
+  text-align:right;
+}
 
-    if (key === "Enter" && state.currentList.length) {
-      if (inText || document.activeElement === els.q) {
-        e.preventDefault();
-        if (state.activeIndex < 0) state.activeIndex = 0;
-        selectIndex(state.activeIndex);
-        return;
-      }
-    }
+.msg__body{padding:12px 14px;display:grid;gap:12px}
 
-    if (key === "t" && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault();
-      toggleTheme({ themeToggleLabel: els.themeToggleLabel });
-      return;
-    }
-  });
-};
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:10px;
+}
 
-const loadData = async () => {
-  const url = new URL("../data.json", import.meta.url);
-  const r = await fetch(url);
-  const j = await r.json();
+@media(max-width:900px){
+  .grid{grid-template-columns:1fr}
+}
 
-  state.data = (j.messages || []).map((x) => ({
-    id: x.id,
-    standard: (x.standard || "").toString().toUpperCase(),
-    code: (x.code || "").toString().toUpperCase(),
-    title: x.title || "",
-    meaning: x.meaning || "",
-    trigger: x.trigger || "",
-    direction: x.direction || "",
-    category: x.category || "",
-    source: x.source || "",
-    examples: x.examples || [],
-  }));
+.card{
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:10px 12px;
+  background:rgba(255,255,255,.02);
+}
 
-  const saved = localStorage.getItem("gdsTheme");
-  setTheme({ themeToggleLabel: els.themeToggleLabel }, saved || "dark");
+.card__title{font-weight:900;margin-bottom:8px}
+.list{display:grid;gap:6px}
+.row{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  font-family:var(--mono);
+  font-size:12px;
+  padding:6px 8px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  background:rgba(0,0,0,.08);
+}
 
-  search();
-};
+[data-theme="light"] .row{
+  background:rgba(0,0,0,.03);
+}
 
-wireUI();
-loadData();
+.row__left{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.small{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.hr{height:1px;background:var(--border);margin:4px 0}
+
+.table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+  overflow:hidden;
+  border:1px solid var(--border);
+  border-radius:16px;
+}
+
+.table th,.table td{
+  padding:10px 10px;
+  border-bottom:1px solid var(--border);
+  font-family:var(--mono);
+  font-size:12px;
+  text-align:left;
+}
+
+.table th{background:rgba(255,255,255,.03);font-weight:900}
+.table tr:last-child td{border-bottom:0}
+
+.tag{
+  display:inline-flex;
+  align-items:center;
+  padding:4px 8px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:rgba(255,255,255,.03);
+  font-family:var(--mono);
+  font-size:12px;
+  font-weight:900;
+}
+
+.tags{display:flex;gap:8px;flex-wrap:wrap}
+
+.pre{
+  white-space:pre-wrap;
+  word-break:break-word;
+  font-family:var(--mono);
+  font-size:12px;
+  line-height:1.5;
+  color:var(--muted);
+}
+
