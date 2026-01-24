@@ -45,6 +45,18 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   }
   explainEmpty.style.display = "none";
 
+  if (parsed.sentences && Array.isArray(parsed.sentences) && parsed.sentences.length) {
+    const box = document.createElement("div");
+    box.className = "explain-sentences";
+    parsed.sentences.slice(0, 12).forEach((s) => {
+      const row = document.createElement("div");
+      row.className = "explain-sentence";
+      row.innerHTML = esc(String(s));
+      box.appendChild(row);
+    });
+    explainBody.appendChild(box);
+  }
+
   const rows = [];
   const add = (k, v) => {
     if (v === null || v === undefined) return;
@@ -93,12 +105,9 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   if (parsed.osi?.length) add("OSI", parsed.osi.map((s) => wrapToken(s)).join("<br>"));
   if (parsed.ticketNumbers?.length) add("Ticket numbers", parsed.ticketNumbers.map((s) => wrapToken(s)).join(" "));
   if (parsed.statusTokens?.length) add("Status tokens", parsed.statusTokens.map((s) => wrapToken(s)).join(" "));
-  if (parsed.edifact?.segments?.length)
-    add("EDIFACT segments", parsed.edifact.segments.map((s) => wrapToken(s)).join(" "));
-  if (parsed.edifact?.messageTypes?.length)
-    add("EDIFACT message types", parsed.edifact.messageTypes.map((s) => wrapToken(s)).join(" "));
-  if (parsed.edifact?.ticketNumbers?.length)
-    add("Ticket numbers", parsed.edifact.ticketNumbers.map((s) => wrapToken(s)).join(" "));
+  if (parsed.edifact?.segments?.length) add("EDIFACT segments", parsed.edifact.segments.map((s) => wrapToken(s)).join(" "));
+  if (parsed.edifact?.messageTypes?.length) add("EDIFACT message types", parsed.edifact.messageTypes.map((s) => wrapToken(s)).join(" "));
+  if (parsed.edifact?.ticketNumbers?.length) add("Ticket numbers", parsed.edifact.ticketNumbers.map((s) => wrapToken(s)).join(" "));
   if (parsed.fare?.length) add("Fare tokens", parsed.fare.map((s) => wrapToken(s)).join(" "));
 
   if (parsed.queueLogic?.length) {
