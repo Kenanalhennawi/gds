@@ -1,76 +1,94 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>GDS Codes Explorer (Modular v2)</title>
-    <link rel="stylesheet" href="./style.css" />
-  </head>
-  <body>
-    <div class="app">
-      <header class="top">
-        <div>
-          <div class="brand">GDS Codes Explorer</div>
-          <div class="sub">Search, detect, and explain Amadeus/Galileo/Sabre-style history lines</div>
-        </div>
-        <div class="right">
-          <input id="q" class="search" placeholder="Search code (e.g. SSR, TKNE, QP, TRL, HK, DK) or meaning..." autocomplete="off" />
-        </div>
-      </header>
-
-      <main class="grid">
-        <section class="panel">
-          <div class="panel-h">
-            <div class="h">Codes</div>
-            <div class="muted" id="stats">0 results</div>
-          </div>
-          <div class="results" id="results" role="list"></div>
-        </section>
-
-        <section class="panel">
-          <div class="panel-h">
-            <div class="h">Details</div>
-            <div class="muted">Selected code meaning</div>
-          </div>
-          <div class="details" id="details">
-            <div class="big-code">—</div>
-            <div class="muted">Pick a result</div>
-          </div>
-        </section>
-
-        <section class="panel span2">
-          <div class="panel-h">
-            <div class="h">Paste History / EDIFACT</div>
-            <div class="muted">Detect tokens + parse segments</div>
-          </div>
-          <div class="paste">
-            <textarea id="history" placeholder="Paste PNR history / EDIFACT / queue text here..."></textarea>
-            <div class="row">
-              <button id="btnDetect" class="btn">Detect</button>
-              <button id="btnExplain" class="btn">Explain</button>
-              <button id="btnClear" class="btn ghost">Clear</button>
-            </div>
-
-            <div class="card">
-              <div class="h">Detected tokens</div>
-              <div class="muted" id="detectEmpty">Nothing detected yet</div>
-              <div class="chips" id="detectChips"></div>
-            </div>
-
-            <div class="card">
-              <div class="h">Parsed summary</div>
-              <div class="muted" id="explainEmpty">Click Explain after pasting text</div>
-              <div id="explainBody"></div>
-            </div>
-          </div>
-        </section>
-      </main>
-
-      <footer class="foot">
-        <div class="muted">Offline-ready. Data + parsing in browser only.</div>
-      </footer>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>GDS / AIRIMP / EDIFACT Code Reader</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">GDS</div>
+      <div class="brandText">
+        <div class="brandTitle">GDS / AIRIMP / EDIFACT Code Reader</div>
+        <div class="brandSub" id="metaLine">Loading…</div>
+      </div>
     </div>
+    <div class="tabs">
+      <button class="tab active" data-tab="analyzer">Analyzer</button>
+      <button class="tab" data-tab="library">Library</button>
+    </div>
+  </header>
 
-    <script type="module" src="./src/main.js"></script>
-  </body>
+  <main class="wrap">
+    <section class="panel active" id="tab-analyzer">
+      <div class="grid">
+        <div class="card">
+          <div class="cardHead">
+            <div class="cardTitle">Paste message / history</div>
+            <div class="cardHint">Paste any AIRIMP / EDIFACT / GDS history text, then click Analyze</div>
+          </div>
+          <div class="cardBody">
+            <textarea id="inputText" spellcheck="false" placeholder="Paste here…"></textarea>
+            <div class="actions">
+              <button class="btn primary" id="analyzeBtn">Analyze</button>
+              <button class="btn" id="clearBtn">Clear</button>
+              <div class="spacer"></div>
+              <label class="toggle">
+                <input type="checkbox" id="showContext" checked />
+                <span>Show matched lines</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cardHead">
+            <div class="cardTitle">Detected codes</div>
+            <div class="cardHint" id="detectedHint">0 codes</div>
+          </div>
+          <div class="cardBody">
+            <div class="filters">
+              <input id="filterDetected" class="input" placeholder="Filter detected codes…" />
+              <select id="sortDetected" class="input">
+                <option value="count">Sort: Most frequent</option>
+                <option value="alpha">Sort: A → Z</option>
+                <option value="category">Sort: Category</option>
+              </select>
+            </div>
+            <div id="detectedList" class="list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="tab-library">
+      <div class="card">
+        <div class="cardHead">
+          <div class="cardTitle">Library</div>
+          <div class="cardHint">Search the full code library loaded from data.json</div>
+        </div>
+        <div class="cardBody">
+          <div class="filters">
+            <input id="librarySearch" class="input" placeholder="Search code / title / meaning / category…" />
+            <select id="libraryStandard" class="input">
+              <option value="">All standards</option>
+            </select>
+            <select id="libraryCategory" class="input">
+              <option value="">All categories</option>
+            </select>
+          </div>
+          <div id="libraryList" class="list"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div>Offline-ready. Uses local data.json.</div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
 </html>
