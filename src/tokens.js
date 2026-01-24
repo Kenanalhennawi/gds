@@ -6,73 +6,91 @@ export const TOKEN_GROUPS = [
       { key: "QP", label: "QP", desc: "Passenger Name Record update/response wrapper" },
       { key: "QK", label: "QK", desc: "Passenger Name Record update/response wrapper" },
       { key: "QD", label: "QD", desc: "Passenger Name Record update/response wrapper" },
-      { key: "HDQRMFZ", label: "HDQRMFZ", desc: "Host/queue routing header (format varies by host)" }
-    ]
+      { key: "HDQRM", label: "HDQRM*", desc: "Host/queue PNR message label" },
+    ],
+    patterns: [/\bQP\b/, /\bQK\b/, /\bQD\b/, /\bHDQRM[A-Z0-9]{1,4}\b/],
   },
   {
     id: "actions",
-    title: "Action blocks",
+    title: "Transaction Types",
     items: [
-      { key: "TRL", label: "TRL", desc: "Transaction reply list / host response block" },
-      { key: "AKA", label: "AKA", desc: "Acknowledgement / accepted transaction" },
-      { key: "NAR", label: "NAR", desc: "Availability reply block" },
-      { key: "DVD", label: "DVD", desc: "Divide/split record related block" },
-      { key: "ASC", label: "ASC", desc: "Schedule change / re-accommodation block" },
-      { key: "NCO", label: "NCO", desc: "Updated connection/order block" }
-    ]
+      { key: "AKA", label: "AKA", desc: "Acknowledgement / accepted" },
+      { key: "TRL", label: "TRL", desc: "Transaction reply / log" },
+      { key: "NAR", label: "NAR", desc: "New arrangement / rebook response" },
+      { key: "DVD", label: "DVD", desc: "Divide PNR / passenger split" },
+      { key: "ASC", label: "ASC", desc: "Air schedule change" },
+      { key: "NCO", label: "NCO", desc: "New connection / onward changes" },
+      { key: "AKA", label: "AKA", desc: "Acknowledgement" },
+    ],
+    patterns: [/\bAKA\b/, /\bTRL\b/, /\bNAR\b/, /\bDVD\b/, /\bASC\b/, /\bNCO\b/],
   },
   {
-    id: "pnr",
-    title: "PNR / Service lines",
+    id: "segmentStatus",
+    title: "Segment Status",
+    items: [
+      { key: "HK", label: "HK", desc: "Confirmed" },
+      { key: "SS", label: "SS", desc: "Sold" },
+      { key: "UC", label: "UC", desc: "Unable to confirm" },
+      { key: "UN", label: "UN", desc: "Unable" },
+      { key: "DK", label: "DK", desc: "Need action / ticketing time limit used by some hosts" },
+      { key: "CS", label: "CS", desc: "Codeshare segment (status)" },
+      { key: "CH", label: "CH", desc: "Checked in / operational use (status)" },
+      { key: "TK", label: "TK", desc: "Schedule change, contact needed" },
+      { key: "HX", label: "HX", desc: "Cancelled by airline" },
+      { key: "XX", label: "XX", desc: "Cancelled" },
+      { key: "LK", label: "LK", desc: "Waitlist/Request (host-dependent)" },
+    ],
+    patterns: [/\bHK\d+\b/, /\bSS\d+\b/, /\bUC\d+\b/, /\bUN\d+\b/, /\bDK\d+\b/, /\bCS\d+\b/, /\bCH\d+\b/, /\bTK\d+\b/, /\bHX\d+\b/, /\bXX\d+\b/, /\bLK\d+\b/],
+  },
+  {
+    id: "ssrOsi",
+    title: "SSR / OSI",
     items: [
       { key: "SSR", label: "SSR", desc: "Special Service Request" },
       { key: "OSI", label: "OSI", desc: "Other Service Information" },
-      { key: "DOCS", label: "DOCS", desc: "Travel document details" },
-      { key: "DOCO", label: "DOCO", desc: "Other document details (visas, residence etc.)" },
-      { key: "FOID", label: "FOID", desc: "Form of identification" },
-      { key: "TKNE", label: "TKNE", desc: "Ticket number element" },
-      { key: "ADTK", label: "ADTK", desc: "Auto ticketing time limit" },
-      { key: "CTCE", label: "CTCE", desc: "Contact email" },
-      { key: "CTCM", label: "CTCM", desc: "Contact mobile" },
-      { key: "CTCH", label: "CTCH", desc: "Contact home phone" },
-      { key: "CTCT", label: "CTCT", desc: "Contact ticketing office" },
-      { key: "FQTV", label: "FQTV", desc: "Frequent flyer number" },
+      { key: "DOCS", label: "SSR DOCS", desc: "Passport details" },
+      { key: "DOCO", label: "SSR DOCO", desc: "Other document/visa" },
+      { key: "FOID", label: "SSR FOID", desc: "Form of identification" },
+      { key: "TKNE", label: "SSR TKNE", desc: "Ticket number element" },
+      { key: "FQTV", label: "SSR FQTV", desc: "Frequent flyer" },
+      { key: "ADTK", label: "SSR ADTK", desc: "Ticketing time limit" },
+      { key: "CTCE", label: "CTCE", desc: "Email contact" },
+      { key: "CTCM", label: "CTCM", desc: "Mobile contact" },
+      { key: "CTCH", label: "CTCH", desc: "Home contact" },
+      { key: "CTCA", label: "CTCA", desc: "Address contact" },
       { key: "WCHR", label: "WCHR", desc: "Wheelchair request" },
-      { key: "AVML", label: "AVML", desc: "Asian Vegetarian Meal" },
-      { key: "MOML", label: "MOML", desc: "Misc order/meal/host marker (host dependent)" },
-      { key: "GSTN", label: "GSTN", desc: "Tax/GST number element (host/market dependent)" }
-    ]
-  },
-  {
-    id: "status",
-    title: "Segment status",
-    items: [
-      { key: "HK", label: "HK", desc: "Confirmed" },
-      { key: "SS", label: "SS", desc: "Sold/requested (host dependent)" },
-      { key: "UC", label: "UC", desc: "Unable confirm" },
-      { key: "UN", label: "UN", desc: "Unable/waitlist (host dependent)" },
-      { key: "HX", label: "HX", desc: "Cancelled by airline" },
-      { key: "XX", label: "XX", desc: "Cancelled" },
-      { key: "DK", label: "DK", desc: "Holding / request (host dependent)" },
-      { key: "CS", label: "CS", desc: "Codeshare confirmed (host dependent)" },
-      { key: "CH", label: "CH", desc: "Codeshare confirmed (host dependent)" },
-      { key: "TK", label: "TK", desc: "Schedule change / times changed (host dependent)" },
-      { key: "LK", label: "LK", desc: "Waitlist/holding (host dependent)" }
-    ]
+      { key: "AVML", label: "AVML", desc: "Asian vegetarian meal" },
+      { key: "MOML", label: "MOML", desc: "Mother/infant message (host-dependent)" },
+      { key: "OTHS", label: "OTHS", desc: "Other service info (free text)" },
+    ],
+    patterns: [/\bSSR\b/, /\bOSI\b/, /\bDOCS\b/, /\bDOCO\b/, /\bFOID\b/, /\bTKNE\b/, /\bFQTV\b/, /\bADTK\b/, /\bCTCE\b/, /\bCTCM\b/, /\bCTCH\b/, /\bCTCA\b/, /\bWCHR\b/, /\bAVML\b/, /\bMOML\b/, /\bOTHS\b/],
   },
   {
     id: "diagnostics",
     title: "Diagnostics",
     items: [
-      { key: "SEATS NOT AVAILABLE", label: "SEATS NOT AVAILABLE", desc: "Availability failure block from host" }
-    ]
-  }
+      { key: "SEATS_NOT_AVAILABLE", label: "SEATS NOT AVAILABLE", desc: "Sell failed because requested seats are not available" },
+      { key: "SCHEDULE_CHANGE", label: "SCHEDULE CHANGE", desc: "Airline modified timing/flight; re-accommodation may be required" },
+      { key: "NOSHO", label: "NOSHO", desc: "No show at airport" },
+      { key: "XLD", label: "XLD", desc: "Cancelled" },
+      { key: "MCNX", label: "MCNX", desc: "Minor schedule change / contact needed" },
+    ],
+    patterns: [/SEATS\s+NOT\s+AVAILABLE/i, /SCHEDULE\s+CHANGE/i, /\bNOSHO\b/i, /\bXLD\b/i, /\bMCNX\b/i],
+  },
 ];
 
-export const TOKEN_PATTERNS = [
-  { id: "envelopes", rx: /\b(QP|QK|QD)\b/g },
-  { id: "actions", rx: /\b(TRL|AKA|NAR|DVD|ASC|NCO)\b/g },
-  { id: "pnr", rx: /\b(SSR|OSI|DOCS|DOCO|FOID|TKNE|ADTK|CTCE|CTCM|CTCH|CTCT|FQTV|WCHR|AVML|MOML|GSTN)\b/g },
-  { id: "status", rx: /\b(HK|SS|UC|UN|HX|XX|DK|CS|CH|TK|LK)\d+\b/g },
-  { id: "diagnostics", rx: /\bSEATS\s+NOT\s+AVAILABLE\b/g }
-];
+export const tokenizeText = (text) => {
+  const t = (text || "").toString();
+  const hits = [];
+  TOKEN_GROUPS.forEach((g) => {
+    g.patterns.forEach((p) => {
+      if (p.test(t)) hits.push(g.id);
+    });
+  });
+  return Array.from(new Set(hits));
+};
+
+export const explainTokenGroups = (groupIds) => {
+  const ids = new Set(groupIds || []);
+  return TOKEN_GROUPS.filter((g) => ids.has(g.id));
+};
