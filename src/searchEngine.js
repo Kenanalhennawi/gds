@@ -1,40 +1,55 @@
-import { normalize } from "./utils.js";
+import { n } from "./utils.js";
 
-const scoreText = (hay, needle) => {
-  if (!needle) return 0;
-  if (!hay) return -Infinity;
-  if (hay === needle) return 1000;
-  if (hay.startsWith(needle)) return 400;
-  const idx = hay.indexOf(needle);
-  if (idx >= 0) return 200 - Math.min(idx, 50);
-  let s = 0;
-  for (let i = 0; i < needle.length; i++) if (hay.includes(needle[i])) s += 2;
-  return s;
-};
+export const createSearchEngine = ({ getFuzzy }) => {
+  const score = (m, term) => {
+    if (!term) return 1;
+    const s = n(`${m.code} ${m.title} ${m.meaning} ${m.trigger} ${m.category} ${m.standard}`);
+    if (s.includes(term)) return 100;
+    if (!getFuzzy()) return 0;
+    const parts = term.split(/\s+/).filter(Boolean);
+    let hit = 0;
+    for (const p of parts) if (s.includes(p)) hit++;
+    return hit > 0 ? Math.min(60, hit * 20) : 0;
+  };
 
-export const buildIndex = (codes) => {
-  const items = (codes || []).map((c, i) => {
-    const blob = normalize(
-      [c.code, c.title, c.meaning, c.trigger, c.direction, c.category, c.standard].filter(Boolean).join(" ")
-    ).toLowerCase();
-    return { ...c, _id: i + 1, _blob: blob, _code: String(c.code || "").toLowerCase() };
-  });
-  return items;
-};
+  const existsCode = (data, code) => {
+    const up = (code || "").toString().trim().toUpperCase();
+    if (!up) return false;
+    return data.some((m) => (m.code || "").toString().toUpperCase() === up);
+  };
 
-export const search = (indexed, query) => {
-  const q = normalize(query).toLowerCase();
-  const parts = q ? q.split(/\s+/).filter(Boolean) : [];
-  const scored = indexed
-    .map((m) => {
-      if (!q) return { m, s: 0 };
-      let s = 0;
-      s += scoreText(m._code, q);
-      parts.forEach((p) => (s += scoreText(m._blob, p)));
-      return { m, s };
-    })
-    .filter((x) => !q || x.s > 0)
-    .sort((a, b) => b.s - a.s || a.m._id - b.m._id)
-    .map((x) => ({ ...x.m, _score: x.s }));
-  return scored;
+  const bestItemForTerm = (data, term) => {
+    const t = n(term || "").trim();
+    if (!t) return null;
+    let best = null;
+    let bestS = -1;
+    for (const m of data) {
+      const s = score(m, t);
+      if (s > bestS) {
+        bestS = s;
+        best = m;
+        if (bestS >= 100) break;
+      }
+    }
+    if (bestS <= 0) return null;
+    return { item: best, score: bestS };
+  };
+
+  const runSearch = ({ data, activeStandard, term }) => {
+    let list = data;
+    if (activeStandard !== "ALL") list = list.filter((m) => m.standard === activeStandard);
+
+    if (term) {
+      const scored = list
+        .map((m) => ({ m, s: score(m, term) }))
+        .filter((x) => x.s > 0)
+        .sort((a, b) => b.s - a.s)
+        .map((x) => x.m);
+      list = scored;
+    }
+
+    return list;
+  };
+
+  return { score, existsCode, bestItemForTerm, runSearch };
 };
