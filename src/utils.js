@@ -22,3 +22,5 @@ export const uniq = (arr) => [...new Set(arr || [])];
 
 export const wrapToken = (token) =>
   `<code data-token="${escAttr(token)}">${esc(token)}</code>`;
+export const stripControl = (s) => (s || "").replace(/[\u0000-\u001F\u007F]/g, "");
+
