@@ -1,94 +1,167 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>GDS / AIRIMP / EDIFACT Code Reader</title>
+  <title>GDS Message Library</title>
+  <meta name="description" content="Search AIRIMP, EDIFACT, SSIM and GDS history codes to understand meaning quickly." />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="bg-overlay"></div>
+
   <header class="topbar">
     <div class="brand">
-      <div class="logo">GDS</div>
-      <div class="brandText">
-        <div class="brandTitle">GDS / AIRIMP / EDIFACT Code Reader</div>
-        <div class="brandSub" id="metaLine">Loading…</div>
+      <div class="brand-badge" aria-hidden="true">GDS</div>
+      <div class="brand-text">
+        <div class="brand-title">GDS Message Library</div>
+        <div class="brand-subtitle">Paste history • Search codes • Understand meaning</div>
       </div>
     </div>
-    <div class="tabs">
-      <button class="tab active" data-tab="analyzer">Analyzer</button>
-      <button class="tab" data-tab="library">Library</button>
+
+    <div class="topbar-actions">
+      <button id="themeToggle" class="btn btn-ghost" type="button" aria-label="Toggle theme">
+        <span id="themeToggleLabel">Dark</span>
+      </button>
+      <button id="btnHelp" class="btn btn-primary" type="button">Help</button>
     </div>
   </header>
 
-  <main class="wrap">
-    <section class="panel active" id="tab-analyzer">
-      <div class="grid">
-        <div class="card">
-          <div class="cardHead">
-            <div class="cardTitle">Paste message / history</div>
-            <div class="cardHint">Paste any AIRIMP / EDIFACT / GDS history text, then click Analyze</div>
-          </div>
-          <div class="cardBody">
-            <textarea id="inputText" spellcheck="false" placeholder="Paste here…"></textarea>
-            <div class="actions">
-              <button class="btn primary" id="analyzeBtn">Analyze</button>
-              <button class="btn" id="clearBtn">Clear</button>
-              <div class="spacer"></div>
-              <label class="toggle">
-                <input type="checkbox" id="showContext" checked />
-                <span>Show matched lines</span>
-              </label>
-            </div>
-          </div>
+  <main class="layout">
+    <section class="panel panel-left">
+      <div class="panel-header">
+        <h1 class="h1">Search</h1>
+        <p class="muted">Type a code (RQR, UNB, TKCREQ, SSR DOCS...) or paste a full EDIFACT / PNR / fare block.</p>
+      </div>
+
+      <div class="searchbox">
+        <label class="sr-only" for="q">Search</label>
+        <input id="q" type="text" placeholder="Search or paste history..." autocomplete="off" />
+        <button id="btnClear" class="btn btn-ghost" type="button" title="Clear">Clear</button>
+      </div>
+
+      <div class="filters">
+        <div class="chip-group" role="group" aria-label="Standard filter">
+          <button class="chip is-active" data-standard="ALL" type="button">All</button>
+          <button class="chip" data-standard="AIRIMP" type="button">AIRIMP</button>
+          <button class="chip" data-standard="EDIFACT" type="button">EDIFACT</button>
+          <button class="chip" data-standard="SSIM" type="button">SSIM</button>
+          <button class="chip" data-standard="GDS" type="button">GDS</button>
         </div>
 
-        <div class="card">
-          <div class="cardHead">
-            <div class="cardTitle">Detected codes</div>
-            <div class="cardHint" id="detectedHint">0 codes</div>
-          </div>
-          <div class="cardBody">
-            <div class="filters">
-              <input id="filterDetected" class="input" placeholder="Filter detected codes…" />
-              <select id="sortDetected" class="input">
-                <option value="count">Sort: Most frequent</option>
-                <option value="alpha">Sort: A → Z</option>
-                <option value="category">Sort: Category</option>
-              </select>
-            </div>
-            <div id="detectedList" class="list"></div>
-          </div>
+        <div class="switches">
+          <label class="switch">
+            <input id="toggleFuzzy" type="checkbox" checked />
+            <span class="switch-ui"></span>
+            <span class="switch-label">Fuzzy search</span>
+          </label>
+
+          <label class="switch">
+            <input id="toggleAutoSelect" type="checkbox" checked />
+            <span class="switch-ui"></span>
+            <span class="switch-label">Auto-open top match</span>
+          </label>
         </div>
+      </div>
+
+      <div class="detect-panel" id="detectPanel" aria-live="polite">
+        <div class="detect-head">
+          <div class="detect-title">Detected tokens</div>
+          <div class="detect-sub">Click a token to search it</div>
+        </div>
+        <div class="detect-body">
+          <div class="detect-empty" id="detectEmpty">Paste a history block to detect codes.</div>
+          <div class="detect-chips" id="detectChips"></div>
+        </div>
+      </div>
+
+      <div class="explain-panel" id="explainPanel">
+        <div class="explain-head">
+          <div class="explain-title">Auto explanation</div>
+          <div class="explain-sub">When you paste a long line, this breaks it into meaningful parts.</div>
+        </div>
+        <div class="explain-body" id="explainBody">
+          <div class="explain-empty" id="explainEmpty">Paste a long history line to auto-explain headers, segments, SSR/OSI, EDIFACT envelope and fare tokens.</div>
+        </div>
+      </div>
+
+      <div class="stats" id="stats">Loading…</div>
+      <div class="results" id="results" role="list" aria-label="Search results"></div>
+
+      <div class="kbd-hints" id="kbdHints">
+        <span class="kbd"><span>/</span></span><span class="hint">focus</span>
+        <span class="kbd"><span>↑</span></span><span class="kbd"><span>↓</span></span><span class="hint">navigate</span>
+        <span class="kbd"><span>Enter</span></span><span class="hint">open</span>
+        <span class="kbd"><span>Esc</span></span><span class="hint">clear/close</span>
       </div>
     </section>
 
-    <section class="panel" id="tab-library">
-      <div class="card">
-        <div class="cardHead">
-          <div class="cardTitle">Library</div>
-          <div class="cardHint">Search the full code library loaded from data.json</div>
-        </div>
-        <div class="cardBody">
-          <div class="filters">
-            <input id="librarySearch" class="input" placeholder="Search code / title / meaning / category…" />
-            <select id="libraryStandard" class="input">
-              <option value="">All standards</option>
-            </select>
-            <select id="libraryCategory" class="input">
-              <option value="">All categories</option>
-            </select>
-          </div>
-          <div id="libraryList" class="list"></div>
-        </div>
+    <section class="panel panel-right">
+      <div class="panel-header">
+        <h2 class="h2">Details</h2>
+        <p class="muted">Select a result to view meaning, trigger, direction, and examples.</p>
       </div>
+
+      <article class="details" id="details">
+        <div class="empty-state">
+          <div class="empty-title">No message selected</div>
+          <div class="empty-text">Search on the left and click a result.</div>
+
+          <div class="examples">
+            <div class="examples-title">Try:</div>
+            <div class="examples-grid">
+              <button class="example-pill" data-example="HDQRM" type="button">HDQRM</button>
+              <button class="example-pill" data-example="SSR DOCS" type="button">SSR DOCS</button>
+              <button class="example-pill" data-example="UNB UNH TKCREQ" type="button">UNB UNH TKCREQ</button>
+              <button class="example-pill" data-example="NUC ROE XT" type="button">NUC ROE XT</button>
+              <button class="example-pill" data-example="HK1" type="button">HK1</button>
+            </div>
+          </div>
+        </div>
+      </article>
     </section>
   </main>
 
   <footer class="footer">
-    <div>Offline-ready. Uses local data.json.</div>
+    <div class="footer-left">
+      <span class="dot"></span>
+      <span>Offline-ready • Data from <code>data.json</code></span>
+    </div>
+    <div class="footer-right">
+      <span class="muted">© Created by Kenan Alhennawi <span id="year"></span></span>
+    </div>
   </footer>
 
-  <script src="app.js"></script>
+  <dialog id="helpModal" class="modal">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div>
+          <div class="modal-title">How to use</div>
+          <div class="modal-subtitle">Search codes or paste GDS history lines.</div>
+        </div>
+        <button id="btnCloseHelp" class="btn btn-ghost" type="button">Close</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="help-grid">
+          <div class="help-col">
+            <div class="help-title">Search</div>
+            <div class="help-text">Type code or meaning. Paste full history lines to auto-break down.</div>
+          </div>
+          <div class="help-col">
+            <div class="help-title">Keyboard</div>
+            <div class="help-text">
+              <div class="help-row"><span class="kbd"><span>/</span></span> focus search</div>
+              <div class="help-row"><span class="kbd"><span>↑</span></span><span class="kbd"><span>↓</span></span> navigate results</div>
+              <div class="help-row"><span class="kbd"><span>Enter</span></span> open selected</div>
+              <div class="help-row"><span class="kbd"><span>Esc</span></span> clear / close modal</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script type="module" src="src/main.js"></script>
 </body>
 </html>
