@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "updated": "2026-01-22",
+  "updated": "2026-01-25",
   "scope": "AIRIMP / EDIFACT / GDS (Amadeus-style) Operational Message & History Library",
   "messages": [
     {
@@ -13,7 +13,10 @@
       "direction": "System generated",
       "category": "Queue Handling",
       "source": "Operational usage",
-      "examples": ["HDQRM", "HDQROFZ"]
+      "examples": [
+        "HDQRM",
+        "HDQROFZ"
+      ]
     },
     {
       "id": "hdqr",
@@ -25,7 +28,10 @@
       "direction": "System generated",
       "category": "Queue Handling",
       "source": "Operational usage",
-      "examples": ["HDQR", "HDQRO"]
+      "examples": [
+        "HDQR",
+        "HDQRO"
+      ]
     },
     {
       "id": "hdqrm",
@@ -37,7 +43,9 @@
       "direction": "System generated",
       "category": "Queue Handling",
       "source": "Operational usage",
-      "examples": ["HDQRMFZ .MUCRM1A ..."]
+      "examples": [
+        "HDQRMFZ .MUCRM1A ..."
+      ]
     },
     {
       "id": "hdqro",
@@ -49,7 +57,9 @@
       "direction": "System generated",
       "category": "Queue Handling",
       "source": "Operational usage",
-      "examples": ["HDQROFZ"]
+      "examples": [
+        "HDQROFZ"
+      ]
     },
     {
       "id": "hdqrofz",
@@ -61,9 +71,10 @@
       "direction": "System generated",
       "category": "Queue Handling",
       "source": "Operational usage",
-      "examples": ["HDQROFZ"]
+      "examples": [
+        "HDQROFZ"
+      ]
     },
-
     {
       "id": "airimp-family-hdq",
       "standard": "AIRIMP",
@@ -74,7 +85,9 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["HDQ   Queue Handling"]
+      "examples": [
+        "HDQ   Queue Handling"
+      ]
     },
     {
       "id": "airimp-family-hdqr",
@@ -86,7 +99,9 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["HDQR  Queue Request"]
+      "examples": [
+        "HDQR  Queue Request"
+      ]
     },
     {
       "id": "airimp-family-qf",
@@ -98,7 +113,9 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["QF    Queue Finish"]
+      "examples": [
+        "QF    Queue Finish"
+      ]
     },
     {
       "id": "airimp-family-qg",
@@ -110,7 +127,9 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["QG    Queue Get"]
+      "examples": [
+        "QG    Queue Get"
+      ]
     },
     {
       "id": "airimp-family-pnr",
@@ -122,7 +141,9 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["PNR   Passenger Name Record"]
+      "examples": [
+        "PNR   Passenger Name Record"
+      ]
     },
     {
       "id": "airimp-family-pnl",
@@ -134,7 +155,9 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["PNL   Passenger Name List"]
+      "examples": [
+        "PNL   Passenger Name List"
+      ]
     },
     {
       "id": "airimp-family-adl",
@@ -146,7 +169,9 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["ADL   Add/Delete"]
+      "examples": [
+        "ADL   Add/Delete"
+      ]
     },
     {
       "id": "airimp-family-adm",
@@ -158,7 +183,9 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["ADM   Advice Message"]
+      "examples": [
+        "ADM   Advice Message"
+      ]
     },
     {
       "id": "airimp-family-irm",
@@ -170,7 +197,9 @@
       "direction": "Airline ↔ Airline / GDS",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["IRM   Interline Reservation Message"]
+      "examples": [
+        "IRM   Interline Reservation Message"
+      ]
     },
     {
       "id": "airimp-family-ack",
@@ -182,7 +211,9 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["ACK   Acknowledgement"]
+      "examples": [
+        "ACK   Acknowledgement"
+      ]
     },
     {
       "id": "airimp-family-rej",
@@ -194,7 +225,9 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["REJ   Rejection"]
+      "examples": [
+        "REJ   Rejection"
+      ]
     },
     {
       "id": "airimp-family-err",
@@ -206,9 +239,10 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Message Families",
       "source": "User provided AIRIMP index",
-      "examples": ["ERR   Error Message"]
+      "examples": [
+        "ERR   Error Message"
+      ]
     },
-
     {
       "id": "book-action-ss",
       "standard": "GDS",
@@ -219,7 +253,9 @@
       "direction": "Agent → System",
       "category": "Booking & Segment Action Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["SS   Sell Segment"]
+      "examples": [
+        "SS   Sell Segment"
+      ]
     },
     {
       "id": "book-action-xx",
@@ -231,7 +267,9 @@
       "direction": "Agent → System",
       "category": "Booking & Segment Action Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["XX   Cancel Segment"]
+      "examples": [
+        "XX   Cancel Segment"
+      ]
     },
     {
       "id": "book-action-rr",
@@ -243,7 +281,9 @@
       "direction": "Agent → System",
       "category": "Booking & Segment Action Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["RR   Reconfirm"]
+      "examples": [
+        "RR   Reconfirm"
+      ]
     },
     {
       "id": "book-action-tk",
@@ -255,7 +295,9 @@
       "direction": "System / Airline",
       "category": "Booking & Segment Action Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["TK   Time Change"]
+      "examples": [
+        "TK   Time Change"
+      ]
     },
     {
       "id": "book-action-sc",
@@ -267,7 +309,9 @@
       "direction": "System / Airline",
       "category": "Booking & Segment Action Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["SC   Schedule Change"]
+      "examples": [
+        "SC   Schedule Change"
+      ]
     },
     {
       "id": "book-action-sk",
@@ -279,9 +323,10 @@
       "direction": "System / Airline",
       "category": "Booking & Segment Action Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["SK   Schedule Change Notification"]
+      "examples": [
+        "SK   Schedule Change Notification"
+      ]
     },
-
     {
       "id": "segstatus-hk",
       "standard": "GDS",
@@ -292,8 +337,21 @@
       "direction": "System response",
       "category": "Segment Status Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["HK Confirmed", "HK1"],
-      "aliases": ["HK1", "HK2", "HK3", "HK4", "HK5", "HK6", "HK7", "HK8", "HK9"]
+      "examples": [
+        "HK Confirmed",
+        "HK1"
+      ],
+      "aliases": [
+        "HK1",
+        "HK2",
+        "HK3",
+        "HK4",
+        "HK5",
+        "HK6",
+        "HK7",
+        "HK8",
+        "HK9"
+      ]
     },
     {
       "id": "segstatus-hl",
@@ -305,8 +363,21 @@
       "direction": "System response",
       "category": "Segment Status Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["HL Waitlisted", "HL1"],
-      "aliases": ["HL1", "HL2", "HL3", "HL4", "HL5", "HL6", "HL7", "HL8", "HL9"]
+      "examples": [
+        "HL Waitlisted",
+        "HL1"
+      ],
+      "aliases": [
+        "HL1",
+        "HL2",
+        "HL3",
+        "HL4",
+        "HL5",
+        "HL6",
+        "HL7",
+        "HL8",
+        "HL9"
+      ]
     },
     {
       "id": "segstatus-hn",
@@ -318,8 +389,21 @@
       "direction": "System response",
       "category": "Segment Status Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["HN Need Confirmation", "HN1"],
-      "aliases": ["HN1", "HN2", "HN3", "HN4", "HN5", "HN6", "HN7", "HN8", "HN9"]
+      "examples": [
+        "HN Need Confirmation",
+        "HN1"
+      ],
+      "aliases": [
+        "HN1",
+        "HN2",
+        "HN3",
+        "HN4",
+        "HN5",
+        "HN6",
+        "HN7",
+        "HN8",
+        "HN9"
+      ]
     },
     {
       "id": "segstatus-lk",
@@ -331,8 +415,21 @@
       "direction": "System response",
       "category": "Segment Status Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["LK Pending from Waitlist", "LK1"],
-      "aliases": ["LK1", "LK2", "LK3", "LK4", "LK5", "LK6", "LK7", "LK8", "LK9"]
+      "examples": [
+        "LK Pending from Waitlist",
+        "LK1"
+      ],
+      "aliases": [
+        "LK1",
+        "LK2",
+        "LK3",
+        "LK4",
+        "LK5",
+        "LK6",
+        "LK7",
+        "LK8",
+        "LK9"
+      ]
     },
     {
       "id": "segstatus-uc",
@@ -344,8 +441,21 @@
       "direction": "System response",
       "category": "Segment Status Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["UC Unable Confirm", "UC1"],
-      "aliases": ["UC1", "UC2", "UC3", "UC4", "UC5", "UC6", "UC7", "UC8", "UC9"]
+      "examples": [
+        "UC Unable Confirm",
+        "UC1"
+      ],
+      "aliases": [
+        "UC1",
+        "UC2",
+        "UC3",
+        "UC4",
+        "UC5",
+        "UC6",
+        "UC7",
+        "UC8",
+        "UC9"
+      ]
     },
     {
       "id": "segstatus-un",
@@ -357,8 +467,21 @@
       "direction": "System response",
       "category": "Segment Status Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["UN Cancelled", "UN1"],
-      "aliases": ["UN1", "UN2", "UN3", "UN4", "UN5", "UN6", "UN7", "UN8", "UN9"]
+      "examples": [
+        "UN Cancelled",
+        "UN1"
+      ],
+      "aliases": [
+        "UN1",
+        "UN2",
+        "UN3",
+        "UN4",
+        "UN5",
+        "UN6",
+        "UN7",
+        "UN8",
+        "UN9"
+      ]
     },
     {
       "id": "segstatus-no",
@@ -370,8 +493,21 @@
       "direction": "System response",
       "category": "Segment Status Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["NO No Action", "NO1"],
-      "aliases": ["NO1", "NO2", "NO3", "NO4", "NO5", "NO6", "NO7", "NO8", "NO9"]
+      "examples": [
+        "NO No Action",
+        "NO1"
+      ],
+      "aliases": [
+        "NO1",
+        "NO2",
+        "NO3",
+        "NO4",
+        "NO5",
+        "NO6",
+        "NO7",
+        "NO8",
+        "NO9"
+      ]
     },
     {
       "id": "segstatus-rr",
@@ -383,10 +519,22 @@
       "direction": "System response",
       "category": "Segment Status Codes",
       "source": "User provided AIRIMP index",
-      "examples": ["RR Reconfirmed", "RR1"],
-      "aliases": ["RR1", "RR2", "RR3", "RR4", "RR5", "RR6", "RR7", "RR8", "RR9"]
+      "examples": [
+        "RR Reconfirmed",
+        "RR1"
+      ],
+      "aliases": [
+        "RR1",
+        "RR2",
+        "RR3",
+        "RR4",
+        "RR5",
+        "RR6",
+        "RR7",
+        "RR8",
+        "RR9"
+      ]
     },
-
     {
       "id": "irrops-sk",
       "standard": "GDS",
@@ -397,7 +545,9 @@
       "direction": "Airline/System",
       "category": "Schedule & IRROPS",
       "source": "User provided AIRIMP index",
-      "examples": ["SK Schedule Change"]
+      "examples": [
+        "SK Schedule Change"
+      ]
     },
     {
       "id": "irrops-sc",
@@ -409,7 +559,9 @@
       "direction": "Airline/System",
       "category": "Schedule & IRROPS",
       "source": "User provided AIRIMP index",
-      "examples": ["SC Detailed Schedule Change"]
+      "examples": [
+        "SC Detailed Schedule Change"
+      ]
     },
     {
       "id": "irrops-tk",
@@ -421,7 +573,9 @@
       "direction": "Airline/System",
       "category": "Schedule & IRROPS",
       "source": "User provided AIRIMP index",
-      "examples": ["TK Time Change"]
+      "examples": [
+        "TK Time Change"
+      ]
     },
     {
       "id": "irrops-irr",
@@ -433,7 +587,9 @@
       "direction": "Airline/System",
       "category": "Schedule & IRROPS",
       "source": "User provided AIRIMP index",
-      "examples": ["IRR Irregular Operations"]
+      "examples": [
+        "IRR Irregular Operations"
+      ]
     },
     {
       "id": "irrops-mis",
@@ -445,7 +601,9 @@
       "direction": "Airline/System",
       "category": "Schedule & IRROPS",
       "source": "User provided AIRIMP index",
-      "examples": ["MIS Misconnection"]
+      "examples": [
+        "MIS Misconnection"
+      ]
     },
     {
       "id": "irrops-cnl",
@@ -457,9 +615,10 @@
       "direction": "Airline/System",
       "category": "Schedule & IRROPS",
       "source": "User provided AIRIMP index",
-      "examples": ["CNL Cancellation"]
+      "examples": [
+        "CNL Cancellation"
+      ]
     },
-
     {
       "id": "osi-yy",
       "standard": "GDS",
@@ -470,7 +629,9 @@
       "direction": "Agent → Airlines",
       "category": "OSI",
       "source": "User provided AIRIMP index",
-      "examples": ["OSI YY CTCT DXB 971 ..."]
+      "examples": [
+        "OSI YY CTCT DXB 971 ..."
+      ]
     },
     {
       "id": "osi-xx",
@@ -482,9 +643,10 @@
       "direction": "Agent → Airline",
       "category": "OSI",
       "source": "User provided AIRIMP index",
-      "examples": ["OSI FZ ..."]
+      "examples": [
+        "OSI FZ ..."
+      ]
     },
-
     {
       "id": "ticket-tktl",
       "standard": "GDS",
@@ -495,7 +657,9 @@
       "direction": "System / Agent",
       "category": "Ticketing & Fare Control",
       "source": "User provided AIRIMP index",
-      "examples": ["TKTL Ticket Time Limit"]
+      "examples": [
+        "TKTL Ticket Time Limit"
+      ]
     },
     {
       "id": "ticket-et",
@@ -507,7 +671,9 @@
       "direction": "System / Agent",
       "category": "Ticketing & Fare Control",
       "source": "User provided AIRIMP index",
-      "examples": ["ET   Electronic Ticket"]
+      "examples": [
+        "ET   Electronic Ticket"
+      ]
     },
     {
       "id": "ticket-exch",
@@ -519,7 +685,9 @@
       "direction": "Agent/System",
       "category": "Ticketing & Fare Control",
       "source": "User provided AIRIMP index",
-      "examples": ["EXCH Exchange"]
+      "examples": [
+        "EXCH Exchange"
+      ]
     },
     {
       "id": "ticket-rfnd",
@@ -531,7 +699,9 @@
       "direction": "Agent/System",
       "category": "Ticketing & Fare Control",
       "source": "User provided AIRIMP index",
-      "examples": ["RFND Refund"]
+      "examples": [
+        "RFND Refund"
+      ]
     },
     {
       "id": "ticket-fop",
@@ -543,9 +713,10 @@
       "direction": "Agent/System",
       "category": "Ticketing & Fare Control",
       "source": "User provided AIRIMP index",
-      "examples": ["FOP  Form of Payment"]
+      "examples": [
+        "FOP  Form of Payment"
+      ]
     },
-
     {
       "id": "inv-avs",
       "standard": "GDS",
@@ -556,7 +727,9 @@
       "direction": "System ↔ System",
       "category": "Inventory & Availability",
       "source": "User provided AIRIMP index",
-      "examples": ["AVS Availability Status"]
+      "examples": [
+        "AVS Availability Status"
+      ]
     },
     {
       "id": "inv-inv",
@@ -568,9 +741,10 @@
       "direction": "System ↔ System",
       "category": "Inventory & Availability",
       "source": "User provided AIRIMP index",
-      "examples": ["INV Inventory Message"]
+      "examples": [
+        "INV Inventory Message"
+      ]
     },
-
     {
       "id": "queue-qet",
       "standard": "GDS",
@@ -581,7 +755,9 @@
       "direction": "Agent/System",
       "category": "Queue & System Control",
       "source": "User provided AIRIMP index",
-      "examples": ["QET Queue Entry"]
+      "examples": [
+        "QET Queue Entry"
+      ]
     },
     {
       "id": "queue-qrt",
@@ -593,7 +769,10 @@
       "direction": "Agent/System",
       "category": "Queue & System Control",
       "source": "User provided AIRIMP index",
-      "examples": ["QRT Queue Remove", "HDQRO"]
+      "examples": [
+        "QRT Queue Remove",
+        "HDQRO"
+      ]
     },
     {
       "id": "queue-qch",
@@ -605,7 +784,9 @@
       "direction": "Agent/System",
       "category": "Queue & System Control",
       "source": "User provided AIRIMP index",
-      "examples": ["QCH Queue Change"]
+      "examples": [
+        "QCH Queue Change"
+      ]
     },
     {
       "id": "queue-qad",
@@ -617,9 +798,10 @@
       "direction": "Agent/System",
       "category": "Queue & System Control",
       "source": "User provided AIRIMP index",
-      "examples": ["QAD Queue Add"]
+      "examples": [
+        "QAD Queue Add"
+      ]
     },
-
     {
       "id": "interline-irm",
       "standard": "AIRIMP",
@@ -630,7 +812,9 @@
       "direction": "Airline ↔ Airline / GDS",
       "category": "Interline & Codeshare",
       "source": "User provided AIRIMP index",
-      "examples": ["IRM Interline Reservation"]
+      "examples": [
+        "IRM Interline Reservation"
+      ]
     },
     {
       "id": "interline-csa",
@@ -642,7 +826,9 @@
       "direction": "Airline/System",
       "category": "Interline & Codeshare",
       "source": "User provided AIRIMP index",
-      "examples": ["CSA Codeshare Agreement"]
+      "examples": [
+        "CSA Codeshare Agreement"
+      ]
     },
     {
       "id": "interline-opc",
@@ -654,7 +840,9 @@
       "direction": "Airline/System",
       "category": "Interline & Codeshare",
       "source": "User provided AIRIMP index",
-      "examples": ["OPC Operating Carrier"]
+      "examples": [
+        "OPC Operating Carrier"
+      ]
     },
     {
       "id": "interline-mk",
@@ -666,9 +854,10 @@
       "direction": "Airline/System",
       "category": "Interline & Codeshare",
       "source": "User provided AIRIMP index",
-      "examples": ["MK  Marketing Carrier"]
+      "examples": [
+        "MK  Marketing Carrier"
+      ]
     },
-
     {
       "id": "bag-bsm",
       "standard": "GDS",
@@ -679,7 +868,9 @@
       "direction": "System ↔ System",
       "category": "Baggage & Airport Control",
       "source": "User provided AIRIMP index",
-      "examples": ["BSM Baggage Source Message"]
+      "examples": [
+        "BSM Baggage Source Message"
+      ]
     },
     {
       "id": "bag-bpm",
@@ -691,7 +882,9 @@
       "direction": "System ↔ System",
       "category": "Baggage & Airport Control",
       "source": "User provided AIRIMP index",
-      "examples": ["BPM Baggage Process"]
+      "examples": [
+        "BPM Baggage Process"
+      ]
     },
     {
       "id": "bag-bag",
@@ -703,7 +896,9 @@
       "direction": "System / Agent",
       "category": "Baggage & Airport Control",
       "source": "User provided AIRIMP index",
-      "examples": ["BAG Baggage Allowance"]
+      "examples": [
+        "BAG Baggage Allowance"
+      ]
     },
     {
       "id": "airport-cki",
@@ -715,7 +910,9 @@
       "direction": "DCS/System",
       "category": "Baggage & Airport Control",
       "source": "User provided AIRIMP index",
-      "examples": ["CKI Check-in Status"]
+      "examples": [
+        "CKI Check-in Status"
+      ]
     },
     {
       "id": "airport-dcs",
@@ -727,9 +924,10 @@
       "direction": "DCS/System",
       "category": "Baggage & Airport Control",
       "source": "User provided AIRIMP index",
-      "examples": ["DCS Departure Control"]
+      "examples": [
+        "DCS Departure Control"
+      ]
     },
-
     {
       "id": "qual-hk",
       "standard": "GDS",
@@ -740,7 +938,9 @@
       "direction": "System",
       "category": "Common Qualifiers & Indicators",
       "source": "User provided AIRIMP index",
-      "examples": ["HK Holding Confirmed"]
+      "examples": [
+        "HK Holding Confirmed"
+      ]
     },
     {
       "id": "qual-kk",
@@ -752,7 +952,9 @@
       "direction": "System",
       "category": "Common Qualifiers & Indicators",
       "source": "User provided AIRIMP index",
-      "examples": ["KK Confirmed (After Request)"]
+      "examples": [
+        "KK Confirmed (After Request)"
+      ]
     },
     {
       "id": "qual-nn",
@@ -764,7 +966,9 @@
       "direction": "System",
       "category": "Common Qualifiers & Indicators",
       "source": "User provided AIRIMP index",
-      "examples": ["NN Need Action"]
+      "examples": [
+        "NN Need Action"
+      ]
     },
     {
       "id": "qual-pn",
@@ -776,7 +980,9 @@
       "direction": "System",
       "category": "Common Qualifiers & Indicators",
       "source": "User provided AIRIMP index",
-      "examples": ["PN Pending"]
+      "examples": [
+        "PN Pending"
+      ]
     },
     {
       "id": "qual-rq",
@@ -788,7 +994,10 @@
       "direction": "System",
       "category": "Common Qualifiers & Indicators",
       "source": "User provided AIRIMP index",
-      "examples": ["RQ Request", "RQ1"]
+      "examples": [
+        "RQ Request",
+        "RQ1"
+      ]
     },
     {
       "id": "qual-sa",
@@ -800,9 +1009,10 @@
       "direction": "System",
       "category": "Common Qualifiers & Indicators",
       "source": "User provided AIRIMP index",
-      "examples": ["SA Space Available"]
+      "examples": [
+        "SA Space Available"
+      ]
     },
-
     {
       "id": "ssr-adlt",
       "standard": "GDS",
@@ -813,7 +1023,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR ADLT"]
+      "examples": [
+        "SSR ADLT"
+      ]
     },
     {
       "id": "ssr-inft",
@@ -825,7 +1037,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR INFT"]
+      "examples": [
+        "SSR INFT"
+      ]
     },
     {
       "id": "ssr-umnr",
@@ -837,7 +1051,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR UMNR"]
+      "examples": [
+        "SSR UMNR"
+      ]
     },
     {
       "id": "ssr-wchr",
@@ -849,7 +1065,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR WCHR"]
+      "examples": [
+        "SSR WCHR"
+      ]
     },
     {
       "id": "ssr-wchs",
@@ -861,7 +1079,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR WCHS"]
+      "examples": [
+        "SSR WCHS"
+      ]
     },
     {
       "id": "ssr-wchc",
@@ -873,7 +1093,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR WCHC"]
+      "examples": [
+        "SSR WCHC"
+      ]
     },
     {
       "id": "ssr-blnd",
@@ -885,7 +1107,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR BLND"]
+      "examples": [
+        "SSR BLND"
+      ]
     },
     {
       "id": "ssr-deaf",
@@ -897,7 +1121,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR DEAF"]
+      "examples": [
+        "SSR DEAF"
+      ]
     },
     {
       "id": "ssr-maas",
@@ -909,7 +1135,9 @@
       "direction": "Agent → Airline/Airport",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR MAAS"]
+      "examples": [
+        "SSR MAAS"
+      ]
     },
     {
       "id": "ssr-meda",
@@ -921,7 +1149,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR MEDA"]
+      "examples": [
+        "SSR MEDA"
+      ]
     },
     {
       "id": "ssr-oxyg",
@@ -933,7 +1163,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR OXYG"]
+      "examples": [
+        "SSR OXYG"
+      ]
     },
     {
       "id": "ssr-seat",
@@ -945,7 +1177,9 @@
       "direction": "Agent/System → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR SEAT"]
+      "examples": [
+        "SSR SEAT"
+      ]
     },
     {
       "id": "ssr-exst",
@@ -957,7 +1191,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR EXST"]
+      "examples": [
+        "SSR EXST"
+      ]
     },
     {
       "id": "ssr-petc",
@@ -969,7 +1205,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR PETC"]
+      "examples": [
+        "SSR PETC"
+      ]
     },
     {
       "id": "ssr-avih",
@@ -981,7 +1219,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR AVIH"]
+      "examples": [
+        "SSR AVIH"
+      ]
     },
     {
       "id": "ssr-weap",
@@ -993,7 +1233,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR WEAP"]
+      "examples": [
+        "SSR WEAP"
+      ]
     },
     {
       "id": "ssr-spml",
@@ -1005,7 +1247,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR SPML"]
+      "examples": [
+        "SSR SPML"
+      ]
     },
     {
       "id": "ssr-avml",
@@ -1017,7 +1261,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR AVML"]
+      "examples": [
+        "SSR AVML"
+      ]
     },
     {
       "id": "ssr-vgml",
@@ -1029,7 +1275,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR VGML"]
+      "examples": [
+        "SSR VGML"
+      ]
     },
     {
       "id": "ssr-ksml",
@@ -1041,7 +1289,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR KSML"]
+      "examples": [
+        "SSR KSML"
+      ]
     },
     {
       "id": "ssr-hnml",
@@ -1053,7 +1303,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR HNML"]
+      "examples": [
+        "SSR HNML"
+      ]
     },
     {
       "id": "ssr-moml",
@@ -1065,7 +1317,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR MOML"]
+      "examples": [
+        "SSR MOML"
+      ]
     },
     {
       "id": "ssr-chml",
@@ -1077,7 +1331,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR CHML"]
+      "examples": [
+        "SSR CHML"
+      ]
     },
     {
       "id": "ssr-bbml",
@@ -1089,7 +1345,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR BBML"]
+      "examples": [
+        "SSR BBML"
+      ]
     },
     {
       "id": "ssr-fpml",
@@ -1101,7 +1359,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR FPML"]
+      "examples": [
+        "SSR FPML"
+      ]
     },
     {
       "id": "ssr-docs",
@@ -1113,7 +1373,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR DOCS FZ HK1/P/IR/I56684429/IR/11SEP77/F/07MAY27/JAMARANI/SOMAYEH"]
+      "examples": [
+        "SSR DOCS FZ HK1/P/IR/I56684429/IR/11SEP77/F/07MAY27/JAMARANI/SOMAYEH"
+      ]
     },
     {
       "id": "ssr-doco",
@@ -1125,7 +1387,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR DOCO"]
+      "examples": [
+        "SSR DOCO"
+      ]
     },
     {
       "id": "ssr-doca",
@@ -1137,7 +1401,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR DOCA"]
+      "examples": [
+        "SSR DOCA"
+      ]
     },
     {
       "id": "ssr-ctce",
@@ -1149,7 +1415,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR CTCE FZ HK1/CRM//PARTOCRS.COM"]
+      "examples": [
+        "SSR CTCE FZ HK1/CRM//PARTOCRS.COM"
+      ]
     },
     {
       "id": "ssr-ctcm",
@@ -1161,7 +1429,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR CTCM FZ HK1/00989112197223"]
+      "examples": [
+        "SSR CTCM FZ HK1/00989112197223"
+      ]
     },
     {
       "id": "ssr-ctct",
@@ -1173,7 +1443,9 @@
       "direction": "Agent → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["OSI YY CTCT DXB 971 ..."]
+      "examples": [
+        "OSI YY CTCT DXB 971 ..."
+      ]
     },
     {
       "id": "ssr-insu",
@@ -1185,9 +1457,10 @@
       "direction": "Agent/System → Airline",
       "category": "SSR",
       "source": "User provided AIRIMP index",
-      "examples": ["SSR INSU"]
+      "examples": [
+        "SSR INSU"
+      ]
     },
-
     {
       "id": "edifact-unb",
       "standard": "EDIFACT",
@@ -1198,7 +1471,9 @@
       "direction": "System ↔ System",
       "category": "EDIFACT Control Segments",
       "source": "IATA EDIFACT usage",
-      "examples": ["UNB+IATA:1+1A0TKDKL+FZIET+260106:1035+057G4G0JLV0001+++O'"]
+      "examples": [
+        "UNB+IATA:1+1A0TKDKL+FZIET+260106:1035+057G4G0JLV0001+++O'"
+      ]
     },
     {
       "id": "edifact-unh",
@@ -1210,7 +1485,9 @@
       "direction": "System ↔ System",
       "category": "EDIFACT Control Segments",
       "source": "IATA EDIFACT usage",
-      "examples": ["UNH+1+TKCREQ:00:1:IA+14890AQHQTTM9P'"]
+      "examples": [
+        "UNH+1+TKCREQ:00:1:IA+14890AQHQTTM9P'"
+      ]
     },
     {
       "id": "edifact-msg",
@@ -1222,7 +1499,9 @@
       "direction": "System ↔ System",
       "category": "EDIFACT Content Segments",
       "source": "IATA EDIFACT usage",
-      "examples": ["MSG+:131'"]
+      "examples": [
+        "MSG+:131'"
+      ]
     },
     {
       "id": "edifact-org",
@@ -1234,7 +1513,9 @@
       "direction": "System ↔ System",
       "category": "EDIFACT Content Segments",
       "source": "IATA EDIFACT usage",
-      "examples": ["ORG+KL:MUC+00000000:146759+AMS++A+NL:EUR:EN+A9982WSSU'"]
+      "examples": [
+        "ORG+KL:MUC+00000000:146759+AMS++A+NL:EUR:EN+A9982WSSU'"
+      ]
     },
     {
       "id": "edifact-tkt",
@@ -1246,7 +1527,9 @@
       "direction": "System ↔ System",
       "category": "EDIFACT Content Segments",
       "source": "IATA EDIFACT usage",
-      "examples": ["TKT+0745511964047:T::3'"]
+      "examples": [
+        "TKT+0745511964047:T::3'"
+      ]
     },
     {
       "id": "edifact-unt",
@@ -1258,7 +1541,9 @@
       "direction": "System ↔ System",
       "category": "EDIFACT Control Segments",
       "source": "IATA EDIFACT usage",
-      "examples": ["UNT+5+1'"]
+      "examples": [
+        "UNT+5+1'"
+      ]
     },
     {
       "id": "edifact-unz",
@@ -1270,7 +1555,9 @@
       "direction": "System ↔ System",
       "category": "EDIFACT Control Segments",
       "source": "IATA EDIFACT usage",
-      "examples": ["UNZ+1+057G4G0JLV0001'"]
+      "examples": [
+        "UNZ+1+057G4G0JLV0001'"
+      ]
     },
     {
       "id": "airimp-tkcreq",
@@ -1282,9 +1569,10 @@
       "direction": "System ↔ System",
       "category": "AIRIMP Ticketing Messages",
       "source": "IATA AIRIMP / operational usage",
-      "examples": ["UNH+1+TKCREQ:00:1:IA+..."]
+      "examples": [
+        "UNH+1+TKCREQ:00:1:IA+..."
+      ]
     },
-
     {
       "id": "fare-thr",
       "standard": "FARE",
@@ -1295,7 +1583,9 @@
       "direction": "Pricing system output",
       "category": "Fare Construction",
       "source": "Operational fare line usage",
-      "examples": ["THR FZ X DXB ..."]
+      "examples": [
+        "THR FZ X DXB ..."
+      ]
     },
     {
       "id": "fare-x",
@@ -1307,7 +1597,10 @@
       "direction": "Pricing system output",
       "category": "Fare Construction",
       "source": "Operational fare line usage",
-      "examples": ["FZ X DXB", "KL X AMS"]
+      "examples": [
+        "FZ X DXB",
+        "KL X AMS"
+      ]
     },
     {
       "id": "fare-nuc",
@@ -1319,7 +1612,9 @@
       "direction": "Pricing system output",
       "category": "Fare Construction",
       "source": "Operational fare line usage",
-      "examples": ["500.92NUC500.92END"]
+      "examples": [
+        "500.92NUC500.92END"
+      ]
     },
     {
       "id": "fare-end",
@@ -1331,7 +1626,9 @@
       "direction": "Pricing system output",
       "category": "Fare Construction",
       "source": "Operational fare line usage",
-      "examples": ["...NUC500.92END ROE..."]
+      "examples": [
+        "...NUC500.92END ROE..."
+      ]
     },
     {
       "id": "fare-roe",
@@ -1343,7 +1640,9 @@
       "direction": "Pricing system output",
       "category": "Fare Construction",
       "source": "Operational fare line usage",
-      "examples": ["ROE712769.20"]
+      "examples": [
+        "ROE712769.20"
+      ]
     },
     {
       "id": "fare-xt",
@@ -1355,9 +1654,10 @@
       "direction": "Pricing system output",
       "category": "Fare Construction",
       "source": "Operational fare line usage",
-      "examples": ["XT45F65ZR70 I610IR60CJ70RN"]
+      "examples": [
+        "XT45F65ZR70 I610IR60CJ70RN"
+      ]
     },
-
     {
       "id": "sample-fare-line",
       "standard": "FARE",
@@ -1368,9 +1668,10 @@
       "direction": "Pricing system output",
       "category": "Fare Construction",
       "source": "User provided example",
-      "examples": ["THR FZ X DXB KL X AMS KL YVR500.92NUC500.92END ROE712769.20XT45F65ZR70 I610IR60CJ70RN"]
+      "examples": [
+        "THR FZ X DXB KL X AMS KL YVR500.92NUC500.92END ROE712769.20XT45F65ZR70 I610IR60CJ70RN"
+      ]
     },
-
     {
       "id": "sample-edifact-tkcreq",
       "standard": "EDIFACT",
@@ -1383,6 +1684,406 @@
       "source": "User provided example",
       "examples": [
         "UNB+IATA:1+1A0TKDKL+FZIET+260106:1035+057G4G0JLV0001+++O' UNH+1+TKCREQ:00:1:IA+14890AQHQTTM9P' MSG+:131' ORG+KL:MUC+00000000:146759+AMS++A+NL:EUR:EN+A9982WSSU' TKT+0745511964047:T::3' UNT+5+1' UNZ+1+057G4G0JLV0001'"
+      ]
+    },
+    {
+      "id": "qp",
+      "standard": "GDS",
+      "code": "QP",
+      "title": "Queue/Process Message (Response)",
+      "meaning": "Host/GDS operational message prefix commonly used in AIRIMP/TTY logs to show a system response or processed message snapshot.",
+      "trigger": "Appears at the start of a response block in history/queue logs.",
+      "direction": "System generated",
+      "category": "TTY / Operational Prefixes",
+      "source": "Operational usage",
+      "examples": [
+        "QP HDQRMET",
+        "QP MUCRM1A"
+      ]
+    },
+    {
+      "id": "qk",
+      "standard": "GDS",
+      "code": "QK",
+      "title": "Queue/Process Message (Request/Incoming)",
+      "meaning": "Host/GDS operational message prefix commonly used in AIRIMP/TTY logs to show an incoming/request block or a transaction step recorded in history.",
+      "trigger": "Appears at the start of an incoming/request block in history/queue logs.",
+      "direction": "System generated",
+      "category": "TTY / Operational Prefixes",
+      "source": "Operational usage",
+      "examples": [
+        "QK HDQRMFZ",
+        "QK HDQRM1B"
+      ]
+    },
+    {
+      "id": "qd",
+      "standard": "GDS",
+      "code": "QD",
+      "title": "Queue/Process Message (Delta/Follow-up)",
+      "meaning": "Host/GDS operational message prefix commonly used in AIRIMP/TTY logs to show a follow-up/delta block (status change, update, or additional transaction step).",
+      "trigger": "Appears when a transaction produces an additional update block.",
+      "direction": "System generated",
+      "category": "TTY / Operational Prefixes",
+      "source": "Operational usage",
+      "examples": [
+        "QD HDQRMFZ .PEKRMCA 1E/251308"
+      ]
+    },
+    {
+      "id": "trl",
+      "standard": "GDS",
+      "code": "TRL",
+      "title": "Transaction / Trailer Line",
+      "meaning": "Indicator used inside some AIRIMP/TTY dumps to mark a transaction/trailer or routing/control section within the message block.",
+      "trigger": "Appears as a standalone control line inside a message block.",
+      "direction": "System generated",
+      "category": "EDIFACT / TTY Control",
+      "source": "Operational usage",
+      "examples": [
+        "TRL"
+      ]
+    },
+    {
+      "id": "aka",
+      "standard": "GDS",
+      "code": "AKA",
+      "title": "Acknowledged / Accepted",
+      "meaning": "Indicator that the message/transaction was accepted and the following content is the acknowledged record snapshot.",
+      "trigger": "Sent when the host accepts/processes the preceding request.",
+      "direction": "System generated",
+      "category": "Acknowledgements & Control",
+      "source": "Operational usage",
+      "examples": [
+        "AKA"
+      ]
+    },
+    {
+      "id": "nar",
+      "standard": "GDS",
+      "code": "NAR",
+      "title": "New/Additional Record Info",
+      "meaning": "Indicator that the block contains additional/new record information as part of the transaction (often follows sell/updates).",
+      "trigger": "Sent when the host adds or confirms additional record information.",
+      "direction": "System generated",
+      "category": "Acknowledgements & Control",
+      "source": "Operational usage",
+      "examples": [
+        "NAR"
+      ]
+    },
+    {
+      "id": "dvd",
+      "standard": "GDS",
+      "code": "DVD",
+      "title": "Divide Record",
+      "meaning": "Indicator used in some GDS logs to show a divided record/PNR (split passengers/segments into a new record).",
+      "trigger": "Divide/split action performed on a record.",
+      "direction": "System generated",
+      "category": "PNR Operations",
+      "source": "Operational usage",
+      "examples": [
+        "DVD"
+      ]
+    },
+    {
+      "id": "asc",
+      "standard": "GDS",
+      "code": "ASC",
+      "title": "After Schedule Change",
+      "meaning": "Indicator used in some GDS logs for a schedule-change-related acknowledgement/update block (rebook, time change, etc.).",
+      "trigger": "Schedule change transaction processing.",
+      "direction": "System generated",
+      "category": "Schedule & IRROPS",
+      "source": "Operational usage",
+      "examples": [
+        "ASC"
+      ]
+    },
+    {
+      "id": "nco",
+      "standard": "GDS",
+      "code": "NCO",
+      "title": "New/Changed Itinerary (Post-Processing)",
+      "meaning": "Indicator used in some GDS logs that the block reflects a new/changed itinerary after processing (reaccommodation, rebook, etc.).",
+      "trigger": "Post-processing after changes (schedule change, rebook, etc.).",
+      "direction": "System generated",
+      "category": "Schedule & IRROPS",
+      "source": "Operational usage",
+      "examples": [
+        "NCO"
+      ]
+    },
+    {
+      "id": "dk",
+      "standard": "GDS",
+      "code": "DK",
+      "title": "Holding / Need Action (Status)",
+      "meaning": "Segment status used in some GDS contexts to indicate the segment is being held/pending and needs further action (e.g., ticketing/time limit) before it becomes fully confirmed.",
+      "trigger": "Sell/hold created but not finalized.",
+      "direction": "System response",
+      "category": "Segment Status Codes",
+      "source": "Operational usage",
+      "examples": [
+        "DK1"
+      ],
+      "aliases": [
+        "DK1",
+        "DK2",
+        "DK3",
+        "DK4",
+        "DK5",
+        "DK6",
+        "DK7",
+        "DK8",
+        "DK9"
+      ]
+    },
+    {
+      "id": "cs",
+      "standard": "GDS",
+      "code": "CS",
+      "title": "Codeshare Sold (Status)",
+      "meaning": "Segment status used in some contexts to indicate a codeshare/linked segment was sold/confirmed under special handling (often appears with codeshare notation).",
+      "trigger": "Codeshare sell/confirm.",
+      "direction": "System response",
+      "category": "Segment Status Codes",
+      "source": "Operational usage",
+      "examples": [
+        "CS1"
+      ],
+      "aliases": [
+        "CS1",
+        "CS2",
+        "CS3",
+        "CS4",
+        "CS5",
+        "CS6",
+        "CS7",
+        "CS8",
+        "CS9"
+      ]
+    },
+    {
+      "id": "ch",
+      "standard": "GDS",
+      "code": "CH",
+      "title": "Holding Confirmed (Status)",
+      "meaning": "Segment status used in some contexts to indicate confirmed holding / confirmed in host context (often appears in processed outputs).",
+      "trigger": "Confirmed holding / confirmed in host.",
+      "direction": "System response",
+      "category": "Segment Status Codes",
+      "source": "Operational usage",
+      "examples": [
+        "CH1"
+      ],
+      "aliases": [
+        "CH1",
+        "CH2",
+        "CH3",
+        "CH4",
+        "CH5",
+        "CH6",
+        "CH7",
+        "CH8",
+        "CH9"
+      ]
+    },
+    {
+      "id": "hx",
+      "standard": "GDS",
+      "code": "HX",
+      "title": "Cancelled by Carrier",
+      "meaning": "Segment status indicating the carrier cancelled the segment (standard schedule/cancellation status in many GDS).",
+      "trigger": "Carrier cancels segment.",
+      "direction": "System/Airline",
+      "category": "Segment Status Codes",
+      "source": "Operational usage",
+      "examples": [
+        "HX1"
+      ],
+      "aliases": [
+        "HX1",
+        "HX2",
+        "HX3",
+        "HX4",
+        "HX5",
+        "HX6",
+        "HX7",
+        "HX8",
+        "HX9"
+      ]
+    },
+    {
+      "id": "adtk",
+      "standard": "GDS",
+      "code": "ADTK",
+      "title": "Advance Ticketing Time Limit (SSR/OSI Text)",
+      "meaning": "Common ticketing time limit instruction often sent as SSR/OSI text (e.g., 'PLS ADTK BY ... OR SEATS WILL BE XLD').",
+      "trigger": "Ticketing deadline instruction.",
+      "direction": "Airline/System → Agent",
+      "category": "Ticketing & Fare Control",
+      "source": "Operational usage",
+      "examples": [
+        "SSR OTHS FZ PLS ADTK BY 13JAN26 1225 GMT OR SEATS WILL BE XLD"
+      ]
+    },
+    {
+      "id": "ssr-tkne",
+      "standard": "GDS",
+      "code": "SSR TKNE",
+      "title": "Ticket Number Element",
+      "meaning": "SSR containing e-ticket number reference mapped to a specific segment/passenger.",
+      "trigger": "Ticket issuance / ticket number synchronization.",
+      "direction": "System/Agent → Airline",
+      "category": "SSR",
+      "source": "Operational usage",
+      "examples": [
+        "SSR TKNE CA HK1 DXBPEK0942P06JAN-1CUKAJ/ALEKSANDERMR.1412100064407C2",
+        "SSR TKNE FZ HK1 RUHDXB 0848L28JAN.1417463579484C1"
+      ]
+    },
+    {
+      "id": "ssr-nsst",
+      "standard": "GDS",
+      "code": "SSR NSST",
+      "title": "No Seat Status / Seat Data",
+      "meaning": "SSR used by some carriers/systems for seat status/seat data message reference (often sent automatically).",
+      "trigger": "Seat status/seat data auto message.",
+      "direction": "System → Airline",
+      "category": "SSR",
+      "source": "Operational usage",
+      "examples": [
+        "SSR NSST EK KK1 DXBBKK0374K29JAN -1LEVY/YUVALMR.76H"
+      ]
+    },
+    {
+      "id": "ssr-fqtv",
+      "standard": "GDS",
+      "code": "SSR FQTV",
+      "title": "Frequent Traveler Number",
+      "meaning": "SSR for frequent traveler / loyalty number (FFP).",
+      "trigger": "FQTV entry in booking.",
+      "direction": "Agent/System → Airline",
+      "category": "SSR",
+      "source": "Operational usage",
+      "examples": [
+        "SSR FQTV FZ HK/EK107126574-ALYASSI/SAUDMR"
+      ]
+    },
+    {
+      "id": "ssr-gstn",
+      "standard": "GDS",
+      "code": "SSR GSTN",
+      "title": "GST Number",
+      "meaning": "SSR used in some markets to capture GST/tax registration number for corporate/travel agent invoicing.",
+      "trigger": "GST registration details captured.",
+      "direction": "Agent/System → Airline",
+      "category": "SSR",
+      "source": "Operational usage",
+      "examples": [
+        "SSR GSTN FZ HK1/IND/32AAICD4979Q1ZV/DAKAR CLASS PRIVATE LIMITED"
+      ]
+    },
+    {
+      "id": "ssr-gste",
+      "standard": "GDS",
+      "code": "SSR GSTE",
+      "title": "GST Email",
+      "meaning": "SSR used to capture GST invoicing email address.",
+      "trigger": "GST email captured.",
+      "direction": "Agent/System → Airline",
+      "category": "SSR",
+      "source": "Operational usage",
+      "examples": [
+        "SSR GSTE FZ HK1/IND/I112959076878//TRAVELMAIL./MMT.COM"
+      ]
+    },
+    {
+      "id": "ssr-gstp",
+      "standard": "GDS",
+      "code": "SSR GSTP",
+      "title": "GST Phone",
+      "meaning": "SSR used to capture GST invoicing phone number.",
+      "trigger": "GST phone captured.",
+      "direction": "Agent/System → Airline",
+      "category": "SSR",
+      "source": "Operational usage",
+      "examples": [
+        "SSR GSTP FZ HK1/IND/917736377709-1VADASSERYHARI/SOORAJMR"
+      ]
+    },
+    {
+      "id": "osi-ctce",
+      "standard": "GDS",
+      "code": "OSI CTCE",
+      "title": "OSI Email Contact",
+      "meaning": "OSI line carrying an email contact (CTCE).",
+      "trigger": "Contact data added as OSI.",
+      "direction": "Agent/System → Airline",
+      "category": "OSI",
+      "source": "Operational usage",
+      "examples": [
+        "OSI FZ CTC E BINSAIF777//GMAIL.COM",
+        "OSI ET CTCE YAZEEDWATBAN//GMAIL.COM"
+      ]
+    },
+    {
+      "id": "osi-ctcm",
+      "standard": "GDS",
+      "code": "OSI CTCM",
+      "title": "OSI Mobile Contact",
+      "meaning": "OSI line carrying a mobile contact (CTCM).",
+      "trigger": "Contact data added as OSI.",
+      "direction": "Agent/System → Airline",
+      "category": "OSI",
+      "source": "Operational usage",
+      "examples": [
+        "OSI ET CTCM 966566717503",
+        "OSI CA CTCM 355694831035"
+      ]
+    },
+    {
+      "id": "osi-ctcp",
+      "standard": "GDS",
+      "code": "OSI CTCP",
+      "title": "OSI Contact Phone (Primary)",
+      "meaning": "OSI line carrying a contact phone (CTCP) often including location/office identifiers.",
+      "trigger": "Contact phone data added as OSI.",
+      "direction": "Agent/System → Airline",
+      "category": "OSI",
+      "source": "Operational usage",
+      "examples": [
+        "OSI FZ CTCP SEL0096879148310 C",
+        "OSI YY CTCP YTO 647 347-4757"
+      ]
+    },
+    {
+      "id": "osi-ctch",
+      "standard": "GDS",
+      "code": "OSI CTCH",
+      "title": "OSI Contact Phone (Home)",
+      "meaning": "OSI line carrying a home phone contact (CTCH) in some systems.",
+      "trigger": "Home phone data added as OSI.",
+      "direction": "Agent/System → Airline",
+      "category": "OSI",
+      "source": "Operational usage",
+      "examples": [
+        "OSI FZ CTCH SEL0096879148310 H"
+      ]
+    },
+    {
+      "id": "rloc",
+      "standard": "GDS",
+      "code": "RLOC",
+      "title": "Record Locator Reference",
+      "meaning": "Tag used in some logs/OSI lines to reference another system record locator (cross-reference PNR).",
+      "trigger": "Cross-system locator reference.",
+      "direction": "System generated",
+      "category": "PNR Cross-Reference",
+      "source": "Operational usage",
+      "examples": [
+        "OSIYY RLOC SWI1GFPLJHX"
       ]
     }
   ]
