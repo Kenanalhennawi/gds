@@ -130,6 +130,16 @@ body {
     min-height: 0; 
 }
 
+.excess-baggage-section {
+    grid-column: 1 / -1;
+    overflow-y: auto;
+}
+
+.excess-baggage-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
 .input-section { height: 100%; }
 
 #gdsInput {
