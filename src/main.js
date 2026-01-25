@@ -1,7 +1,6 @@
 import { parseLog } from "./parser.js";
 import { renderTimeline } from "./ui.js";
 
-// DOM Elements
 const els = {
     input: document.getElementById("gdsInput"),
     timeline: document.getElementById("timeline"),
@@ -9,13 +8,11 @@ const els = {
     clear: document.getElementById("btnClear")
 };
 
-// Main Processing Function
 const processInput = () => {
-    if (!els.input) return; // Safety check
+    if (!els.input) return;
 
     const raw = els.input.value;
     
-    // If empty, show empty state
     if (!raw || !raw.trim()) {
         renderTimeline(els.timeline, []);
         if(els.status) els.status.textContent = "Ready for input";
@@ -37,18 +34,18 @@ const processInput = () => {
     }
 };
 
-// Event Listeners
 if (els.input) {
     els.input.addEventListener("input", processInput);
 }
 
 if (els.clear) {
     els.clear.addEventListener("click", () => {
-        if(els.input) els.input.value = "";
-        processInput();
-        if(els.input) els.input.focus();
+        if(els.input) {
+            els.input.value = "";
+            processInput();
+            els.input.focus();
+        }
     });
 }
 
-// Initial Load
 processInput();
