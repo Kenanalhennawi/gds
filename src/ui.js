@@ -94,13 +94,70 @@ export const renderTimeline = (container, data) => {
             }
         }
 
+        // Build detailed explanation section
         let contextHtml = "";
-        if (evt.context.recordLocator || evt.context.airline || evt.context.office || evt.headerType) {
+        let hasContext = evt.context.recordLocator || evt.context.airline || evt.context.office || evt.headerType || evt.timestamp || evt.rawHeader;
+        
+        if (hasContext) {
             contextHtml = `<div class="card-context">
+                <div class="context-row">
+                    <span class="ctx-label">Detected Type:</span> 
+                    <span class="ctx-val">GDS_HISTORY</span>
+                </div>
                 <div class="context-row">
                     <span class="ctx-label">Message Type:</span> 
                     <span class="ctx-val" title="${actionDesc}">${action}</span>
                 </div>`;
+            
+            if (evt.rawHeader) {
+                // Parse header components for detailed explanation
+                const headerParts = [];
+                if (evt.rawHeader.includes('HDQ')) {
+                    if (evt.rawHeader.includes('HDQRM')) {
+                        headerParts.push('HDQ (Host Data Queue)');
+                        headerParts.push('RM (Record Message)');
+                        const airlineMatch = evt.rawHeader.match(/HDQRM([A-Z0-9]{2})/);
+                        if (airlineMatch) {
+                            headerParts.push(`${airlineMatch[1]} (${translateAirline(airlineMatch[1])})`);
+                        }
+                    } else {
+                        headerParts.push('HDQ (Host Data Queue)');
+                        const airlineMatch = evt.rawHeader.match(/HDQ([A-Z0-9]{2})/);
+                        if (airlineMatch) {
+                            headerParts.push(`${airlineMatch[1]} (${translateAirline(airlineMatch[1])})`);
+                        }
+                    }
+                }
+                if (evt.rawHeader.match(/^([A-Z]{3})RM([A-Z0-9]{2})/)) {
+                    const officeMatch = evt.rawHeader.match(/^([A-Z]{3})RM([A-Z0-9]{2})/);
+                    if (officeMatch) {
+                        headerParts.push(`${officeMatch[1]} (${translateCity(officeMatch[1])})`);
+                        headerParts.push('RM (Record Message)');
+                        headerParts.push(`${officeMatch[2]} (${translateAirline(officeMatch[2])})`);
+                    }
+                }
+                
+                contextHtml += `<div class="context-row">
+                    <span class="ctx-label">Header:</span> 
+                    <span class="ctx-val" style="font-family:var(--font-code);">${evt.rawHeader}</span>
+                </div>`;
+                if (headerParts.length > 0) {
+                    contextHtml += `<div class="context-row" style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+                        <span>${headerParts.join(' + ')}</span>
+                    </div>`;
+                }
+            }
+            
+            if (evt.timestamp) {
+                // Format timestamp: 050437 -> 05:04:37 or date format
+                const ts = evt.timestamp;
+                const formattedTime = ts.length === 6 ? `${ts.substring(0,2)}:${ts.substring(2,4)}:${ts.substring(4,6)}` : ts;
+                contextHtml += `<div class="context-row">
+                    <span class="ctx-label">Timestamp:</span> 
+                    <span class="ctx-val">${formattedTime}</span>
+                </div>`;
+            }
+            
             if (evt.context.office) {
                 contextHtml += `<div class="context-row">
                     <span class="ctx-label">Office/Sign-in:</span> 
@@ -166,10 +223,20 @@ export const renderTimeline = (container, data) => {
         `;
 
         if (evt.passengers && evt.passengers.length > 0) {
-            html += `<div class="pax-list">`;
+            html += `<div class="pax-list" style="margin-bottom:15px; padding-left:15px;">
+                <div style="font-weight:700; color:var(--text-main); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">
+                    👤 Passenger(s):
+                </div>`;
             evt.passengers.forEach(p => {
                 const titleDisplay = p.title ? ` ${p.title}` : '';
-                html += `<div class="pax-item">👤 ${p.surname}/${p.given}${titleDisplay}</div>`;
+                html += `<div class="pax-item" style="margin-bottom:6px;">
+                    <div style="font-weight:700;">${p.surname}/${p.given}${titleDisplay}</div>
+                    <div style="font-size:10px; color:var(--text-muted); margin-top:2px;">
+                        <div><strong>Surname:</strong> ${p.surname}</div>
+                        <div><strong>Given Name:</strong> ${p.given}</div>
+                        ${p.title ? `<div><strong>Title:</strong> ${p.title}</div>` : ''}
+                    </div>
+                </div>`;
             });
             html += `</div>`;
         }
@@ -188,6 +255,15 @@ export const renderTimeline = (container, data) => {
                     flightDisplay += seg.fareClass;
                 }
                 
+                // Detailed segment explanation
+                let segmentDetails = `<div style="font-size:10px; color:var(--text-muted); margin-top:4px; line-height:1.4;">
+                    <div><strong>Carrier:</strong> ${seg.carrier} (${carrier})</div>
+                    <div><strong>Flight:</strong> ${seg.flight}${seg.fareClass ? `, Fare Class: ${seg.fareClass}` : ''}</div>
+                    <div><strong>Route:</strong> ${seg.from} (${from}) → ${seg.to} (${to})</div>
+                    <div><strong>Date:</strong> ${seg.date}</div>
+                    <div><strong>Status:</strong> ${seg.status} (${st.label})</div>
+                `;
+                
                 // Add codeshare info if available
                 let codeshareInfo = '';
                 if (seg.codeshare) {
@@ -195,7 +271,9 @@ export const renderTimeline = (container, data) => {
                     codeshareInfo = `<div style="font-size:10px; color:var(--text-muted); margin-top:2px;">
                         <span style="color:var(--info-blue);">${seg.codeshare}</span> - Codeshare: Operated by ${carrier}, Marketed by ${marketingCarrierName}
                     </div>`;
+                    segmentDetails += `<div><strong>Codeshare:</strong> ${seg.codeshare} - Operating: ${carrier}, Marketing: ${marketingCarrierName}</div>`;
                 }
+                segmentDetails += `</div>`;
                 
                 html += `
                     <div class="segment-row" style="border-left-color:${st.class === 'status-hk' ? 'var(--success-green)' : st.class === 'status-hx' ? 'var(--error-red)' : 'var(--warning-amber)'}">
@@ -203,6 +281,7 @@ export const renderTimeline = (container, data) => {
                         <div class="seg-route">
                             ${from} ➝ ${to} <span style="opacity:0.5; margin-left:5px">${seg.date}</span>
                             ${codeshareInfo}
+                            ${segmentDetails}
                         </div>
                         <div class="seg-status ${st.class}">${st.icon} ${st.label}</div>
                     </div>
@@ -220,14 +299,22 @@ export const renderTimeline = (container, data) => {
             evt.ssrs.forEach(ssr => {
                 const msg = evt.messages.find(m => m.ssrCode === ssr.code);
                 const explanation = msg ? msg.details || msg.msg : '';
+                const carrierName = translateAirline(ssr.carrier);
+                const statusInfo = ssr.status ? translateStatus(ssr.status) : null;
+                
                 html += `
                     <div style="margin-bottom:8px; padding:10px; background:rgba(96,165,250,0.1); border-radius:6px; border-left:3px solid var(--info-blue); transition:all 0.3s ease;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                             <strong style="color:var(--info-blue); font-size:12px;">SSR ${ssr.code}</strong>
-                            <span style="font-size:11px; color:var(--text-muted);">${ssr.carrier}</span>
+                            <span style="font-size:11px; color:var(--text-muted);">${ssr.carrier} (${carrierName})</span>
                         </div>
-                        ${explanation ? `<div style="font-size:12px; color:var(--text-main); margin-top:4px;">${explanation}</div>` : ''}
-                        ${ssr.details ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.8;">${ssr.details.substring(0, 100)}${ssr.details.length > 100 ? '...' : ''}</div>` : ''}
+                        <div style="font-size:10px; color:var(--text-muted); margin-top:2px; line-height:1.4;">
+                            <div><strong>SSR Code:</strong> ${ssr.code}</div>
+                            <div><strong>Carrier:</strong> ${ssr.carrier} (${carrierName})</div>
+                            ${ssr.status ? `<div><strong>Status:</strong> ${ssr.status} ${statusInfo ? `(${statusInfo.label})` : ''}</div>` : ''}
+                            ${explanation ? `<div style="margin-top:4px; color:var(--text-main); font-size:11px;"><strong>Explanation:</strong> ${explanation}</div>` : ''}
+                        </div>
+                        ${ssr.details ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.8; background:rgba(0,0,0,0.2); padding:4px; border-radius:3px;">${ssr.details}</div>` : ''}
                     </div>
                 `;
             });
