@@ -155,29 +155,48 @@ export const parseLog = (input) => {
         }
         
         // Try format with slash: FZ1263M/EK2474B24JAN DXBVNO CH1
-        const segSlashMatch = line.match(/([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2}\d{1,4}[A-Z]?\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
+        // Pattern: OperatingCarrierFlight/MarketingCarrierMarketingFlightDate Route(6chars) Status
+        // Example: FZ1263M/EK2474B24JAN DXBVNO CH1
+        const segSlashMatch = line.match(/([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{6})\s+([A-Z]{2}\d+)/);
         if (segSlashMatch) {
+            const route = segSlashMatch[6]; // DXBVNO
+            const from = route.substring(0, 3); // DXB
+            const to = route.substring(3, 6); // VNO
             currentBlock.segments.push({
-                carrier: segSlashMatch[1],
-                flight: segSlashMatch[2],
-                date: segSlashMatch[3].match(/\d{2}[A-Z]{3}/)?.[0] || '',
-                from: segSlashMatch[4],
-                to: segSlashMatch[5],
-                status: segSlashMatch[6]
+                carrier: segSlashMatch[1], // FZ
+                flight: segSlashMatch[2], // 1263M
+                date: segSlashMatch[5], // 24JAN
+                from: from, // DXB
+                to: to, // VNO
+                status: segSlashMatch[7] // CH1
             });
             return;
         }
         
-        // Try format without explicit date: FZ1263M/EK2474B24JAN DXBVNO CH1 (extract date from marketing carrier part)
-        const segCompactMatch = line.match(/([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2}\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
-        if (segCompactMatch) {
+        // Try format with separated route: FZ1263M/EK2474B24JAN DXB VNO CH1
+        const segSlashSeparatedMatch = line.match(/([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2}\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{2}\d+)/);
+        if (segSlashSeparatedMatch) {
             currentBlock.segments.push({
-                carrier: segCompactMatch[1],
-                flight: segCompactMatch[2],
-                date: segCompactMatch[4],
-                from: segCompactMatch[5],
-                to: segCompactMatch[6],
-                status: segCompactMatch[7]
+                carrier: segSlashSeparatedMatch[1],
+                flight: segSlashSeparatedMatch[2],
+                date: segSlashSeparatedMatch[4],
+                from: segSlashSeparatedMatch[5],
+                to: segSlashSeparatedMatch[6],
+                status: segSlashSeparatedMatch[7]
+            });
+            return;
+        }
+        
+        // Try format with date in marketing part but route combined: FZ1263M/EK2474B24JAN DXBVNO CH1
+        const segSlashCombinedRoute = line.match(/([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2}\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
+        if (segSlashCombinedRoute) {
+            currentBlock.segments.push({
+                carrier: segSlashCombinedRoute[1],
+                flight: segSlashCombinedRoute[2],
+                date: segSlashCombinedRoute[4],
+                from: segSlashCombinedRoute[5],
+                to: segSlashCombinedRoute[6],
+                status: segSlashCombinedRoute[7]
             });
             return;
         }
