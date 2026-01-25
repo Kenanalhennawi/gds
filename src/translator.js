@@ -35,6 +35,8 @@ const AIRLINES = {
     MD: "Air Madagascar", UU: "Air Austral", HM: "Air Seychelles",
     WB: "RwandAir", TC: "Air Tanzania", HF: "Air Cote d'Ivoire",
     KP: "ASKY Airlines", UG: "Tunisair Express", RB: "Syrian Air",
+    MK: "Air Mauritius", P4: "Air Peace", "8M": "Myanmar Airways Int", ID: "Batik Air Indonesia", OD: "Batik Air Malaysia",
+    PG: "Bangkok Airways", Z5: "GMG Airlines", "4M": "LATAM Argentina", "4C": "LATAM Colombia",
     
     // --- Europe ---
     LH: "Lufthansa", AF: "Air France", KL: "KLM", BA: "British Airways",
@@ -70,7 +72,10 @@ const AIRLINES = {
     BG: "Biman Bangladesh", BS: "US-Bangla Airlines", RX: "Regent Airways",
     UL: "SriLankan Airlines", KB: "Druk Air", RA: "Nepal Airlines",
     QF: "Qantas", VA: "Virgin Australia", NZ: "Air New Zealand", FJ: "Fiji Airways",
-    JQ: "Jetstar", TR: "Scoot", AK: "AirAsia", D7: "AirAsia X"
+    JQ: "Jetstar", TR: "Scoot", AK: "AirAsia", D7: "AirAsia X",
+    "5J": "Cebu Pacific", Z2: "AirAsia Zest", I5: "AirAsia India", QZ: "Indonesia AirAsia",
+    FD: "Thai AirAsia", XJ: "Thai AirAsia X", ZG: "AirAsia Zest",
+    "9C": "Spring Airlines", HO: "Juneyao Airlines", "9H": "Air Changan", "3Q": "China Yunnan Airlines"
 };
 
 export const translateAirline = (code) => {
