@@ -47,7 +47,10 @@ export const translateAirline = (code) => {
     AA: "American Airlines",
     ET: "Ethiopian Airlines",
     CA: "Air China",
-    AC: "Air Canada"
+    AC: "Air Canada",
+    "1A": "Amadeus",
+    "1G": "Galileo",
+    "1B": "Abacus"
   };
   return map[code.toUpperCase()] || code;
 };
@@ -79,7 +82,10 @@ export const translateCity = (code) => {
         KBL: "Kabul",
         PEK: "Beijing",
         YYZ: "Toronto",
-        JFK: "New York"
+        JFK: "New York",
+        TIA: "Tirana",
+        BJM: "Bujumbura",
+        ADD: "Addis Ababa"
     };
     return map[code.toUpperCase()] || code;
 }
@@ -113,6 +119,9 @@ export const translateSSR = (text) => {
   }
   if (t.includes("HK1") && t.includes("TKNE")) {
       return { title: "Ticket Issued", msg: "E-ticket number attached.", type: "success" };
+  }
+  if (t.includes("NSST")) {
+      return { title: "Seat Selection", msg: "Seat data transmitted to airline.", type: "info" };
   }
 
   return null;
