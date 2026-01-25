@@ -16,7 +16,7 @@ export const renderTimeline = (container, data) => {
         });
     }
 
-    // 1. Render Summary Dashboard
+    // 1. Render Summary Dashboard (always show if we have events)
     if (summary && events.length > 0) {
         const summaryCard = document.createElement("div");
         summaryCard.className = `glass-panel summary-card ${summary.alertLevel}`;
@@ -24,7 +24,8 @@ export const renderTimeline = (container, data) => {
         summaryCard.style.padding = "20px";
         summaryCard.style.borderLeft = "4px solid " + (
             summary.alertLevel === 'critical' ? 'var(--error-red)' : 
-            summary.alertLevel === 'success' ? 'var(--success-green)' : 'var(--warning-amber)'
+            summary.alertLevel === 'success' ? 'var(--success-green)' : 
+            summary.alertLevel === 'warning' ? 'var(--warning-amber)' : 'var(--info-blue)'
         );
         
         summaryCard.innerHTML = `
@@ -44,6 +45,7 @@ export const renderTimeline = (container, data) => {
             </div>`;
         return;
     }
+    
 
     // 3. Render Events
     events.forEach((evt, eventIndex) => {
@@ -149,7 +151,8 @@ export const renderTimeline = (container, data) => {
         if (evt.passengers && evt.passengers.length > 0) {
             html += `<div class="pax-list">`;
             evt.passengers.forEach(p => {
-                html += `<div class="pax-item">👤 ${p.surname}/${p.given} ${p.title}</div>`;
+                const titleDisplay = p.title ? ` ${p.title}` : '';
+                html += `<div class="pax-item">👤 ${p.surname}/${p.given}${titleDisplay}</div>`;
             });
             html += `</div>`;
         }
