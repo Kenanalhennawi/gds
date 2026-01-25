@@ -165,10 +165,28 @@ export const renderTimeline = (container, data) => {
                 const to = translateCity(seg.to);
                 const st = translateStatus(seg.status);
                 
+                // Build flight display with fare class if available
+                let flightDisplay = `${seg.carrier}${seg.flight}`;
+                if (seg.fareClass) {
+                    flightDisplay += seg.fareClass;
+                }
+                
+                // Add codeshare info if available
+                let codeshareInfo = '';
+                if (seg.codeshare) {
+                    const marketingCarrierName = seg.marketingCarrier ? translateAirline(seg.marketingCarrier) : seg.marketingCarrier;
+                    codeshareInfo = `<div style="font-size:10px; color:var(--text-muted); margin-top:2px;">
+                        <span style="color:var(--info-blue);">${seg.codeshare}</span> - Codeshare: Operated by ${carrier}, Marketed by ${marketingCarrierName}
+                    </div>`;
+                }
+                
                 html += `
                     <div class="segment-row" style="border-left-color:${st.class === 'status-hk' ? 'var(--success-green)' : st.class === 'status-hx' ? 'var(--error-red)' : 'var(--warning-amber)'}">
-                        <div class="seg-code" title="${carrier}">${seg.carrier}${seg.flight}</div>
-                        <div class="seg-route">${from} ➝ ${to} <span style="opacity:0.5; margin-left:5px">${seg.date}</span></div>
+                        <div class="seg-code" title="${carrier}">${flightDisplay}</div>
+                        <div class="seg-route">
+                            ${from} ➝ ${to} <span style="opacity:0.5; margin-left:5px">${seg.date}</span>
+                            ${codeshareInfo}
+                        </div>
                         <div class="seg-status ${st.class}">${st.icon} ${st.label}</div>
                     </div>
                 `;
