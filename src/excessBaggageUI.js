@@ -24,7 +24,19 @@ function getCountryForAirport(code) {
     return airport ? airport.country : null;
 }
 
+// Global click handler for closing autocomplete dropdowns (single listener)
+let globalClickHandler = null;
+
 export function renderExcessBaggageCalculator(container) {
+    // Remove old global click handler if it exists
+    if (globalClickHandler) {
+        document.removeEventListener('click', globalClickHandler);
+        globalClickHandler = null;
+    }
+    
+    // Track all active autocomplete dropdowns
+    const activeDropdowns = new Set();
+    
     container.innerHTML = `
         <div class="excess-baggage-container">
             <div class="glass-panel" style="margin-bottom:20px;">
@@ -289,7 +301,7 @@ export function renderExcessBaggageCalculator(container) {
     const currencyOptionsHTML = currencies.map(curr => `<option value="${curr}">${curr}</option>`).join('');
     
     // Populate all currency selects in one batch operation
-    const currencySelect = container.querySelector('#currencySelect');
+    let currencySelect = container.querySelector('#currencySelect');
     const sportsCurrency = container.querySelector('#sportsCurrency');
     const reportingCurrency = container.querySelector('#reportingCurrency');
     const upgradeSelect = container.querySelector('#upgradeCurrency');
@@ -339,11 +351,10 @@ export function renderExcessBaggageCalculator(container) {
         });
     });
     
-    // Input handlers
+    // Input handlers (currencySelect already declared above)
     const originInput = container.querySelector('#originInput');
     const destInput = container.querySelector('#destinationInput');
     const airlineSelect = container.querySelector('#airlineSelect');
-    const currencySelect = container.querySelector('#currencySelect');
     const btn = container.querySelector('#calculateBtn');
     const clearBtn = container.querySelector('#clearBtn');
     const resultDiv = container.querySelector('#rateResult');
@@ -369,6 +380,9 @@ export function renderExcessBaggageCalculator(container) {
     function createAutocompleteHandler(input, dropdown, infoDiv, onSelect) {
         let debounceTimer;
         let selectedAirport = null;
+        
+        // Add this dropdown to active set
+        activeDropdowns.add({ input, dropdown });
         
         input.addEventListener('input', () => {
             clearTimeout(debounceTimer);
@@ -419,13 +433,6 @@ export function renderExcessBaggageCalculator(container) {
             }, 150);
         });
         
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.style.display = 'none';
-            }
-        });
-        
         // Handle Enter key
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -436,9 +443,32 @@ export function renderExcessBaggageCalculator(container) {
                 dropdown.style.display = 'none';
             }
         });
-        
-        return () => selectedAirport;
     }
+    
+    // Single global click handler for all autocomplete dropdowns
+    globalClickHandler = (e) => {
+        // Don't interfere with header navigation buttons or their children
+        const target = e.target;
+        if (target && (
+            target.id === 'tabDecoder' || 
+            target.id === 'tabExcessBaggage' || 
+            target.closest('#tabDecoder') || 
+            target.closest('#tabExcessBaggage') ||
+            target.closest('.header-tabs')
+        )) {
+            return; // Allow header button clicks to work
+        }
+        
+        // Close all active dropdowns if click is outside
+        activeDropdowns.forEach(({ input, dropdown }) => {
+            if (!input.contains(target) && !dropdown.contains(target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+    };
+    
+    // Add single global listener
+    document.addEventListener('click', globalClickHandler);
     
     // Setup autocomplete for origin
     createAutocompleteHandler(originInput, originAutocomplete, originInfo, (airport) => {
