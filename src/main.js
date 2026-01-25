@@ -5,7 +5,8 @@ const els = {
     input: document.getElementById("gdsInput"),
     timeline: document.getElementById("timeline"),
     status: document.getElementById("inputStatus"),
-    clear: document.getElementById("btnClear")
+    clear: document.getElementById("btnClear"),
+    btnParse: document.getElementById("btnParse")
 };
 
 const processInput = () => {
@@ -25,17 +26,17 @@ const processInput = () => {
         
         if (els.status) {
             els.status.textContent = events.length > 0 
-                ? `Analyzed ${events.length} event blocks successfully` 
-                : "No structured data detected";
+                ? `Analyzed ${events.length} event blocks` 
+                : "No valid data found";
         }
     } catch (e) {
-        console.error("Parsing error:", e);
+        console.error(e);
         if(els.status) els.status.textContent = "Error parsing data";
     }
 };
 
-if (els.input) {
-    els.input.addEventListener("input", processInput);
+if (els.btnParse) {
+    els.btnParse.addEventListener("click", processInput);
 }
 
 if (els.clear) {
@@ -48,4 +49,9 @@ if (els.clear) {
     });
 }
 
-processInput();
+// Also parse on paste for convenience
+if (els.input) {
+    els.input.addEventListener("paste", () => {
+        setTimeout(processInput, 100);
+    });
+}
