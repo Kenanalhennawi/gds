@@ -54,6 +54,11 @@ const AIRPORT_DATA = {
     // Lebanon
     'BEY': { code: 'BEY', city: 'Beirut', country: 'Lebanon', name: 'Beirut' },
     
+    // Syria
+    'DAM': { code: 'DAM', city: 'Damascus', country: 'Syria', name: 'Damascus' },
+    'ALP': { code: 'ALP', city: 'Aleppo', country: 'Syria', name: 'Aleppo' },
+    'LTK': { code: 'LTK', city: 'Latakia', country: 'Syria', name: 'Latakia' },
+    
     // Iraq
     'BGW': { code: 'BGW', city: 'Baghdad', country: 'Iraq', name: 'Baghdad' },
     'BSR': { code: 'BSR', city: 'Basra', country: 'Iraq', name: 'Basra' },
@@ -320,17 +325,21 @@ const AIRPORT_DATA = {
 // Create searchable airport list
 const AIRPORT_LIST = Object.values(AIRPORT_DATA);
 
-// Pre-computed search index for performance
+// Pre-computed search index for performance - built once
 let searchIndex = null;
 
 function buildSearchIndex() {
     if (searchIndex) return searchIndex;
     
-    searchIndex = AIRPORT_LIST.map(airport => ({
-        airport,
-        searchText: `${airport.code} ${airport.city} ${airport.country} ${airport.name}`.toUpperCase()
-    }));
-    
+    // Build index once and cache it
+    const index = [];
+    for (const airport of AIRPORT_LIST) {
+        index.push({
+            airport,
+            searchText: `${airport.code} ${airport.city} ${airport.country} ${airport.name}`.toUpperCase()
+        });
+    }
+    searchIndex = index;
     return searchIndex;
 }
 
