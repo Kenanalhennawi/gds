@@ -41,8 +41,13 @@ export const renderTimeline = (container, events) => {
             </div>
         `;
 
-        if (evt.pax) {
-            html += `<div style="padding:0 15px 10px; font-size:12px; color:#fff; font-weight:700;">👤 ${evt.pax}</div>`;
+        if (evt.passengers && evt.passengers.length > 0) {
+            html += `<div class="alerts-container" style="margin-bottom:15px; border-left:2px solid var(--neon-gold); background:rgba(255,200,0,0.05); padding:10px;">
+                <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">PASSENGERS (${evt.passengers.length})</div>`;
+            evt.passengers.forEach(p => {
+                html += `<div style="font-size:13px; font-weight:700; color:#fff;">👤 ${p.surname}/${p.given} ${p.title}</div>`;
+            });
+            html += `</div>`;
         }
 
         if (evt.segments.length > 0) {
