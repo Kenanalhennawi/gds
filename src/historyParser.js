@@ -39,9 +39,31 @@ const parseActionLine = (l) => {
 
 const parseOfficeLine = (l) => {
   // Matches: MUC1A BAB9HM/YTO6W2140/6759931/YTO/1A/T/CA//SU
-  const m = l.match(/^([A-Z0-9]{2,3})\s+([A-Z0-9]{5,8})\/(\S+)/);
-  if (!m) return null;
-  return { office: m[1], recordLocator: m[2], signIn: m[3] };
+  let m = l.match(/^([A-Z0-9]{2,3})\s+([A-Z0-9]{5,8})\/(\S+)/);
+  if (m) return { office: m[1], recordLocator: m[2], signIn: m[3] };
+
+  // Matches: DXBEK DTZMGS (City/Airline + RLOC)
+  m = l.match(/^([A-Z]{3})([A-Z0-9]{2})\s+([A-Z0-9]{6})$/);
+  if (m) return { office: m[1], airline: m[2], recordLocator: m[3] };
+
+  return null;
+};
+
+const parseAirimpContext = (l) => {
+  // Matches standard: LAX1SQ 123456...
+  let m = l.match(/^(\S{2}Q\S{4})\s+([A-Z0-9]{6})\/(\S+)\/(\d{6,})\/(\S+)\/(\S{2})\/(\S)\/(\S{2})\/(\S{3})/);
+  if (m) return { airlineContext: m[1], recordRef: m[2] };
+
+  // Matches compressed: HDQFZ9PVL96/TLV/86494564/TLV/FZ/A/IL/USD
+  m = l.match(/^HDQ([A-Z0-9]{2})([A-Z0-9]{6})\/([A-Z]{3})\/(\d+)\/([A-Z]{3})\/([A-Z0-9]{2})\//);
+  if (m) return { 
+    airlineContext: m[1], // FZ
+    recordRef: m[2],      // 9PVL96
+    office: m[3],         // TLV
+    iata: m[4]
+  };
+
+  return null;
 };
 
 const parsePassengerLine = (l) => {
@@ -138,7 +160,8 @@ export const parseHistory = (input) => {
       pax: null,
       office: null,
       action: null,
-      recordLocator: null
+      recordLocator: null,
+      airlineContext: null
     };
   };
 
@@ -160,8 +183,17 @@ export const parseHistory = (input) => {
 
     const off = parseOfficeLine(l);
     if (off) {
-      current.office = off.office;
-      current.recordLocator = off.recordLocator;
+      if (off.office) current.office = off.office;
+      if (off.recordLocator) current.recordLocator = off.recordLocator;
+      if (off.airline) current.airlineContext = off.airline;
+      return;
+    }
+
+    const ctx = parseAirimpContext(l);
+    if (ctx) {
+      if (ctx.airlineContext) current.airlineContext = ctx.airlineContext;
+      if (ctx.recordRef) current.recordLocator = ctx.recordRef;
+      if (ctx.office) current.office = ctx.office;
       return;
     }
 
@@ -205,8 +237,8 @@ export const parseHistory = (input) => {
   const header = blocks.find(b => b.header)?.header || null;
   const office = blocks.find(b => b.office)?.office || null;
   const recordLocator = blocks.find(b => b.recordLocator)?.recordLocator || null;
+  const airlineContext = blocks.find(b => b.airlineContext)?.airlineContext || null;
 
-  // Reconstruct basic queue logic tokens for explanation
   let queueLogic = [];
   if (header && header.startsWith("HDQ")) {
     queueLogic.push({ code: "HDQ", meaning: "Queue Handling Message" });
@@ -221,6 +253,7 @@ export const parseHistory = (input) => {
     header,
     office,
     recordLocator,
+    airlineContext,
     envelopes,
     segments: allSegments,
     ssr: allSsr,
