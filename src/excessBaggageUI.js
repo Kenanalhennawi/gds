@@ -8,6 +8,7 @@ import {
     getZoneForAirport, 
     getZoneName, 
     getCurrencyForDestination,
+    getCurrencyForOriginOrDestination,
     getAllCurrencies,
     getGoShowFare,
     getSportsEquipmentRate,
@@ -131,7 +132,7 @@ export function renderExcessBaggageCalculator(container) {
                                     class="styled-select"
                                     style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
-                                    <option value="AUTO">Auto (by destination)</option>
+                                    <option value="AUTO">Auto (by origin/destination)</option>
                                 </select>
                             </div>
                         </div>
@@ -474,14 +475,25 @@ export function renderExcessBaggageCalculator(container) {
     createAutocompleteHandler(originInput, originAutocomplete, originInfo, (airport) => {
         const zone = getZoneForAirport(airport.code);
         originInfo.textContent = `${airport.city}, ${airport.country}${zone ? ` - Zone ${zone}` : ''}`;
+        
+        // Auto-select currency based on origin or destination
+        if (currencySelect && currencySelect.value === 'AUTO') {
+            const destValue = destInput ? destInput.value.trim() : null;
+            const currency = getCurrencyForOriginOrDestination(airport.code, destValue);
+            currencySelect.value = currency;
+        }
     });
     
     // Setup autocomplete for destination
     createAutocompleteHandler(destInput, destAutocomplete, destInfo, (airport) => {
         const zone = getZoneForAirport(airport.code);
-        const currency = getCurrencyForDestination(airport.code);
-        destInfo.textContent = `${airport.city}, ${airport.country}${zone ? ` - Zone ${zone}` : ''} (${currency})`;
+        const destCurrency = getCurrencyForDestination(airport.code);
+        destInfo.textContent = `${airport.city}, ${airport.country}${zone ? ` - Zone ${zone}` : ''} (${destCurrency})`;
+        
+        // Auto-select currency based on origin or destination (prefers origin)
         if (currencySelect && currencySelect.value === 'AUTO') {
+            const originValue = originInput ? originInput.value.trim() : null;
+            const currency = getCurrencyForOriginOrDestination(originValue, airport.code);
             currencySelect.value = currency;
         }
     });
