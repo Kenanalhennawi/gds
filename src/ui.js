@@ -39,6 +39,7 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   }
   explainEmpty.style.display = "none";
 
+  // --- PART 1: OVERVIEW CARD ---
   const grid = document.createElement("div");
   grid.className = "explain-grid";
 
@@ -63,6 +64,7 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   
   explainBody.appendChild(grid);
 
+  // --- PART 2: SEPARATOR ---
   const hr = document.createElement("hr");
   hr.style.margin = "16px 0";
   hr.style.border = "none";
@@ -75,6 +77,8 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   timelineTitle.style.marginBottom = "10px";
   explainBody.appendChild(timelineTitle);
 
+
+  // --- PART 3: HUMAN TIMELINE ---
   const container = document.createElement("div");
   container.className = "timeline";
 
@@ -87,6 +91,7 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
     const header = document.createElement("div");
     header.className = "event-header";
     
+    // Determine WHO did it (Source)
     let who = "System";
     let detail = "";
 
@@ -98,6 +103,7 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
         detail = "System";
     }
 
+    // Determine WHAT they did (Action)
     let what = "Update";
     if (block.envelope === "QK") what = "Request";
     if (block.envelope === "QP") what = "Response";
@@ -112,6 +118,31 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
       </div>
     `;
     eventDiv.appendChild(header);
+
+    // --- FIX: Explicitly explain the PNR/Context line here ---
+    if (block.recordLocator || block.airlineContext) {
+       const ctxDiv = document.createElement("div");
+       ctxDiv.style.background = "rgba(255, 255, 255, 0.05)";
+       ctxDiv.style.padding = "8px";
+       ctxDiv.style.borderRadius = "6px";
+       ctxDiv.style.fontSize = "12px";
+       ctxDiv.style.marginBottom = "8px";
+       
+       let ctxHtml = "";
+       if (block.recordLocator) {
+         ctxHtml += `<div><strong>Active Record (PNR):</strong> <span style="color:var(--accent); font-weight:bold">${esc(block.recordLocator)}</span></div>`;
+       }
+       if (block.airlineContext) {
+         const air = translateAirline(block.airlineContext);
+         ctxHtml += `<div><strong>Airline Context:</strong> ${esc(air)} (${esc(block.airlineContext)})</div>`;
+       }
+       if (block.office) {
+         const city = translateCity(block.office.substring(0,3));
+         ctxHtml += `<div><strong>Origin Office:</strong> ${esc(city)} (${esc(block.office)})</div>`;
+       }
+       ctxDiv.innerHTML = ctxHtml;
+       eventDiv.appendChild(ctxDiv);
+    }
 
     if (block.pax) {
         const paxDiv = document.createElement("div");
