@@ -75,6 +75,24 @@ export const parseLog = (input) => {
             block.context.recordLocator = mCity[3];
             return;
         }
+        
+        // Handle DXBEK QYHRKF/DXB/86491845/DXB/EK/A/AE format
+        const mCityOffice = line.match(/([A-Z]{3})([A-Z0-9]{2})\s+([A-Z0-9]{6})\/([A-Z]{3})\/(\d+)\/([A-Z]{3})\/([A-Z0-9]{2})/);
+        if (mCityOffice) {
+            block.context.office = mCityOffice[1];
+            block.context.airline = mCityOffice[2];
+            block.context.recordLocator = mCityOffice[3];
+            return;
+        }
+        
+        // Handle DXBEK QYHRKF (simpler format)
+        const mSimple = line.match(/([A-Z]{3})([A-Z0-9]{2})\s+([A-Z0-9]{6})/);
+        if (mSimple && !block.context.recordLocator) {
+            block.context.office = mSimple[1];
+            block.context.airline = mSimple[2];
+            block.context.recordLocator = mSimple[3];
+            return;
+        }
     };
 
     const extractPassengers = (line) => {
@@ -122,6 +140,7 @@ export const parseLog = (input) => {
             return;
         }
 
+        // Try standard segment format: FZ123 24JAN DXBADD HK1
         const segMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4}[A-Z]?)\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
         if (segMatch) {
             currentBlock.segments.push({
@@ -131,6 +150,34 @@ export const parseLog = (input) => {
                 from: segMatch[4],
                 to: segMatch[5],
                 status: segMatch[6]
+            });
+            return;
+        }
+        
+        // Try format with slash: FZ1263M/EK2474B24JAN DXBVNO CH1
+        const segSlashMatch = line.match(/([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2}\d{1,4}[A-Z]?\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
+        if (segSlashMatch) {
+            currentBlock.segments.push({
+                carrier: segSlashMatch[1],
+                flight: segSlashMatch[2],
+                date: segSlashMatch[3].match(/\d{2}[A-Z]{3}/)?.[0] || '',
+                from: segSlashMatch[4],
+                to: segSlashMatch[5],
+                status: segSlashMatch[6]
+            });
+            return;
+        }
+        
+        // Try format without explicit date: FZ1263M/EK2474B24JAN DXBVNO CH1 (extract date from marketing carrier part)
+        const segCompactMatch = line.match(/([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2}\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
+        if (segCompactMatch) {
+            currentBlock.segments.push({
+                carrier: segCompactMatch[1],
+                flight: segCompactMatch[2],
+                date: segCompactMatch[4],
+                from: segCompactMatch[5],
+                to: segCompactMatch[6],
+                status: segCompactMatch[7]
             });
             return;
         }
@@ -159,8 +206,8 @@ export const parseLog = (input) => {
             return;
         }
         
-        // Also handle SSR without space (SSRTKNE)
-        const ssrGluedMatch = line.match(/^SSR([A-Z]{4})\s+([A-Z0-9]{2})\s+([A-Z]{2}\d+)?/i);
+        // Also handle SSR without space (SSRTKNE or SSRFQTVFZHK/EK107126574)
+        const ssrGluedMatch = line.match(/^SSR([A-Z]{4})([A-Z0-9]{2})([A-Z]{2}\d+)?/i);
         if (ssrGluedMatch) {
             const ssrCode = ssrGluedMatch[1];
             const carrier = ssrGluedMatch[2];
@@ -173,6 +220,30 @@ export const parseLog = (input) => {
                 status: status,
                 raw: line,
                 details: rest
+            });
+            
+            const ssrInfo = translateSSR(line);
+            if (ssrInfo) {
+                currentBlock.messages.push(ssrInfo);
+            }
+            return;
+        }
+        
+        // Handle SSR with slash format: SSRFQTVFZHK/EK107126574-ALYASSI/SAUDMR
+        const ssrSlashMatch = line.match(/^SSR([A-Z]{4})([A-Z0-9]{2})([A-Z]{2}\d+)?\/([^\s-]+)(?:-([^\s]+))?/i);
+        if (ssrSlashMatch) {
+            const ssrCode = ssrSlashMatch[1];
+            const carrier = ssrSlashMatch[2];
+            const status = ssrSlashMatch[3] || '';
+            const value = ssrSlashMatch[4] || '';
+            const passenger = ssrSlashMatch[5] || '';
+            
+            currentBlock.ssrs.push({
+                code: ssrCode,
+                carrier: carrier,
+                status: status,
+                raw: line,
+                details: `${value}${passenger ? ' - ' + passenger : ''}`
             });
             
             const ssrInfo = translateSSR(line);
