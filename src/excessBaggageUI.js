@@ -18,6 +18,12 @@ import {
 import { translateAirline, translateCity } from "./translator.js";
 import { searchAirports, getAirportByCode } from "./airportSearch.js";
 
+// Helper to get country name from airport code
+function getCountryForAirport(code) {
+    const airport = getAirportByCode(code);
+    return airport ? airport.country : null;
+}
+
 export function renderExcessBaggageCalculator(container) {
     container.innerHTML = `
         <div class="excess-baggage-container">
@@ -460,14 +466,14 @@ export function renderExcessBaggageCalculator(container) {
     // Setup autocomplete for origin
     createAutocompleteHandler(originInput, originAutocomplete, originInfo, (airport) => {
         const zone = getZoneForAirport(airport.code);
-        originInfo.textContent = `${airport.city}, ${airport.country} - ${zone ? getZoneName(zone) : 'Zone not found'}`;
+        originInfo.textContent = `${airport.city}, ${airport.country}${zone ? ` - Zone ${zone}` : ''}`;
     });
     
     // Setup autocomplete for destination
     createAutocompleteHandler(destInput, destAutocomplete, destInfo, (airport) => {
         const zone = getZoneForAirport(airport.code);
         const currency = getCurrencyForDestination(airport.code);
-        destInfo.textContent = `${airport.city}, ${airport.country} - ${zone ? getZoneName(zone) : 'Zone not found'} (${currency})`;
+        destInfo.textContent = `${airport.city}, ${airport.country}${zone ? ` - Zone ${zone}` : ''} (${currency})`;
         if (currencySelect && currencySelect.value === 'AUTO') {
             currencySelect.value = currency;
         }
@@ -692,10 +698,23 @@ function displayExcessBaggageResult(result) {
     const carrierColor = result.airline === 'EK' ? 'var(--info-blue)' : 
                         result.airline === 'AC' ? 'var(--success-green)' :
                         result.airline === 'UA' ? 'var(--primary-blue)' :
-                        'var(--warning-amber)';
+                        result.airline === 'OAL' ? 'var(--warning-amber)' :
+                        'var(--primary-blue)';
     
     const originCity = translateCity(result.origin);
     const destCity = translateCity(result.destination);
+    const originAirport = getAirportByCode(result.origin);
+    const destAirport = getAirportByCode(result.destination);
+    const originCountry = originAirport ? originAirport.country : null;
+    const destCountry = destAirport ? destAirport.country : null;
+    
+    // For EK/OAL, show region; for FZ, show country or zone
+    const originDisplay = (result.airline === 'EK' || result.airline === 'OAL') && result.originRegion 
+        ? result.originRegion 
+        : (originCountry || (result.originZone ? `Zone ${result.originZone}` : ''));
+    const destDisplay = (result.airline === 'EK' || result.airline === 'OAL') && result.destRegion 
+        ? result.destRegion 
+        : (destCountry || (result.destZone ? `Zone ${result.destZone}` : ''));
     
     let html = `
         <div style="font-weight:700; font-size:18px; margin-bottom:15px; color:${carrierColor};">
@@ -710,7 +729,7 @@ function displayExcessBaggageResult(result) {
                         ${result.origin} ${originCity !== result.origin ? `(${originCity})` : ''}
                     </div>
                     <div style="font-size:12px; color:var(--text-muted); margin-top:3px;">
-                        ${getZoneName(result.originZone)}
+                        ${originCountry || originDisplay}${result.originZone && !originCountry ? ` - Zone ${result.originZone}` : ''}
                     </div>
                 </div>
                 <div>
@@ -719,7 +738,7 @@ function displayExcessBaggageResult(result) {
                         ${result.destination} ${destCity !== result.destination ? `(${destCity})` : ''}
                     </div>
                     <div style="font-size:12px; color:var(--text-muted); margin-top:3px;">
-                        ${getZoneName(result.destZone)} (${result.currency})
+                        ${destCountry || destDisplay}${result.destZone && !destCountry ? ` - Zone ${result.destZone}` : ''} (${result.currency})
                     </div>
                 </div>
             </div>
@@ -738,17 +757,20 @@ function displayExcessBaggageResult(result) {
                 </div>
             </div>
         `;
-    } else if (result.airline === 'EK') {
+    } else if (result.airline === 'EK' || result.airline === 'OAL') {
+        const routeInfo = result.originRegion && result.destRegion 
+            ? `Route: ${result.originRegion} → ${result.destRegion}`
+            : '';
         html += `
             <div style="background:rgba(96,165,250,0.1); padding:15px; border-radius:8px; border-left:3px solid var(--info-blue);">
                 <div style="font-weight:700; margin-bottom:10px; color:var(--info-blue);">Excess Baggage Rate</div>
                 <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-bottom:5px;">
-                    ${result.ratePerKg === 'N/A' ? 'N/A' : `$${result.ratePerKg} USD`}
+                    ${result.ratePerKg === null || result.ratePerKg === 'N/A' || result.ratePerKg === undefined ? 'Rate not available' : `$${result.ratePerKg} USD`}
                 </div>
                 <div style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">
                     Per kilogram (kg) of excess baggage
+                    ${routeInfo ? `<br><span style="font-size:11px; color:var(--text-dim); margin-top:5px; display:block;">${routeInfo}</span>` : ''}
                 </div>
-                <div style="font-size:12px; color:var(--text-muted); padding-top:10px; border-top:1px solid rgba(255,255,255,0.1);">
                     Route: ${result.originRegion} → ${result.destRegion}
                 </div>
             </div>
