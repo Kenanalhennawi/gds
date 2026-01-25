@@ -53,10 +53,6 @@ export const renderTimeline = (container, data) => {
     }
     
     // Hide hero section when data is present
-    const heroSection = document.getElementById('heroSection');
-    if (heroSection) {
-        heroSection.classList.add('hidden');
-    }
     
 
     // 3. Render Events
