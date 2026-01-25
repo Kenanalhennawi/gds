@@ -1,4 +1,5 @@
 import { esc, wrapToken } from "./utils.js";
+import { translateStatus, translateSSR } from "./translator.js";
 
 export const ensureVisible = (el, container) => {
   if (!el || !container) return;
@@ -32,124 +33,107 @@ export const renderDetect = ({ detectChips, detectEmpty, q, search }, tokens) =>
 
 export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   explainBody.innerHTML = "";
-  if (
-    !parsed ||
-    (!parsed.kind &&
-      !parsed.header &&
-      !parsed?.edifact?.segments?.length &&
-      !parsed?.segments?.length &&
-      !parsed?.ssr?.length)
-  ) {
+  if (!parsed || parsed.kind !== "GDS_HISTORY") {
     explainEmpty.style.display = "block";
     return;
   }
   explainEmpty.style.display = "none";
 
-  if (parsed.sentences && Array.isArray(parsed.sentences) && parsed.sentences.length) {
-    const box = document.createElement("div");
-    box.className = "explain-sentences";
-    parsed.sentences.slice(0, 12).forEach((s) => {
-      const row = document.createElement("div");
-      row.className = "explain-sentence";
-      row.innerHTML = esc(String(s));
-      box.appendChild(row);
-    });
-    explainBody.appendChild(box);
+  const container = document.createElement("div");
+  container.className = "timeline";
+
+  const blocks = parsed.blocks || [];
+
+  if (blocks.length === 0) {
+    const msg = document.createElement("div");
+    msg.className = "explain-empty";
+    msg.textContent = "No structured history blocks detected.";
+    container.appendChild(msg);
   }
 
-  const rows = [];
-  const add = (k, v) => {
-    if (v === null || v === undefined) return;
-    if (Array.isArray(v) && v.length === 0) return;
-    if (typeof v === "string" && !v.trim()) return;
-    rows.push([k, v]);
-  };
+  blocks.forEach((block) => {
+    const eventDiv = document.createElement("div");
+    eventDiv.className = "timeline-event";
 
-  add("Detected type", parsed.kind || "—");
-  add("Header", parsed.header ? wrapToken(parsed.header) : "—");
-  add("Airline context", parsed.airlineContext ? wrapToken(parsed.airlineContext) : "—");
-  add("Office / sign-in", parsed.office || "—");
-  add("Record reference", parsed.recordRef ? wrapToken(parsed.recordRef) : "—");
-  if (parsed.envelopes?.length) add("Envelopes", parsed.envelopes.map((x) => wrapToken(x)).join(" "));
-  if (parsed.actions?.length) add("Action codes", parsed.actions.map((x) => wrapToken(x)).join(" "));
-  if (parsed.statuses?.length) add("Segment statuses", parsed.statuses.map((x) => wrapToken(x)).join(" "));
-  if (parsed.ticketNumbers?.length) add("Ticket numbers", parsed.ticketNumbers.map((s) => wrapToken(s)).join(" "));
+    const header = document.createElement("div");
+    header.className = "event-header";
+    
+    let source = "Unknown Source";
+    if (block.envelope === "QP") source = "Response (QP)";
+    else if (block.envelope === "QK") source = "Input/Request (QK)";
+    else if (block.envelope === "QD") source = "Update (QD)";
+    else if (block.office) source = `Agent (${block.office})`;
 
-  if (parsed.pax) add("Passenger", `${esc(parsed.pax.surname)}/${esc(parsed.pax.given)} ${esc(parsed.pax.title)}`);
+    const action = block.action ? block.action : (block.header || "");
+    
+    header.innerHTML = `
+      <div class="event-meta">
+        <span class="event-source">${esc(source)}</span>
+        <span class="event-action">${esc(action)}</span>
+      </div>
+    `;
+    eventDiv.appendChild(header);
 
-  if (parsed.segments?.length) {
-    const seg = parsed.segments
-      .map((s) => {
-        const mkt = `${s.carrier}${s.flight}${s.bookingClass}${s.date}`;
-        const op = s.operatingCarrier ? `${s.operatingCarrier}${s.operatingFlight}${s.operatingClass}` : "";
-        const loc = `${s.from}${s.to}`;
-        const st = s.status || "";
-        const pax = s.paxCount ? `/${s.paxCount}` : "";
-        const t = s.depTime || s.arrTime ? ` ${s.depTime || ""}→${s.arrTime || ""}${s.dayOffset ? `(+${s.dayOffset})` : ""}` : "";
-        const cs = op ? ` (${op})` : "";
-        return `${wrapToken(mkt)} ${wrapToken(loc)} ${wrapToken(st + pax)}${cs ? ` ${wrapToken(cs.trim())}` : ""}${t ? ` ${wrapToken(t.trim())}` : ""}`;
-      })
-      .join("<br>");
-    add("Segments", seg);
-  }
+    if (block.segments && block.segments.length > 0) {
+      const segList = document.createElement("div");
+      segList.className = "segment-list";
+      
+      block.segments.forEach(seg => {
+        const trans = translateStatus(seg.status);
+        const item = document.createElement("div");
+        item.className = "segment-item";
+        item.style.borderLeftColor = trans.color;
 
-  if (parsed.ssr?.length) add("SSR types", parsed.ssr.map((s) => wrapToken(s)).join(" "));
-  if (parsed.ssrLines?.length)
-    add(
-      "SSR lines",
-      parsed.ssrLines
-        .slice(0, 40)
-        .map((s) => wrapToken(s))
-        .join("<br>") + (parsed.ssrLines.length > 40 ? "<br>..." : "")
-    );
-  if (parsed.osi?.length) add("OSI", parsed.osi.map((s) => wrapToken(s)).join("<br>"));
-  if (parsed.ticketNumbers?.length) add("Ticket numbers", parsed.ticketNumbers.map((s) => wrapToken(s)).join(" "));
-  if (parsed.statusTokens?.length) add("Status tokens", parsed.statusTokens.map((s) => wrapToken(s)).join(" "));
-  if (parsed.edifact?.segments?.length) add("EDIFACT segments", parsed.edifact.segments.map((s) => wrapToken(s)).join(" "));
-  if (parsed.edifact?.messageTypes?.length) add("EDIFACT message types", parsed.edifact.messageTypes.map((s) => wrapToken(s)).join(" "));
-  if (parsed.edifact?.ticketNumbers?.length) add("Ticket numbers", parsed.edifact.ticketNumbers.map((s) => wrapToken(s)).join(" "));
-  if (parsed.fare?.length) add("Fare tokens", parsed.fare.map((s) => wrapToken(s)).join(" "));
-
-  if (parsed.queueLogic?.length) {
-    const ql = parsed.queueLogic.map((x) => `<div>${wrapToken(x.code)} ${esc(x.meaning)}</div>`).join("");
-    add("Queue logic", ql);
-  }
-
-  if (parsed.diagnostics?.seatsNotAvailable) {
-    const d = parsed.diagnostics.seatsNotAvailable;
-    const lines = [];
-    if (d.reason) lines.push(`<div><b>Reason</b> ${esc(d.reason)}</div>`);
-    if (d.time) lines.push(`<div><b>Time</b> ${esc(d.time)}</div>`);
-    if (d.confirmation) lines.push(`<div><b>Confirmation</b> ${esc(d.confirmation)}</div>`);
-    if (d.systemCode) lines.push(`<div><b>System</b> ${esc(d.systemCode)}</div>`);
-    if (d.recordLocator) lines.push(`<div><b>Record Locator</b> ${esc(d.recordLocator)}</div>`);
-    if (d.flights?.length) {
-      const f = d.flights
-        .map((x) => {
-          const base = `${x.carrier || ""}${x.flightNumber || ""} ${x.origin || ""}-${x.destination || ""} ${x.flightDate || ""} ${x.fareClass || ""}`.trim();
-          const seats = x.seatsAvailable !== undefined && x.seatsRequested !== undefined ? `Seats ${x.seatsAvailable}/${x.seatsRequested}` : "";
-          const amt = x.fareAmount ? `${x.fareAmount} ${x.currencyCode || ""}`.trim() : "";
-          return `<div>${wrapToken(base)} ${esc(seats)} ${esc(amt)}</div>`;
-        })
-        .join("");
-      lines.push(`<div style="margin-top:8px"><b>Flights</b>${f}</div>`);
+        item.innerHTML = `
+          <div class="seg-main">
+            <span class="seg-code">${esc(seg.carrier)}${esc(seg.flight)}</span>
+            <span class="seg-route">${esc(seg.from)} ➔ ${esc(seg.to)}</span>
+            <span class="seg-date">${esc(seg.date)}</span>
+          </div>
+          <div class="seg-status" style="color: ${trans.color}">
+            <span class="status-icon">${trans.icon}</span>
+            <span>${trans.label} (${esc(seg.status)})</span>
+          </div>
+        `;
+        segList.appendChild(item);
+      });
+      eventDiv.appendChild(segList);
     }
-    add("Diagnostics", lines.join(""));
-  }
 
-  const grid = document.createElement("div");
-  grid.className = "explain-grid";
-  rows.forEach(([k, v]) => {
-    const kk = document.createElement("div");
-    kk.className = "explain-k";
-    kk.textContent = k;
-    const vv = document.createElement("div");
-    vv.className = "explain-v";
-    vv.innerHTML = typeof v === "string" ? v : esc(JSON.stringify(v));
-    grid.appendChild(kk);
-    grid.appendChild(vv);
+    const alerts = [];
+    const rawLines = [...(block.ssr || []), ...(block.osi || [])];
+    
+    rawLines.forEach(line => {
+      const text = line.text || line.raw || "";
+      const human = translateSSR(text);
+      if (human) {
+        alerts.push(`
+          <div class="alert alert-${human.type}">
+            <div class="alert-title">${esc(human.title)}</div>
+            <div class="alert-msg">${esc(human.msg)}</div>
+          </div>
+        `);
+      }
+    });
+
+    if (alerts.length > 0) {
+      const alertBox = document.createElement("div");
+      alertBox.className = "event-alerts";
+      alertBox.innerHTML = alerts.join("");
+      eventDiv.appendChild(alertBox);
+    }
+
+    if (block.pax) {
+        const paxDiv = document.createElement("div");
+        paxDiv.className = "event-pax";
+        paxDiv.textContent = `👤 ${block.pax.surname}/${block.pax.given}`;
+        eventDiv.appendChild(paxDiv);
+    }
+
+    container.appendChild(eventDiv);
   });
-  explainBody.appendChild(grid);
+
+  explainBody.appendChild(container);
 };
 
 export const renderResults = ({ results, stats, activeId, onSelect }, list) => {
