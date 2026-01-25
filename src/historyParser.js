@@ -1,15 +1,12 @@
 import { uniq } from "./utils.js";
 
-// Clean messy copy-pastes with hidden control characters
 const toLines = (text) => {
   if (!text) return [];
   
   let clean = text.toString();
   
-  // FIX: Replace SOH () and STX () and other control chars with newlines
-  clean = clean.replace(/[\u0001\u0002\u0003\u0004]/g, "\n");
+  clean = clean.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "\n");
   
-  // Heuristic: If we see a 6-digit number followed by dot/chars (like 231737 .DXB), split it
   clean = clean.replace(/(\d{6})\s+(\.?[A-Z]{2,3})/g, "$1\n$2");
   
   return clean
@@ -38,19 +35,16 @@ const parseActionLine = (l) => {
 };
 
 const parseOfficeLine = (l) => {
-  // Pattern 1: MUC1A ... (Amadeus Style)
   let m = l.match(/^([A-Z0-9]{2,3})\s+([A-Z0-9]{5,8})\/(\S+)/);
   if (m) return { office: m[1], recordLocator: m[2], signIn: m[3] };
+
+  m = l.match(/^([A-Z]{3})([A-Z0-9]{2})\s+([A-Z0-9]{6})$/);
+  if (m) return { office: m[1], airline: m[2], recordLocator: m[3] };
 
   return null;
 };
 
 const parseAirimpContext = (l) => {
-  // Pattern 1: Compressed HDQ with NO SPACE or WITH SPACE
-  // Matches: HDQFZ9PVL96/TLV... or HDQFZ 9PVL96/TLV...
-  // Group 1: Airline (2 chars)
-  // Group 2: PNR (6 chars)
-  // Group 3: Office (3-4 chars)
   const mCompressed = l.match(/^HDQ([A-Z0-9]{2})\s*([A-Z0-9]{6})\/([A-Z0-9]{3,4})\//);
   if (mCompressed) {
     return { 
@@ -59,22 +53,19 @@ const parseAirimpContext = (l) => {
        office: mCompressed[3] 
     };
   }
-  
-  // Pattern 2: City/Airline Pair (e.g. DXBEK DTZMGS)
-  const mPair = l.match(/^([A-Z]{3})([A-Z0-9]{2})\s+([A-Z0-9]{6})$/);
-  if (mPair) {
-      return { office: mPair[1], airlineContext: mPair[2], recordRef: mPair[3] };
-  }
 
-  // Pattern 3: Standard AIRIMP (LAX1SQ ...)
   let m = l.match(/^(\S{2}Q\S{4})\s+([A-Z0-9]{6})\/(\S+)\/(\d{6,})\/(\S+)\/(\S{2})\/(\S)\/(\S{2})\/(\S{3})/);
   if (m) return { airlineContext: m[1], recordRef: m[2] };
+
+  if (l.startsWith("HDQ")) {
+      const airline = l.substring(3, 5); 
+      return { airlineContext: airline };
+  }
 
   return null;
 };
 
 const parsePassengerLine = (l) => {
-  // Matches: 1LEVY/YUVALMR
   const m = l.match(/^(\d+)([A-Z'\-\s]+)\/([A-Z'\-\s]+)$/);
   if (!m) return null;
   return { index: Number(m[1]), surname: m[2].trim(), given: m[3].trim() };
@@ -82,10 +73,8 @@ const parsePassengerLine = (l) => {
 
 const parseSsrLine = (l) => {
   if (!l.startsWith("SSR")) return null;
-  // Matches: SSR TKNE EK HK1 ...
   const m = l.match(/^SSR\s+([A-Z0-9]{3,4})\s+([A-Z0-9]{2})\s+([A-Z]{2})(\d+)\/?(.*)$/);
   if (!m) {
-    // Matches: SSR OTHS EK ...
     const m2 = l.match(/^SSR\s+([A-Z0-9]{3,4})\s+([A-Z0-9]{2})\s+(.*)$/);
     if (!m2) return { raw: l };
     return { type: m2[1], carrier: m2[2], raw: l, text: (m2[3] || "").trim() };
@@ -104,11 +93,9 @@ const splitStatus = (s) => {
 };
 
 const parseSegment = (l) => {
-  // Matches: EK0374K29JAN DXBBKK SS1/2235 0735/1
   const m = l.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z])\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)(?:\/(\d{4})\s+(\d{4})(?:\/(\d))?)?/);
   
   if (!m) {
-    // Short format fallback
     const m2 = l.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z])\s+([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)$/);
     if(m2) {
        const status = m2[7];
