@@ -1,15 +1,12 @@
 import { uniq } from "./utils.js";
 
-// Clean messy copy-pastes with hidden control characters
 const toLines = (text) => {
   if (!text) return [];
   
   let clean = text.toString();
   
-  // FIX: Replace SOH () and STX () and other control chars with newlines
   clean = clean.replace(/[\u0001\u0002\u0003\u0004]/g, "\n");
   
-  // Heuristic: If we see a 6-digit number followed by dot/chars (like 231737 .DXB), split it
   clean = clean.replace(/(\d{6})\s+(\.?[A-Z]{2,3})/g, "$1\n$2");
   
   return clean
@@ -38,11 +35,9 @@ const parseActionLine = (l) => {
 };
 
 const parseOfficeLine = (l) => {
-  // Pattern 1: MUC1A ... (Amadeus Style)
   let m = l.match(/^([A-Z0-9]{2,3})\s+([A-Z0-9]{5,8})\/(\S+)/);
   if (m) return { office: m[1], recordLocator: m[2], signIn: m[3] };
 
-  // Pattern 2: DXBEK DTZMGS (City+Airline + RLOC)
   m = l.match(/^([A-Z]{3})([A-Z0-9]{2})\s+([A-Z0-9]{6})$/);
   if (m) return { office: m[1], airline: m[2], recordLocator: m[3] };
 
@@ -50,28 +45,27 @@ const parseOfficeLine = (l) => {
 };
 
 const parseAirimpContext = (l) => {
-  // Pattern 1: Standard AIRIMP (LAX1SQ ...)
   let m = l.match(/^(\S{2}Q\S{4})\s+([A-Z0-9]{6})\/(\S+)\/(\d{6,})\/(\S+)\/(\S{2})\/(\S)\/(\S{2})\/(\S{3})/);
   if (m) return { airlineContext: m[1], recordRef: m[2] };
 
-  // Pattern 2: Compressed Header (HDQFZ...) - This was failing before
-  // We look specifically for HDQ + 2 char airline code
   if (l.startsWith("HDQ")) {
-      const airline = l.substring(3, 5); // Take char 3 and 4 (e.g., FZ)
-      // Try to find the record locator (usually 6 chars after the first slash)
-      const parts = l.split('/');
+      const airline = l.substring(3, 5); 
+      const remainder = l.substring(5);
+      
+      const parts = remainder.split('/');
       let rloc = null;
       let office = null;
       
-      if(parts.length > 2) {
-          office = parts[1]; // TLV
-          rloc = parts[2]; // 86494564 or PNR
+      if (parts.length > 1) {
+          rloc = parts[0]; 
+      }
+      if (parts.length > 2) {
+          office = parts[1];
       }
       
       return { airlineContext: airline, office: office, recordRef: rloc };
   }
   
-  // Pattern 3: DXBEK ...
   if (l.length > 5 && /^[A-Z]{3}[A-Z]{2}\s/.test(l)) {
       return { airlineContext: l.substring(3,5), office: l.substring(0,3) };
   }
@@ -80,7 +74,6 @@ const parseAirimpContext = (l) => {
 };
 
 const parsePassengerLine = (l) => {
-  // Matches: 1LEVY/YUVALMR
   const m = l.match(/^(\d+)([A-Z'\-\s]+)\/([A-Z'\-\s]+)$/);
   if (!m) return null;
   return { index: Number(m[1]), surname: m[2].trim(), given: m[3].trim() };
@@ -88,10 +81,8 @@ const parsePassengerLine = (l) => {
 
 const parseSsrLine = (l) => {
   if (!l.startsWith("SSR")) return null;
-  // Matches: SSR TKNE EK HK1 ...
   const m = l.match(/^SSR\s+([A-Z0-9]{3,4})\s+([A-Z0-9]{2})\s+([A-Z]{2})(\d+)\/?(.*)$/);
   if (!m) {
-    // Matches: SSR OTHS EK ...
     const m2 = l.match(/^SSR\s+([A-Z0-9]{3,4})\s+([A-Z0-9]{2})\s+(.*)$/);
     if (!m2) return { raw: l };
     return { type: m2[1], carrier: m2[2], raw: l, text: (m2[3] || "").trim() };
@@ -110,11 +101,9 @@ const splitStatus = (s) => {
 };
 
 const parseSegment = (l) => {
-  // Matches: EK0374K29JAN DXBBKK SS1/2235 0735/1
   const m = l.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z])\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)(?:\/(\d{4})\s+(\d{4})(?:\/(\d))?)?/);
   
   if (!m) {
-    // Short format fallback
     const m2 = l.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z])\s+([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)$/);
     if(m2) {
        const status = m2[7];
