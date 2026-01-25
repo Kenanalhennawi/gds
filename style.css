@@ -1,5 +1,5 @@
 :root {
-    --bg-dark: #0f1419;
+    --bg-dark: #08121d;
     --glass: rgba(20, 25, 35, 0.9);
     --glass-border: rgba(100, 120, 150, 0.2);
     --primary-blue: #4a9eff;
@@ -162,35 +162,53 @@ body {
     background: var(--primary-blue);
 }
 
-/* Enhanced Styled Inputs and Selects */
+/* Enhanced Styled Inputs and Selects - Optimized for Performance */
 .styled-input,
 .styled-select {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    /* Minimal transitions for better performance */
+    transition: border-color 0.15s ease, background-color 0.15s ease !important;
+    /* Optimize rendering */
+    contain: layout style paint;
+    will-change: border-color;
 }
 
 .styled-input:hover,
 .styled-select:hover {
     background: rgba(0, 0, 0, 0.4) !important;
     border-color: rgba(74, 158, 255, 0.5) !important;
-    box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1) !important;
-    transform: translateY(-1px);
 }
 
 .styled-input:focus,
 .styled-select:focus {
     background: rgba(0, 0, 0, 0.5) !important;
     border-color: var(--primary-blue) !important;
-    box-shadow: 
-        0 0 0 3px rgba(74, 158, 255, 0.2),
-        0 4px 12px rgba(74, 158, 255, 0.15) !important;
-    transform: translateY(-2px);
     outline: none !important;
 }
 
-.styled-input:active,
+/* Optimize select for instant interaction */
+.styled-select {
+    /* Disable expensive operations during interaction */
+    contain: strict;
+    /* Prevent reflow during dropdown open */
+    backface-visibility: hidden;
+    transform: translateZ(0);
+}
+
 .styled-select:active {
-    transform: translateY(0);
-    box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.3) !important;
+    border-color: var(--primary-blue) !important;
+}
+
+/* Optimize select option rendering */
+.styled-select option {
+    background: rgba(20, 25, 35, 0.95);
+    color: var(--text-main);
+    padding: 6px 8px;
+}
+
+/* Prevent layout thrashing on select open */
+select.styled-select {
+    contain: strict;
+    isolation: isolate;
 }
 
 /* Service Tabs Enhanced Styling */
