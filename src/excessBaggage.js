@@ -80,9 +80,29 @@ export function getCurrencyForDestination(destination) {
     return 'USD'; // Default
 }
 
-// Get all available currencies
+// Get currency for origin or destination (prefers origin, falls back to destination)
+export function getCurrencyForOriginOrDestination(origin, destination) {
+    // First try origin
+    if (origin) {
+        const originCurrency = getCurrencyForDestination(origin);
+        if (originCurrency !== 'USD' || !destination) {
+            return originCurrency;
+        }
+    }
+    // Fall back to destination
+    if (destination) {
+        return getCurrencyForDestination(destination);
+    }
+    return 'USD'; // Default
+}
+
+// Get all available currencies - cached for performance
+let CURRENCIES_CACHE = null;
 export function getAllCurrencies() {
-    return Object.keys(CURRENCY_MAPPING).sort();
+    if (CURRENCIES_CACHE === null) {
+        CURRENCIES_CACHE = Object.keys(CURRENCY_MAPPING).sort();
+    }
+    return CURRENCIES_CACHE;
 }
 
 // Get zone name
