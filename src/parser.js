@@ -3,11 +3,10 @@ import { translateSSR } from "./translator.js";
 const cleanText = (text) => {
     if (!text) return [];
     let clean = text.toString();
-    
     clean = clean.replace(/[\u0001\u0002\u0003\u0004]/g, "\n");
     clean = clean.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "\n");
     clean = clean.replace(/(\d{6})\s+(\.?[A-Z]{2,3})/g, "$1\n$2");
-    
+    clean = clean.replace(/([0-9A-Z]{2}\d{3,4}[A-Z]?\d{2}[A-Z]{3})/g, "\n$1");
     return clean
         .split(/\r\n|\r|\n/)
         .map(l => l.trim())
@@ -36,7 +35,7 @@ export const parseLog = (input) => {
             context: { airline: null, recordLocator: null, office: null },
             segments: [],
             messages: [],
-            pax: null
+            passengers: []
         };
         parseContextFromHeader(currentBlock, header, rawLine);
     };
@@ -61,6 +60,21 @@ export const parseLog = (input) => {
         }
     };
 
+    const extractPassengers = (line) => {
+        const paxes = [];
+        const regex = /\d+([A-Z]+)\/([A-Z]+)(?:\s+([A-Z]{1,4}))?/g;
+        let match;
+        while ((match = regex.exec(line)) !== null) {
+            paxes.push({
+                raw: match[0],
+                surname: match[1],
+                given: match[2],
+                title: match[3] || ""
+            });
+        }
+        return paxes;
+    };
+
     lines.forEach(line => {
         const envMatch = line.match(/(?:^|\s)(QP|QK|QD)\s+(\S+)/);
         if (envMatch) {
@@ -82,17 +96,9 @@ export const parseLog = (input) => {
             else return; 
         }
 
-        const officeMatch = line.match(/^([A-Z]{3})([A-Z0-9]{2})\s+([A-Z0-9]{6})$/);
-        if (officeMatch) {
-            currentBlock.context.office = officeMatch[1];
-            currentBlock.context.airline = officeMatch[2];
-            currentBlock.context.recordLocator = officeMatch[3];
-            return;
-        }
-
-        const paxMatch = line.match(/^\d+([A-Z]+)\/([A-Z]+)(\s+[A-Z]+)?$/);
-        if (paxMatch) {
-            currentBlock.pax = `${paxMatch[1]}/${paxMatch[2]}`;
+        const foundPaxes = extractPassengers(line);
+        if (foundPaxes.length > 0) {
+            currentBlock.passengers.push(...foundPaxes);
             return;
         }
 
