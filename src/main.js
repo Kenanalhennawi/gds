@@ -14,7 +14,7 @@ const processInput = () => {
     const raw = els.input.value;
     
     if (!raw || !raw.trim()) {
-        renderTimeline(els.timeline, { events: [], summary: null });
+        renderTimeline(els.timeline, []);
         if (els.status) els.status.textContent = "Ready";
         return;
     }
@@ -22,7 +22,11 @@ const processInput = () => {
     try {
         const result = parseLog(raw);
         renderTimeline(els.timeline, result);
-        if (els.status) els.status.textContent = `Analyzed ${result.events.length} blocks`;
+        
+        // FIXED: Check if result is an array (old parser) or object (new parser) to avoid crashes
+        const count = Array.isArray(result) ? result.length : (result.events ? result.events.length : 0);
+        
+        if (els.status) els.status.textContent = `Analyzed ${count} blocks`;
     } catch (e) {
         console.error(e);
         if (els.status) els.status.textContent = "Error parsing log";
