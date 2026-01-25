@@ -49,7 +49,14 @@ export const translateSSR = (text) => {
     if (t.includes("ADTK") || t.includes("TIME LIMIT")) return { title: "Ticket Deadline", msg: "Issue ticket by deadline or booking cancels.", type: "warning" };
     if (t.includes("UNABLE")) return { title: "Request Failed", msg: "System rejected request.", type: "critical" };
     if (t.includes("CANCELLED") || t.includes("CANCELED") || t.includes("XLD")) return { title: "Cancellation", msg: "Booking/Segment cancelled.", type: "critical" };
-    if (t.includes("HK1") && t.includes("TKNE")) return { title: "Ticket Issued", msg: "E-Ticket attached.", type: "info" };
+    
+    // Improved TKNE handling: attempts to extract ticket number
+    if (t.includes("HK1") && t.includes("TKNE")) {
+        const ticketMatch = t.match(/(\d{13})/);
+        const ticketNum = ticketMatch ? ticketMatch[1] : "attached";
+        return { title: "Ticket Issued", msg: `E-Ticket ${ticketNum}`, type: "info" };
+    }
+    
     if (t.includes("NSST")) return { title: "Seat Data", msg: "Seat status transmitted.", type: "info" };
     return null;
 };
