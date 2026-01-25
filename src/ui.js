@@ -25,7 +25,6 @@ export const renderTimeline = (container, events) => {
         if (evt.context.airline) sourceName = translateAirline(evt.context.airline);
         if (evt.context.office) sourceName += ` (${translateCity(evt.context.office)})`;
 
-        // Build Context Line
         let contextHtml = "";
         if (evt.context.recordLocator) {
             contextHtml = `<div class="context-row">
@@ -57,12 +56,10 @@ export const renderTimeline = (container, events) => {
             ${contextHtml ? `<div class="card-context">${contextHtml}</div>` : ''}
         `;
 
-        if (evt.pax) {
-            // Handle multiple passengers
-            const paxes = evt.pax.split(',').map(p => p.trim());
+        if (evt.passengers && evt.passengers.length > 0) {
             html += `<div class="pax-list">`;
-            paxes.forEach(p => {
-                 html += `<div class="pax-item">👤 ${p.replace(/^\d+/, '')}</div>`;
+            evt.passengers.forEach(p => {
+                html += `<div class="pax-item">👤 ${p.surname}/${p.given} ${p.title}</div>`;
             });
             html += `</div>`;
         }
