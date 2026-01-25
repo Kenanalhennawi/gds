@@ -128,11 +128,11 @@ export const translateSSR = (text) => {
     if (t.includes("CANCELLED") || t.includes("CANCELED") || t.includes("XLD")) return { title: "Cancellation", msg: "Booking/Segment cancelled.", type: "critical" };
     
     if (t.includes("TKNE")) {
-        const ticketMatch = t.match(/.*?(\d{13}).*/);
+        const ticketMatch = t.match(/[.\-\s](\d{13})/);
         if (ticketMatch) {
             return { title: "Ticket Issued", msg: `E-Ticket ${ticketMatch[1]}`, type: "success" };
         }
-        return null;
+        return null; 
     }
     
     if (t.includes("NSST")) return { title: "Seat Data", msg: "Seat status transmitted.", type: "info" };
