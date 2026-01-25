@@ -56,7 +56,8 @@ export const renderTimeline = (container, data) => {
         
         if (hasChanges) {
             card.style.borderLeft = "4px solid var(--neon-gold)";
-            card.style.boxShadow = "0 0 15px rgba(255, 193, 7, 0.2)";
+            card.style.boxShadow = "0 0 25px rgba(255, 193, 7, 0.3), 0 0 50px rgba(255, 200, 0, 0.1)";
+            card.style.background = "linear-gradient(135deg, rgba(255, 200, 0, 0.05), var(--glass))";
         }
 
         // Get envelope explanation
@@ -106,8 +107,8 @@ export const renderTimeline = (container, data) => {
         // Add change explanation section
         let changesHtml = "";
         if (hasChanges) {
-            changesHtml = `<div class="changes-section" style="margin-top:15px; padding:15px; background:rgba(255,193,7,0.1); border-radius:8px; border-left:3px solid var(--neon-gold);">
-                <div style="font-weight:700; color:var(--neon-gold); margin-bottom:10px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
+            changesHtml = `<div class="changes-section" style="margin-top:15px; padding:15px; background:linear-gradient(135deg, rgba(255,193,7,0.15), rgba(255,150,0,0.1)); border-radius:8px; border-left:3px solid var(--neon-gold); box-shadow:0 0 20px rgba(255,200,0,0.2);">
+                <div style="font-weight:700; color:var(--neon-gold); margin-bottom:10px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; text-shadow:0 0 12px rgba(255,200,0,0.6);">
                     📋 What Happened:
                 </div>`;
             eventChanges.forEach(change => {
@@ -121,9 +122,9 @@ export const renderTimeline = (container, data) => {
                     'status_change': '🔄'
                 }[change.type] || '•';
                 
-                changesHtml += `<div style="margin-bottom:8px; padding:8px; background:rgba(0,0,0,0.3); border-radius:4px; font-size:13px; line-height:1.5;">
-                    <span style="margin-right:6px;">${changeIcon}</span>
-                    <span style="color:var(--text-main);">${change.description}</span>
+                changesHtml += `<div style="margin-bottom:8px; padding:8px; background:linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)); border-radius:4px; font-size:13px; line-height:1.5; border-left:2px solid var(--neon-gold); box-shadow:0 0 10px rgba(255,200,0,0.1);">
+                    <span style="margin-right:6px; font-size:16px;">${changeIcon}</span>
+                    <span style="color:var(--text-main); text-shadow:0 0 5px rgba(255,255,255,0.2);">${change.description}</span>
                 </div>`;
             });
             changesHtml += `</div>`;
@@ -175,20 +176,20 @@ export const renderTimeline = (container, data) => {
         // Display SSR codes with explanations
         if (evt.ssrs && evt.ssrs.length > 0) {
             html += `<div class="ssr-container" style="margin-top:15px; padding-left:15px;">
-                <div style="font-weight:700; color:var(--neon-blue); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">
+                <div style="font-weight:700; color:var(--neon-cyan); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; text-shadow:0 0 10px rgba(0,217,255,0.6);">
                     📋 Special Service Requests (SSR):
                 </div>`;
             evt.ssrs.forEach(ssr => {
                 const msg = evt.messages.find(m => m.ssrCode === ssr.code);
                 const explanation = msg ? msg.details || msg.msg : '';
                 html += `
-                    <div style="margin-bottom:8px; padding:10px; background:rgba(0,243,255,0.05); border-radius:6px; border-left:3px solid var(--neon-blue);">
+                    <div style="margin-bottom:8px; padding:10px; background:linear-gradient(135deg, rgba(0,243,255,0.08), rgba(176,38,255,0.05)); border-radius:6px; border-left:3px solid var(--neon-blue); box-shadow:0 0 15px rgba(0,243,255,0.1); transition:all 0.3s ease;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                            <strong style="color:var(--neon-blue); font-size:12px;">SSR ${ssr.code}</strong>
-                            <span style="font-size:11px; color:var(--text-muted);">${ssr.carrier}</span>
+                            <strong style="color:var(--neon-cyan); font-size:12px; text-shadow:0 0 8px rgba(0,217,255,0.5);">SSR ${ssr.code}</strong>
+                            <span style="font-size:11px; color:var(--neon-purple); text-shadow:0 0 6px rgba(176,38,255,0.4);">${ssr.carrier}</span>
                         </div>
-                        ${explanation ? `<div style="font-size:12px; color:var(--text-main); margin-top:4px;">${explanation}</div>` : ''}
-                        ${ssr.details ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code);">${ssr.details.substring(0, 100)}${ssr.details.length > 100 ? '...' : ''}</div>` : ''}
+                        ${explanation ? `<div style="font-size:12px; color:var(--text-main); margin-top:4px; text-shadow:0 0 5px rgba(255,255,255,0.2);">${explanation}</div>` : ''}
+                        ${ssr.details ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.8;">${ssr.details.substring(0, 100)}${ssr.details.length > 100 ? '...' : ''}</div>` : ''}
                     </div>
                 `;
             });
@@ -198,17 +199,17 @@ export const renderTimeline = (container, data) => {
         // Display OSI messages
         if (evt.osis && evt.osis.length > 0) {
             html += `<div class="osi-container" style="margin-top:15px; padding-left:15px;">
-                <div style="font-weight:700; color:var(--neon-green); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">
+                <div style="font-weight:700; color:var(--neon-lime); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; text-shadow:0 0 10px rgba(127,255,0,0.6);">
                     ℹ️ Other Service Information (OSI):
                 </div>`;
             evt.osis.forEach(osi => {
                 const msg = evt.messages.find(m => m.title && m.title.includes('Contact'));
                 html += `
-                    <div style="margin-bottom:6px; padding:8px; background:rgba(0,255,157,0.05); border-radius:6px; border-left:3px solid var(--neon-green);">
+                    <div style="margin-bottom:6px; padding:8px; background:linear-gradient(135deg, rgba(0,255,157,0.08), rgba(127,255,0,0.05)); border-radius:6px; border-left:3px solid var(--neon-green); box-shadow:0 0 15px rgba(0,255,157,0.1);">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                            <span style="font-size:11px; color:var(--text-muted);">${osi.carrier}</span>
+                            <span style="font-size:11px; color:var(--neon-lime); text-shadow:0 0 6px rgba(127,255,0,0.4);">${osi.carrier}</span>
                         </div>
-                        <div style="font-size:12px; color:var(--text-main);">${osi.message}</div>
+                        <div style="font-size:12px; color:var(--text-main); text-shadow:0 0 5px rgba(255,255,255,0.2);">${osi.message}</div>
                     </div>
                 `;
             });
