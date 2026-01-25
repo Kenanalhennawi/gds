@@ -1,4 +1,4 @@
-import { translateSSR } from "./translator.js";
+import { translateSSR, translateOSI } from "./translator.js";
 
 const cleanText = (text) => {
     if (!text) return [];
@@ -42,9 +42,12 @@ export const parseLog = (input) => {
             envelope: envelope,
             header: header,
             rawHeader: rawLine,
+            headerType: null, // TRL, AKA, ASC, NAR, DVD, NCO
             context: { airline: null, recordLocator: null, office: null },
             segments: [],
             messages: [],
+            ssrs: [], // Store SSR details
+            osis: [], // Store OSI messages
             passengers: []
         };
         parseContextFromHeader(currentBlock, header, rawLine);
@@ -96,6 +99,12 @@ export const parseLog = (input) => {
             return;
         }
 
+        // Detect header types (must be at start of line or after certain patterns)
+        const headerTypeMatch = line.match(/^(TRL|AKA|ASC|NAR|DVD|NCO)\s*/);
+        if (headerTypeMatch && currentBlock) {
+            currentBlock.headerType = headerTypeMatch[1];
+        }
+
         if (line.startsWith("SWI") || line.startsWith("HDQ")) {
             if (!currentBlock) startNewBlock("SYS", line.split(' ')[0], line);
             parseContextFromHeader(currentBlock, null, line);
@@ -126,6 +135,73 @@ export const parseLog = (input) => {
             return;
         }
 
+        // Parse SSR lines - handle various formats
+        const ssrMatch = line.match(/^SSR\s+([A-Z]{4})\s+([A-Z0-9]{2})\s+([A-Z]{2}\d+)?/i);
+        if (ssrMatch) {
+            const ssrCode = ssrMatch[1];
+            const carrier = ssrMatch[2];
+            const status = ssrMatch[3] || '';
+            const rest = line.substring(line.indexOf(ssrMatch[0]) + ssrMatch[0].length).trim();
+            
+            currentBlock.ssrs.push({
+                code: ssrCode,
+                carrier: carrier,
+                status: status,
+                raw: line,
+                details: rest
+            });
+            
+            // Also add to messages for display
+            const ssrInfo = translateSSR(line);
+            if (ssrInfo) {
+                currentBlock.messages.push(ssrInfo);
+            }
+            return;
+        }
+        
+        // Also handle SSR without space (SSRTKNE)
+        const ssrGluedMatch = line.match(/^SSR([A-Z]{4})\s+([A-Z0-9]{2})\s+([A-Z]{2}\d+)?/i);
+        if (ssrGluedMatch) {
+            const ssrCode = ssrGluedMatch[1];
+            const carrier = ssrGluedMatch[2];
+            const status = ssrGluedMatch[3] || '';
+            const rest = line.substring(line.indexOf(ssrGluedMatch[0]) + ssrGluedMatch[0].length).trim();
+            
+            currentBlock.ssrs.push({
+                code: ssrCode,
+                carrier: carrier,
+                status: status,
+                raw: line,
+                details: rest
+            });
+            
+            const ssrInfo = translateSSR(line);
+            if (ssrInfo) {
+                currentBlock.messages.push(ssrInfo);
+            }
+            return;
+        }
+
+        // Parse OSI lines
+        const osiMatch = line.match(/^OSI\s+([A-Z0-9]{2})\s+(.+)/i);
+        if (osiMatch) {
+            const carrier = osiMatch[1];
+            const message = osiMatch[2];
+            currentBlock.osis.push({
+                carrier: carrier,
+                message: message,
+                raw: line
+            });
+            
+            // Add OSI explanation to messages
+            const osiInfo = translateOSI(line);
+            if (osiInfo) {
+                currentBlock.messages.push(osiInfo);
+            }
+            return;
+        }
+
+        // Generic message parsing (for other important messages)
         const ssrInfo = translateSSR(line);
         if (ssrInfo) {
             currentBlock.messages.push(ssrInfo);
