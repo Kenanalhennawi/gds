@@ -20,21 +20,11 @@ const processInput = () => {
     if (!els.input) return;
     const raw = els.input.value;
     
-    // Show/hide hero section based on input
-    const heroSection = document.getElementById('heroSection');
-    
     if (!raw || !raw.trim()) {
         renderTimeline(els.timeline, []);
         if (els.status) els.status.textContent = "Ready - Auto-Analyzing";
-        // Show hero if no data and no active section
-        if (heroSection && els.decoderSection.style.display !== 'block') {
-            heroSection.classList.remove('hidden');
-        }
         return;
     }
-    
-    // Hide hero when input is present
-    if (heroSection) heroSection.classList.add('hidden');
 
     try {
         const events = parseLog(raw);
@@ -119,8 +109,6 @@ if (els.tabDecoder && els.tabExcessBaggage) {
         if (els.excessBaggageSection) els.excessBaggageSection.style.display = "block";
         
         // Hide hero section when excess baggage is active
-        const heroSection = document.getElementById('heroSection');
-        if (heroSection) heroSection.classList.add('hidden');
         
         // Initialize excess baggage calculator if not already done
         if (els.excessBaggageContainer && els.excessBaggageContainer.children.length === 0) {
