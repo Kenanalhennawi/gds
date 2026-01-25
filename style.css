@@ -231,6 +231,7 @@ body {
 .alert-critical { background: rgba(255, 42, 109, 0.15); border: 1px solid rgba(255, 42, 109, 0.3); color: #ff8fae; }
 .alert-warning { background: rgba(255, 200, 0, 0.15); border: 1px solid rgba(255, 200, 0, 0.3); color: #ffe680; }
 .alert-info { background: rgba(0, 243, 255, 0.1); border: 1px solid rgba(0, 243, 255, 0.2); color: #a3f7ff; }
+.alert-success { background: rgba(0, 255, 157, 0.1); border: 1px solid rgba(0, 255, 157, 0.2); color: #a3ffc7; }
 
 .btn-glass {
     background: rgba(255,255,255,0.05);
@@ -271,9 +272,6 @@ body {
 }
 @keyframes pulse { 0% { opacity: 0.3; } 50% { opacity: 1; } 100% { opacity: 0.3; } }
 
-::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
-
 .card-context {
     background: rgba(255, 255, 255, 0.03);
     padding: 10px 15px;
@@ -311,3 +309,6 @@ body {
     border-radius: 4px;
     border: 1px solid rgba(0, 243, 255, 0.2);
 }
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 3px; }
