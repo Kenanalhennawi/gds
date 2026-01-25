@@ -3,11 +3,14 @@ export const translateStatus = (code) => {
     const map = {
         HK: { label: "Confirmed", class: "status-hk", icon: "✓" },
         KK: { label: "Confirmed", class: "status-hk", icon: "✓" },
+        KL: { label: "Confirmed", class: "status-hk", icon: "✓" },
         TK: { label: "Schedule Change", class: "status-tk", icon: "⚠" },
         UN: { label: "Cancelled (Airline)", class: "status-hx", icon: "✕" },
         UC: { label: "Unable Confirm", class: "status-hx", icon: "✕" },
         HX: { label: "Cancelled", class: "status-hx", icon: "✕" },
-        XX: { label: "Cancelled (Admin)", class: "status-hx", icon: "✕" },
+        XX: { label: "Cancelled", class: "status-hx", icon: "✕" },
+        NO: { label: "No Action Taken", class: "status-hx", icon: "−" },
+        US: { label: "Unable to Sell", class: "status-hx", icon: "✕" },
         SS: { label: "Sold", class: "status-hk", icon: "✓" },
         DK: { label: "Holding", class: "status-tk", icon: "⧖" }
     };
@@ -15,18 +18,20 @@ export const translateStatus = (code) => {
 };
 
 export const translateAirline = (code) => {
+    if (!code) return "";
     const map = {
         FZ: "Flydubai", EK: "Emirates", QR: "Qatar Airways", TK: "Turkish Airlines",
         MS: "EgyptAir", SV: "Saudia", XY: "Flynas", G9: "Air Arabia",
         J9: "Jazeera", KU: "Kuwait Airways", WY: "Oman Air", GF: "Gulf Air",
-        EY: "Etihad", AI: "Air India", BA: "British Airways", LH: "Lufthansa",
-        AF: "Air France", KL: "KLM", DL: "Delta", UA: "United",
-        ET: "Ethiopian", CA: "Air China", "1G": "Galileo", "1A": "Amadeus"
+        EY: "Etihad", AI: "Air India", IX: "Air India Express", BA: "British Airways",
+        LH: "Lufthansa", AF: "Air France", KL: "KLM", DL: "Delta", UA: "United",
+        ET: "Ethiopian", CA: "Air China", "1G": "Galileo", "1A": "Amadeus", "1B": "Abacus"
     };
-    return map[code?.toUpperCase()] || code;
+    return map[code.toUpperCase()] || code;
 };
 
 export const translateCity = (code) => {
+    if (!code) return "";
     const map = {
         DXB: "Dubai", DOH: "Doha", RUH: "Riyadh", JED: "Jeddah",
         LHR: "London", CDG: "Paris", AMS: "Amsterdam", FRA: "Frankfurt",
@@ -35,7 +40,7 @@ export const translateCity = (code) => {
         YYZ: "Toronto", JFK: "New York", TIA: "Tirana", BJM: "Bujumbura",
         ADD: "Addis Ababa", DYU: "Dushanbe", VNO: "Vilnius"
     };
-    return map[code?.toUpperCase()] || code;
+    return map[code.toUpperCase()] || code;
 };
 
 export const translateSSR = (text) => {
