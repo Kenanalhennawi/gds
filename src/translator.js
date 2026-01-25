@@ -123,16 +123,18 @@ export const translateSSR = (text) => {
     const t = (text || "").toUpperCase();
     
     if (t.includes("NOSHO")) return { title: "No Show", msg: "Passenger missed flight.", type: "critical" };
+    if (t.includes("ADTK") || t.includes("TIME LIMIT")) return { title: "Ticket Deadline", msg: "Issue ticket by deadline or booking cancels.", type: "warning" };
     if (t.includes("UNABLE")) return { title: "Request Failed", msg: "System rejected request.", type: "critical" };
-    if (t.includes("CANCELLED") || t.includes("CANCELED")) return { title: "Cancellation", msg: "Segment cancelled.", type: "critical" };
+    if (t.includes("CANCELLED") || t.includes("CANCELED") || t.includes("XLD")) return { title: "Cancellation", msg: "Booking/Segment cancelled.", type: "critical" };
     
     if (t.includes("TKNE")) {
-        const ticketMatch = t.match(/[.\-\s](\d{13})/);
+        const ticketMatch = t.match(/.*?(\d{13}).*/);
         if (ticketMatch) {
             return { title: "Ticket Issued", msg: `E-Ticket ${ticketMatch[1]}`, type: "success" };
         }
-        return null; 
+        return null;
     }
     
+    if (t.includes("NSST")) return { title: "Seat Data", msg: "Seat status transmitted.", type: "info" };
     return null;
 };
