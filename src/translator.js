@@ -5,8 +5,8 @@ export const translateStatus = (code) => {
         KK: { label: "Confirmed", class: "status-hk", icon: "✓" },
         KL: { label: "Confirmed", class: "status-hk", icon: "✓" },
         TK: { label: "Schedule Change", class: "status-tk", icon: "⚠" },
-        UN: { label: "Cancelled (Airline)", class: "status-hx", icon: "✕" },
-        UC: { label: "Unable Confirm", class: "status-hx", icon: "✕" },
+        UN: { label: "Cancelled", class: "status-hx", icon: "✕" },
+        UC: { label: "Unable", class: "status-hx", icon: "✕" },
         HX: { label: "Cancelled", class: "status-hx", icon: "✕" },
         XX: { label: "Cancelled", class: "status-hx", icon: "✕" },
         NO: { label: "No Action Taken", class: "status-hx", icon: "−" },
@@ -61,9 +61,9 @@ const AIRLINES = {
     VN: "Vietnam Airlines", GA: "Garuda Indonesia", PR: "Philippine Airlines",
     CX: "Cathay Pacific", BR: "EVA Air", CI: "China Airlines", HX: "Hong Kong Airlines",
     CA: "Air China", MU: "China Eastern", CZ: "China Southern", HU: "Hainan Airlines",
-    MF: "XiamenAir", 3U: "Sichuan Airlines", ZH: "Shenzhen Airlines",
+    MF: "XiamenAir", "3U": "Sichuan Airlines", ZH: "Shenzhen Airlines",
     NH: "All Nippon Airways", JL: "Japan Airlines", KE: "Korean Air", OZ: "Asiana Airlines",
-    AI: "Air India", IX: "Air India Express", UK: "Vistara", 6E: "IndiGo",
+    AI: "Air India", IX: "Air India Express", UK: "Vistara", "6E": "IndiGo",
     SG: "SpiceJet", G8: "Go First", PK: "Pakistan Int. Airlines", PA: "Airblue",
     BG: "Biman Bangladesh", BS: "US-Bangla Airlines", RX: "Regent Airways",
     UL: "SriLankan Airlines", KB: "Druk Air", RA: "Nepal Airlines",
@@ -144,15 +144,16 @@ export const translateCity = (code) => {
 
 export const translateSSR = (text) => {
     const t = (text || "").toUpperCase();
+    
     if (t.includes("NOSHO")) return { title: "No Show", msg: "Passenger missed flight.", type: "critical" };
     if (t.includes("ADTK") || t.includes("TIME LIMIT")) return { title: "Ticket Deadline", msg: "Issue ticket by deadline or booking cancels.", type: "warning" };
     if (t.includes("UNABLE")) return { title: "Request Failed", msg: "System rejected request.", type: "critical" };
     if (t.includes("CANCELLED") || t.includes("CANCELED") || t.includes("XLD")) return { title: "Cancellation", msg: "Booking/Segment cancelled.", type: "critical" };
     
-    if (t.includes("HK1") && t.includes("TKNE")) {
-        const ticketMatch = t.match(/.*?(\d{13}).*/);
+    if (t.includes("TKNE")) {
+        const ticketMatch = t.match(/[.\-\s](\d{13})/);
         if (ticketMatch) {
-            return { title: "Ticket Issued", msg: `E-Ticket ${ticketMatch[1]}`, type: "info" };
+            return { title: "Ticket Issued", msg: `E-Ticket ${ticketMatch[1]}`, type: "success" };
         }
         return null;
     }
