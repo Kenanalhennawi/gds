@@ -2,8 +2,12 @@
     --bg-dark: #08121d;
     --glass: rgba(20, 25, 35, 0.9);
     --glass-border: rgba(100, 120, 150, 0.2);
-    --primary-blue: #4a9eff;
-    --primary-cyan: #5bc0de;
+    --primary-blue: #3b82f6;
+    --primary-blue-light: #60a5fa;
+    --primary-blue-dark: #2563eb;
+    --primary-orange: #f97316;
+    --primary-orange-light: #fb923c;
+    --primary-orange-dark: #ea580c;
     --accent-purple: #8b7cf6;
     --accent-pink: #d67ee8;
     --success-green: #4ade80;
@@ -51,7 +55,7 @@ body {
     position: absolute;
     inset: 0;
     background: 
-        radial-gradient(circle at 20% 30%, rgba(74, 158, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
         radial-gradient(circle at 80% 70%, rgba(139, 124, 246, 0.08) 0%, transparent 50%),
         radial-gradient(circle at 50% 50%, rgba(74, 222, 128, 0.04) 0%, transparent 70%);
     animation: gradientShift 20s ease infinite;
@@ -89,7 +93,7 @@ body {
     display: flex; align-items: center; justify-content: center;
     font-weight: 900; font-size: 14px; color: #fff;
     box-shadow: 
-        0 4px 12px rgba(74, 158, 255, 0.3),
+        0 4px 12px rgba(59, 130, 246, 0.3),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
     position: relative;
 }
@@ -175,13 +179,14 @@ body {
 .styled-input:hover,
 .styled-select:hover {
     background: rgba(0, 0, 0, 0.4) !important;
-    border-color: rgba(74, 158, 255, 0.5) !important;
+    border-color: rgba(59, 130, 246, 0.5) !important;
 }
 
 .styled-input:focus,
 .styled-select:focus {
     background: rgba(0, 0, 0, 0.5) !important;
     border-color: var(--primary-blue) !important;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
     outline: none !important;
 }
 
@@ -195,7 +200,7 @@ body {
 }
 
 .styled-select:active {
-    border-color: var(--primary-blue) !important;
+    border-color: var(--primary-orange) !important;
 }
 
 /* Optimize select option rendering */
@@ -203,6 +208,15 @@ body {
     background: rgba(20, 25, 35, 0.95);
     color: var(--text-main);
     padding: 6px 8px;
+}
+
+.styled-select option:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+.styled-select option:checked {
+    background: rgba(249, 115, 22, 0.3);
+    color: var(--primary-orange-light);
 }
 
 /* Prevent layout thrashing on select open */
@@ -225,7 +239,7 @@ select.styled-select {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(74, 158, 255, 0.2), transparent);
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.2), transparent);
     transition: left 0.5s ease;
 }
 
@@ -234,20 +248,21 @@ select.styled-select {
 }
 
 .service-tab:hover {
-    background: rgba(74, 158, 255, 0.15) !important;
+    background: rgba(59, 130, 246, 0.15) !important;
     color: var(--primary-blue) !important;
     transform: translateY(-2px);
+    border-bottom: 2px solid var(--primary-orange) !important;
 }
 
 .service-tab.active {
-    background: rgba(74, 158, 255, 0.25) !important;
-    border-bottom: 2px solid var(--primary-blue) !important;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(249, 115, 22, 0.15)) !important;
+    border-bottom: 2px solid var(--primary-orange) !important;
     color: var(--primary-blue) !important;
-    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2), 0 2px 6px rgba(249, 115, 22, 0.2);
 }
 
 .service-tab.active:hover {
-    background: rgba(74, 158, 255, 0.3) !important;
+    background: rgba(59, 130, 246, 0.3) !important;
 }
 
 /* Buttons Enhanced Styling */
@@ -281,23 +296,23 @@ select.styled-select {
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 
-        0 8px 20px rgba(74, 158, 255, 0.4),
-        0 0 0 3px rgba(74, 158, 255, 0.2);
+        0 8px 20px rgba(59, 130, 246, 0.4),
+        0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .btn-primary:active {
     transform: translateY(0);
     box-shadow: 
-        0 4px 12px rgba(74, 158, 255, 0.3),
-        0 0 0 3px rgba(74, 158, 255, 0.3);
+        0 4px 12px rgba(59, 130, 246, 0.3),
+        0 0 0 3px rgba(59, 130, 246, 0.3);
 }
 
 .btn-glass:hover {
     background: rgba(100, 120, 150, 0.2) !important;
-    border-color: rgba(74, 158, 255, 0.4) !important;
+    border-color: rgba(59, 130, 246, 0.4) !important;
     color: var(--primary-blue) !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(74, 158, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
 }
 
 .btn-glass:active {
@@ -310,13 +325,13 @@ select.styled-select {
 }
 
 .autocomplete-dropdown > div:hover {
-    background: rgba(74, 158, 255, 0.25) !important;
+    background: rgba(59, 130, 246, 0.25) !important;
     transform: translateX(4px);
     border-left: 3px solid var(--primary-blue);
 }
 
 .autocomplete-dropdown > div:active {
-    background: rgba(74, 158, 255, 0.35) !important;
+    background: rgba(59, 130, 246, 0.35) !important;
     transform: translateX(2px);
 }
 
@@ -338,7 +353,7 @@ label {
 }
 
 .styled-select option:hover {
-    background: rgba(74, 158, 255, 0.2);
+    background: rgba(59, 130, 246, 0.2);
 }
 
 /* Glass Panel Hover Effect */
@@ -349,7 +364,7 @@ label {
 .glass-panel:hover {
     box-shadow: 
         0 8px 32px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(74, 158, 255, 0.1);
+        0 0 0 1px rgba(59, 130, 246, 0.1);
 }
 
 /* Result Display Animations */
@@ -371,7 +386,7 @@ label {
 /* Focus Ring Animation */
 @keyframes focusRing {
     0% {
-        box-shadow: 0 0 0 0 rgba(74, 158, 255, 0.4);
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
     }
     100% {
         box-shadow: 0 0 0 4px rgba(74, 158, 255, 0);
@@ -427,7 +442,7 @@ label {
     height: 1px;
     background: linear-gradient(90deg, 
         transparent, 
-        var(--neon-blue), 
+        var(--primary-blue), 
         transparent
     );
     opacity: 0.5;
@@ -511,7 +526,7 @@ label {
     width: 8px; height: 8px;
     border-radius: 50%;
     background: var(--primary-blue);
-    box-shadow: 0 0 8px rgba(74, 158, 255, 0.5);
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
 }
 
 .action-title { 
@@ -530,10 +545,10 @@ label {
 .context-pill {
     font-family: var(--font-code);
     font-size: 11px;
-    background: rgba(74, 158, 255, 0.15);
+    background: rgba(59, 130, 246, 0.15);
     padding: 4px 8px;
     border-radius: 4px;
-    border: 1px solid rgba(74, 158, 255, 0.3);
+    border: 1px solid rgba(59, 130, 246, 0.3);
     color: var(--primary-blue);
 }
 
@@ -564,7 +579,7 @@ label {
     bottom: 0;
     width: 2px;
     background: linear-gradient(180deg, 
-        var(--neon-blue), 
+        var(--primary-blue), 
         var(--neon-purple), 
         var(--neon-pink)
     );
@@ -649,16 +664,16 @@ label {
 }
 
 .btn-glass:hover { 
-    background: rgba(74, 158, 255, 0.15); 
+    background: rgba(59, 130, 246, 0.15); 
     border-color: var(--primary-blue); 
     color: var(--primary-blue);
     transform: translateY(-1px);
 }
 
 .btn-primary {
-    background: var(--neon-blue);
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
     border: none;
-    color: #000;
+    color: #fff;
     padding: 8px 20px;
     border-radius: 6px;
     cursor: pointer;
@@ -667,9 +682,13 @@ label {
     text-transform: uppercase;
     letter-spacing: 1px;
     transition: all 0.2s;
-    box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
-.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(0, 243, 255, 0.6); }
+.btn-primary:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 6px 25px rgba(249, 115, 22, 0.5);
+    background: linear-gradient(135deg, var(--primary-blue-light), var(--primary-orange-light));
+}
 
 .empty-state {
     height: 100%; 
@@ -778,16 +797,16 @@ label {
     font-size: 13px;
     font-weight: 700;
     color: #fff;
-    background: rgba(74, 158, 255, 0.15);
+    background: rgba(59, 130, 246, 0.15);
     padding: 4px 10px;
     border-radius: 4px;
-    border: 1px solid rgba(74, 158, 255, 0.3);
+    border: 1px solid rgba(59, 130, 246, 0.3);
     transition: all 0.3s ease;
 }
 
 .pax-item:hover {
     transform: scale(1.05);
-    background: rgba(74, 158, 255, 0.25);
+    background: rgba(59, 130, 246, 0.25);
 }
 
 .summary-card {
