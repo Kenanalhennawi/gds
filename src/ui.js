@@ -47,8 +47,9 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   if (blocks.length === 0) {
     const msg = document.createElement("div");
     msg.className = "explain-empty";
-    msg.textContent = "No structured history blocks detected.";
+    msg.textContent = "No history blocks detected.";
     container.appendChild(msg);
+    return;
   }
 
   blocks.forEach((block) => {
@@ -58,9 +59,9 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
     const header = document.createElement("div");
     header.className = "event-header";
     
-    let source = "Unknown Source";
+    let source = "System/Airline";
     if (block.envelope === "QP") source = "Response (QP)";
-    else if (block.envelope === "QK") source = "Input/Request (QK)";
+    else if (block.envelope === "QK") source = "Request (QK)";
     else if (block.envelope === "QD") source = "Update (QD)";
     else if (block.office) source = `Agent (${block.office})`;
 
@@ -73,6 +74,13 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
       </div>
     `;
     eventDiv.appendChild(header);
+
+    if (block.pax) {
+        const paxDiv = document.createElement("div");
+        paxDiv.className = "event-pax";
+        paxDiv.textContent = `👤 ${block.pax.surname}/${block.pax.given}`;
+        eventDiv.appendChild(paxDiv);
+    }
 
     if (block.segments && block.segments.length > 0) {
       const segList = document.createElement("div");
@@ -121,13 +129,6 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
       alertBox.className = "event-alerts";
       alertBox.innerHTML = alerts.join("");
       eventDiv.appendChild(alertBox);
-    }
-
-    if (block.pax) {
-        const paxDiv = document.createElement("div");
-        paxDiv.className = "event-pax";
-        paxDiv.textContent = `👤 ${block.pax.surname}/${block.pax.given}`;
-        eventDiv.appendChild(paxDiv);
     }
 
     container.appendChild(eventDiv);
