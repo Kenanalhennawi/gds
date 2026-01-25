@@ -20,11 +20,21 @@ const processInput = () => {
     if (!els.input) return;
     const raw = els.input.value;
     
+    // Show/hide hero section based on input
+    const heroSection = document.getElementById('heroSection');
+    
     if (!raw || !raw.trim()) {
         renderTimeline(els.timeline, []);
         if (els.status) els.status.textContent = "Ready - Auto-Analyzing";
+        // Show hero if no data and no active section
+        if (heroSection && els.decoderSection.style.display !== 'block') {
+            heroSection.classList.remove('hidden');
+        }
         return;
     }
+    
+    // Hide hero when input is present
+    if (heroSection) heroSection.classList.add('hidden');
 
     try {
         const events = parseLog(raw);
@@ -90,14 +100,7 @@ if (els.tabDecoder && els.tabExcessBaggage) {
         e.stopPropagation();
         
         els.tabDecoder.classList.add("active");
-        els.tabDecoder.style.background = "rgba(59,130,246,0.2)";
-        els.tabDecoder.style.borderColor = "var(--primary-blue)";
-        els.tabDecoder.style.color = "var(--primary-blue)";
-        
         els.tabExcessBaggage.classList.remove("active");
-        els.tabExcessBaggage.style.background = "rgba(255,255,255,0.05)";
-        els.tabExcessBaggage.style.borderColor = "var(--glass-border)";
-        els.tabExcessBaggage.style.color = "var(--text-muted)";
         
         if (els.decoderSection) els.decoderSection.style.display = "block";
         if (els.decoderOutput) els.decoderOutput.style.display = "block";
@@ -109,18 +112,15 @@ if (els.tabDecoder && els.tabExcessBaggage) {
         e.stopPropagation();
         
         els.tabExcessBaggage.classList.add("active");
-        els.tabExcessBaggage.style.background = "rgba(59,130,246,0.2)";
-        els.tabExcessBaggage.style.borderColor = "var(--primary-blue)";
-        els.tabExcessBaggage.style.color = "var(--primary-blue)";
-        
         els.tabDecoder.classList.remove("active");
-        els.tabDecoder.style.background = "rgba(255,255,255,0.05)";
-        els.tabDecoder.style.borderColor = "var(--glass-border)";
-        els.tabDecoder.style.color = "var(--text-muted)";
         
         if (els.decoderSection) els.decoderSection.style.display = "none";
         if (els.decoderOutput) els.decoderOutput.style.display = "none";
         if (els.excessBaggageSection) els.excessBaggageSection.style.display = "block";
+        
+        // Hide hero section when excess baggage is active
+        const heroSection = document.getElementById('heroSection');
+        if (heroSection) heroSection.classList.add('hidden');
         
         // Initialize excess baggage calculator if not already done
         if (els.excessBaggageContainer && els.excessBaggageContainer.children.length === 0) {
