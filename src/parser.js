@@ -3,10 +3,15 @@ import { translateSSR } from "./translator.js";
 const cleanText = (text) => {
     if (!text) return [];
     let clean = text.toString();
-    clean = clean.replace(/[\u0000-\u0009\u000B-\u001F\u007F]+/g, "\n");
+    
+    clean = clean.replace(/[\u0001\u0002\u0003\u0004]/g, "\n");
+    clean = clean.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "\n");
     clean = clean.replace(/(\d{6})\s+(\.?[A-Z]{2,3})/g, "$1\n$2");
-    clean = clean.replace(/([A-Z]{2})\s*(\d+[A-Z])([0-9]{2}[A-Z]{3})/g, "$1$2 $3");
-    return clean.split(/\n+/).map(l => l.trim()).filter(l => l.length > 0);
+    
+    return clean
+        .split(/\r\n|\r|\n/)
+        .map(l => l.trim())
+        .filter(l => l.length > 0);
 };
 
 export const parseLog = (input) => {
@@ -74,7 +79,7 @@ export const parseLog = (input) => {
 
         if (!currentBlock) {
             if (line.length > 4) startNewBlock('UNK', 'FRAGMENT', line);
-            else return;
+            else return; 
         }
 
         const officeMatch = line.match(/^([A-Z]{3})([A-Z0-9]{2})\s+([A-Z0-9]{6})$/);
