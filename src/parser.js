@@ -4,20 +4,14 @@ const cleanText = (text) => {
     if (!text) return [];
     let clean = text.toString();
     
-    // 1. Force-break specific control characters (Blue Boxes)
     clean = clean.replace(/[\u0001\u0002\u0003\u0004]/g, "\n");
     clean = clean.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "\n");
     
-    // 2. Unglue Envelopes from Headers (Critical Fix)
-    // Turns "QKHDQ" into "QK HDQ"
     clean = clean.replace(/(QP|QK|QD)(HDQ)/g, "$1 $2");
-    // Turns "TRLHDQ" into "TRL HDQ"
     clean = clean.replace(/(TRL|AKA|NAR|DVD)(HDQ)/g, "$1 $2");
     
-    // 3. Force split headers onto new lines if glued to previous text
     clean = clean.replace(/([A-Z0-9])(QP|QK|QD|HDQ|SWI|TRL)/g, "$1\n$2");
     
-    // 4. Fix PNR headers
     clean = clean.replace(/(\d{6})\s*(\.?[A-Z]{2,3})/g, "$1\n$2");
 
     return clean
@@ -26,7 +20,6 @@ const cleanText = (text) => {
         .filter(l => l.length > 0);
 };
 
-// NEW: Summary Logic
 const generateSummary = (events) => {
     const summary = { status: "Unknown", description: "No significant events detected.", alertLevel: "info" };
     let hasCancel = false, hasTkt = false, isConf = false;
@@ -87,7 +80,6 @@ export const parseLog = (input) => {
     };
 
     lines.forEach(line => {
-        // Loose Match for Envelopes (fixes "Ruined" state)
         const envMatch = line.match(/(?:^|\s)(QP|QK|QD)\s+(\S+)/);
         if (envMatch) { startNewBlock(envMatch[1], envMatch[2], line); return; }
 
@@ -102,7 +94,6 @@ export const parseLog = (input) => {
             else return; 
         }
 
-        // Passenger Detection
         if (/^\d+[A-Z]+\/[A-Z]+/.test(line)) {
             const paxes = line.match(/\d+[A-Z]+\/[A-Z]+(?:\s+[A-Z]+)?(?:\s+[A-Z]{1,3})?/g);
             if (paxes) currentBlock.passengers.push(...paxes.map(p => {
@@ -112,7 +103,6 @@ export const parseLog = (input) => {
             return;
         }
 
-        // Segment Detection
         const segMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4}[A-Z]?)\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
         if (segMatch) {
             currentBlock.segments.push({
@@ -122,7 +112,6 @@ export const parseLog = (input) => {
             return;
         }
 
-        // SSR Detection
         const ssrInfo = translateSSR(line);
         if (ssrInfo) currentBlock.messages.push(ssrInfo);
     });
