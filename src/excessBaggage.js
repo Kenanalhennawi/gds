@@ -704,6 +704,34 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
         };
     }
     
+    // Handle OAL (Other Airlines) - use FZ rates as default
+    if (airline === 'OAL') {
+        const rates = EXCESS_BAGGAGE_RATES[selectedCurrency] || EXCESS_BAGGAGE_RATES['USD'];
+        const rate = rates[originZone] && rates[originZone][destZone];
+        
+        if (rate === undefined) {
+            return {
+                error: `Rate not available for ${selectedCurrency} from Zone ${originZone} to Zone ${destZone}`,
+                originZone,
+                destZone,
+                currency: selectedCurrency
+            };
+        }
+        
+        return {
+            airline: 'OAL',
+            origin: origin.toUpperCase(),
+            destination: destination.toUpperCase(),
+            originZone,
+            destZone,
+            currency: selectedCurrency,
+            ratePerKg: rate,
+            rateDescription: `${rate} ${selectedCurrency} per kg`,
+            carrierName: 'Other Airlines (OAL)',
+            note: 'Using standard interline rates'
+        };
+    }
+    
     return {
         error: `Rates not configured for airline ${airline}`,
         airline
