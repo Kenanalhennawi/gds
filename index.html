@@ -28,10 +28,9 @@
         <main class="workspace">
             <section class="input-section">
                 <div class="glass-panel">
-                    <textarea id="gdsInput" placeholder="Paste raw GDS history, PNR logs, or EDIFACT messages here..."></textarea>
+                    <textarea id="gdsInput" placeholder="Paste raw GDS history, PNR logs, or EDIFACT messages here... Auto-analysis starts automatically."></textarea>
                     <div class="panel-footer">
-                        <div class="input-status" id="inputStatus">Ready</div>
-                        <button id="btnParse" class="btn-primary">Analyze Log</button>
+                        <div class="input-status" id="inputStatus">Ready - Auto-Analyzing</div>
                     </div>
                 </div>
             </section>
@@ -41,7 +40,7 @@
                     <div class="empty-state">
                         <div class="empty-icon">waiting</div>
                         <h3>Awaiting Data</h3>
-                        <p>Paste history logs and click Analyze.</p>
+                        <p>Paste history logs to begin automatic analysis.</p>
                     </div>
                 </div>
             </section>
