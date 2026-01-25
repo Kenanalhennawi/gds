@@ -1,9 +1,32 @@
 import { translateAirline, translateCity, translateStatus } from "./translator.js";
 
-export const renderTimeline = (container, events) => {
+export const renderTimeline = (container, data) => {
     container.innerHTML = "";
     
-    if (events.length === 0) {
+    // Handle both new format {events, summary} and old format [events]
+    const events = Array.isArray(data) ? data : (data.events || []);
+    const summary = Array.isArray(data) ? null : data.summary;
+
+    // 1. Render Summary Dashboard
+    if (summary && events.length > 0) {
+        const summaryCard = document.createElement("div");
+        summaryCard.className = `glass-panel summary-card ${summary.alertLevel}`;
+        summaryCard.style.marginBottom = "20px";
+        summaryCard.style.padding = "20px";
+        summaryCard.style.borderLeft = "4px solid " + (
+            summary.alertLevel === 'critical' ? 'var(--neon-red)' : 
+            summary.alertLevel === 'success' ? 'var(--neon-green)' : 'var(--neon-gold)'
+        );
+        
+        summaryCard.innerHTML = `
+            <h2 style="margin-bottom:5px; color:#fff;">${summary.status}</h2>
+            <p style="color:var(--text-muted); font-size:14px;">${summary.description}</p>
+        `;
+        container.appendChild(summaryCard);
+    }
+
+    // 2. Empty State
+    if (!events || events.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">nodata</div>
@@ -13,6 +36,7 @@ export const renderTimeline = (container, events) => {
         return;
     }
 
+    // 3. Render Events
     events.forEach(evt => {
         const card = document.createElement("div");
         card.className = "timeline-card";
@@ -27,16 +51,18 @@ export const renderTimeline = (container, events) => {
 
         let contextHtml = "";
         if (evt.context.recordLocator) {
-            contextHtml = `<div class="context-row">
-                <span class="ctx-label">Active Record (PNR):</span> 
-                <span class="ctx-val pnr">${evt.context.recordLocator}</span>
-            </div>`;
-        }
-        if (evt.context.airline) {
-            contextHtml += `<div class="context-row">
-                <span class="ctx-label">Airline Context:</span> 
-                <span class="ctx-val">${translateAirline(evt.context.airline)} (${evt.context.airline})</span>
-            </div>`;
+            contextHtml = `<div class="card-context">
+                <div class="context-row">
+                    <span class="ctx-label">Active Record (PNR):</span> 
+                    <span class="ctx-val pnr">${evt.context.recordLocator}</span>
+                </div>`;
+            if (evt.context.airline) {
+                contextHtml += `<div class="context-row">
+                    <span class="ctx-label">Context:</span> 
+                    <span class="ctx-val">${translateAirline(evt.context.airline)} (${evt.context.airline})</span>
+                </div>`;
+            }
+            contextHtml += `</div>`;
         }
 
         let html = `
@@ -52,8 +78,7 @@ export const renderTimeline = (container, events) => {
                     <span class="context-pill">${evt.envelope || 'LOG'}</span>
                 </div>
             </div>
-            
-            ${contextHtml ? `<div class="card-context">${contextHtml}</div>` : ''}
+            ${contextHtml}
         `;
 
         if (evt.passengers && evt.passengers.length > 0) {
