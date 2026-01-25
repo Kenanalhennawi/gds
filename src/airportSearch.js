@@ -7,12 +7,11 @@ import { translateCity } from "./translator.js";
 
 // Airport data with country information
 const AIRPORT_DATA = {
-    // UAE
+    // UAE (United Arab Emirates)
     'DXB': { code: 'DXB', city: 'Dubai', country: 'United Arab Emirates', name: 'Dubai (Intl)' },
     'DWC': { code: 'DWC', city: 'Dubai', country: 'United Arab Emirates', name: 'Dubai (World Central)' },
     'AUH': { code: 'AUH', city: 'Abu Dhabi', country: 'United Arab Emirates', name: 'Abu Dhabi' },
     'SHJ': { code: 'SHJ', city: 'Sharjah', country: 'United Arab Emirates', name: 'Sharjah' },
-    'AWZ': { code: 'AWZ', city: 'Ahwaz', country: 'Iran', name: 'Ahwaz' },
     
     // Saudi Arabia
     'RUH': { code: 'RUH', city: 'Riyadh', country: 'Saudi Arabia', name: 'Riyadh' },
@@ -74,6 +73,13 @@ const AIRPORT_DATA = {
     'GSM': { code: 'GSM', city: 'Qeshm', country: 'Iran', name: 'Qeshm' },
     'LRR': { code: 'LRR', city: 'Lar', country: 'Iran', name: 'Lar' },
     'BUZ': { code: 'BUZ', city: 'Bushehr', country: 'Iran', name: 'Bushehr' },
+    'AWZ': { code: 'AWZ', city: 'Ahwaz', country: 'Iran', name: 'Ahwaz' },
+    'HDM': { code: 'HDM', city: 'Hamadan', country: 'Iran', name: 'Hamadan' },
+    'BND': { code: 'BND', city: 'Bandar Abbas', country: 'Iran', name: 'Bandar Abbas' },
+    
+    // Yemen
+    'ADE': { code: 'ADE', city: 'Aden', country: 'Yemen', name: 'Aden' },
+    'SAH': { code: 'SAH', city: 'Sanaa', country: 'Yemen', name: 'Sanaa' },
     
     // Israel
     'TLV': { code: 'TLV', city: 'Tel Aviv', country: 'Israel', name: 'Tel Aviv' },
@@ -100,6 +106,7 @@ const AIRPORT_DATA = {
     'CCU': { code: 'CCU', city: 'Kolkata', country: 'India', name: 'Kolkata' },
     'AMD': { code: 'AMD', city: 'Ahmedabad', country: 'India', name: 'Ahmedabad' },
     'LKO': { code: 'LKO', city: 'Lucknow', country: 'India', name: 'Lucknow' },
+    'GOI': { code: 'GOI', city: 'Goa', country: 'India', name: 'Goa' },
     
     // Pakistan
     'KHI': { code: 'KHI', city: 'Karachi', country: 'Pakistan', name: 'Karachi' },
@@ -153,6 +160,7 @@ const AIRPORT_DATA = {
     'FRU': { code: 'FRU', city: 'Bishkek', country: 'Kyrgyzstan', name: 'Bishkek' },
     'OSS': { code: 'OSS', city: 'Osh', country: 'Kyrgyzstan', name: 'Osh' },
     'GYD': { code: 'GYD', city: 'Baku', country: 'Azerbaijan', name: 'Baku' },
+    'GBB': { code: 'GBB', city: 'Guba', country: 'Azerbaijan', name: 'Guba' },
     'EVN': { code: 'EVN', city: 'Yerevan', country: 'Armenia', name: 'Yerevan' },
     'TBS': { code: 'TBS', city: 'Tbilisi', country: 'Georgia', name: 'Tbilisi' },
     'BUS': { code: 'BUS', city: 'Batumi', country: 'Georgia', name: 'Batumi' },
@@ -260,14 +268,13 @@ const AIRPORT_DATA = {
     'HGA': { code: 'HGA', city: 'Hargeisa', country: 'Somalia', name: 'Hargeisa' },
     'MGQ': { code: 'MGQ', city: 'Mogadishu', country: 'Somalia', name: 'Mogadishu' },
     
+    // Yemen
+    'ADE': { code: 'ADE', city: 'Aden', country: 'Yemen', name: 'Aden' },
+    'SAH': { code: 'SAH', city: 'Sanaa', country: 'Yemen', name: 'Sanaa' },
+    
     // Additional airports from PDF
-    'AWZ': { code: 'AWZ', city: 'Ahwaz', country: 'Iran', name: 'Ahwaz' },
-    'HDM': { code: 'HDM', city: 'Hamadan', country: 'Iran', name: 'Hamadan' },
     'HRI': { code: 'HRI', city: 'Hambantota', country: 'Sri Lanka', name: 'Hambantota' },
     'KDH': { code: 'KDH', city: 'Kandahar', country: 'Afghanistan', name: 'Kandahar' },
-    'SAH': { code: 'SAH', city: 'Sanaa', country: 'Yemen', name: 'Sanaa' },
-    'GBB': { code: 'GBB', city: 'Guba', country: 'Azerbaijan', name: 'Guba' },
-    'GOI': { code: 'GOI', city: 'Goa', country: 'India', name: 'Goa' },
     'GOJ': { code: 'GOJ', city: 'Nizhny Novgorod', country: 'Russia', name: 'Nizhny Novgorod' },
     'KUT': { code: 'KUT', city: 'Kutaisi', country: 'Georgia', name: 'Kutaisi' },
     'MBX': { code: 'MBX', city: 'Maribor', country: 'Slovenia', name: 'Maribor' },
