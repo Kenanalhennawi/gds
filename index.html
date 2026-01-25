@@ -20,13 +20,22 @@
                     <span>Enterprise Edition</span>
                 </div>
             </div>
+            <div class="header-tabs" style="display:flex; gap:10px; margin-left:30px;">
+                <button id="tabDecoder" class="tab-btn active" style="padding:8px 16px; background:rgba(74,158,255,0.2); border:1px solid var(--primary-blue); border-radius:6px; color:var(--primary-blue); font-weight:600; cursor:pointer; transition:all 0.3s;">
+                    GDS Decoder
+                </button>
+                <button id="tabExcessBaggage" class="tab-btn" style="padding:8px 16px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:6px; color:var(--text-muted); font-weight:600; cursor:pointer; transition:all 0.3s;">
+                    Excess Baggage Policy
+                </button>
+            </div>
             <div class="actions">
                 <button id="btnClear" class="btn-glass">Clear Console</button>
             </div>
         </header>
 
         <main class="workspace">
-            <section class="input-section">
+            <!-- GDS Decoder Section -->
+            <section id="decoderSection" class="input-section">
                 <div class="glass-panel">
                     <textarea id="gdsInput" placeholder="Paste raw GDS history, PNR logs, or EDIFACT messages here... Auto-analysis starts automatically."></textarea>
                     <div class="panel-footer">
@@ -35,7 +44,7 @@
                 </div>
             </section>
 
-            <section class="output-section">
+            <section id="decoderOutput" class="output-section">
                 <div id="timeline" class="timeline-container">
                     <div class="empty-state">
                         <div class="empty-icon">waiting</div>
@@ -43,6 +52,11 @@
                         <p>Paste history logs to begin automatic analysis.</p>
                     </div>
                 </div>
+            </section>
+            
+            <!-- Excess Baggage Policy Section -->
+            <section id="excessBaggageSection" class="excess-baggage-section" style="display:none; grid-column:1/-1; padding:20px;">
+                <div id="excessBaggageContainer"></div>
             </section>
         </main>
     </div>
