@@ -7,12 +7,10 @@ import { translateAirline, translateCity } from "./translator.js";
 
 // Zone mapping for airports (from PDF page 13-14)
 const ZONE_MAPPING = {
-    // Zone 1: UAE
     'DXB': 1, 'DWC': 1, 'AWZ': 1, 'AQI': 1, 'BAH': 1, 'BND': 1, 'BSR': 1, 'DMM': 1, 'DOH': 1, 'ELQ': 1,
     'HAS': 1, 'HOF': 1, 'IFN': 1, 'KER': 1, 'KHI': 1, 'KIH': 1, 'KWI': 1, 'LRR': 1, 'MCT': 1, 'OHS': 1,
     'RUH': 1, 'SLL': 1, 'SYZ': 1,
     
-    // Zone 2: Gulf Countries (GCC) + Zone 2 airports
     'KWI': 2, 'BAH': 2, 'MCT': 2, 'SLL': 2, 'OHS': 2,
     'ADE': 2, 'AHB': 2, 'AJF': 2, 'AMD': 2, 'AMM': 2, 'AQJ': 2, 'BEY': 2, 'BGW': 2, 'BOM': 2, 'BLR': 2,
     'BUS': 2, 'BUZ': 2, 'CCJ': 2, 'CCU': 2, 'COK': 2, 'DEL': 2, 'EAM': 2, 'EBL': 2, 'EVN': 2, 'GBB': 2,
@@ -21,7 +19,6 @@ const ZONE_MAPPING = {
     'MUX': 2, 'NJF': 2, 'NUM': 2, 'RSI': 2, 'SAH': 2, 'SKT': 2, 'TBS': 2, 'TBZ': 2, 'TIF': 2, 'TRV': 2,
     'TUU': 2, 'UET': 2, 'ULH': 2, 'YNB': 2,
     
-    // Zone 3: Saudi Arabia (KSA) + Zone 3 airports
     'AHB': 3, 'AQI': 3, 'AJF': 3, 'DMM': 3, 'ELQ': 3, 'EAM': 3, 'GIZ': 3, 'HAS': 3, 'HOF': 3,
     'JED': 3, 'NUM': 3, 'MED': 3, 'RUH': 3, 'RSI': 3, 'TUU': 3, 'TIF': 3, 'ULH': 3, 'YNB': 3,
     'ADB': 3, 'ADD': 3, 'AER': 3, 'ALA': 3, 'ASB': 3, 'ASM': 3, 'AYT': 3, 'BEG': 3, 'BGY': 3, 'BJM': 3,
@@ -662,10 +659,19 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
     
     // Handle EK rates
     if (airline === 'EK') {
-        const originRegion = mapZoneToEKRegion(originZone);
-        const destRegion = mapZoneToEKRegion(destZone);
-        const perKgRate = EK_EXCESS_RATES.per_kg[originRegion] && 
-                         EK_EXCESS_RATES.per_kg[originRegion][destRegion];
+        const originRegion = getEKRegionForAirport(origin);
+        const destRegion = getEKRegionForAirport(destination);
+        
+        if (!originRegion || !destRegion) {
+            return {
+                error: `Region not found for ${origin.toUpperCase()} or ${destination.toUpperCase()}`,
+                origin,
+                destination
+            };
+        }
+        
+        const perKgRate = EK_OAL_EXCESS_RATES_PER_KG[originRegion] && 
+                         EK_OAL_EXCESS_RATES_PER_KG[originRegion][destRegion];
         
         return {
             airline: 'EK',
@@ -676,8 +682,8 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
             originRegion,
             destRegion,
             currency: 'USD',
-            ratePerKg: perKgRate || 'N/A',
-            rateDescription: perKgRate ? `$${perKgRate} USD per kg` : 'Rate not available',
+            ratePerKg: perKgRate || null,
+            rateDescription: perKgRate ? `$${perKgRate} USD per kg` : 'Rate not available for this route',
             carrierName: translateAirline('EK')
         };
     }
@@ -704,19 +710,21 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
         };
     }
     
-    // Handle OAL (Other Airlines) - use FZ rates as default
+    // Handle OAL (Other Airlines) - use EK/OAL rates
     if (airline === 'OAL') {
-        const rates = EXCESS_BAGGAGE_RATES[selectedCurrency] || EXCESS_BAGGAGE_RATES['USD'];
-        const rate = rates[originZone] && rates[originZone][destZone];
+        const originRegion = getEKRegionForAirport(origin);
+        const destRegion = getEKRegionForAirport(destination);
         
-        if (rate === undefined) {
+        if (!originRegion || !destRegion) {
             return {
-                error: `Rate not available for ${selectedCurrency} from Zone ${originZone} to Zone ${destZone}`,
-                originZone,
-                destZone,
-                currency: selectedCurrency
+                error: `Region not found for ${origin.toUpperCase()} or ${destination.toUpperCase()}`,
+                origin,
+                destination
             };
         }
+        
+        const perKgRate = EK_OAL_EXCESS_RATES_PER_KG[originRegion] && 
+                         EK_OAL_EXCESS_RATES_PER_KG[originRegion][destRegion];
         
         return {
             airline: 'OAL',
@@ -724,11 +732,13 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
             destination: destination.toUpperCase(),
             originZone,
             destZone,
-            currency: selectedCurrency,
-            ratePerKg: rate,
-            rateDescription: `${rate} ${selectedCurrency} per kg`,
+            originRegion,
+            destRegion,
+            currency: 'USD',
+            ratePerKg: perKgRate || null,
+            rateDescription: perKgRate ? `$${perKgRate} USD per kg` : 'Rate not available for this route',
             carrierName: 'Other Airlines (OAL)',
-            note: 'Using standard interline rates'
+            note: 'Using EK/OAL interline rates'
         };
     }
     
@@ -803,25 +813,147 @@ export function getTransferBaggageFee(location) {
 }
 
 // EK Excess Rates
-const EK_EXCESS_RATES = {
-    per_kg: {
-        'M.E.': { 'M.E.': 15, 'WAIO': 15, 'Africa': 25, 'Europe': 25, 'Far East': 25, 'ANZ': 40, 'Americas': 40 },
-        'WAIO': { 'M.E.': 15, 'WAIO': 15, 'Africa': 25, 'Europe': 25, 'Far East': 25, 'ANZ': 40, 'Americas': 40 },
-        'Europe': { 'M.E.': 25, 'WAIO': 30, 'Africa': 30, 'Europe': 30, 'Far East': 40, 'ANZ': 30, 'Americas': 50 },
-        'Far East': { 'M.E.': 25, 'WAIO': 30, 'Africa': 15, 'Europe': 30, 'Far East': 30, 'ANZ': 15, 'Americas': 30 },
-        'ANZ': { 'M.E.': 40, 'WAIO': 50, 'Africa': 50, 'Europe': 30, 'Far East': 15, 'ANZ': 15, 'Americas': 30 },
-        'Americas': { 'M.E.': 40, 'WAIO': 40, 'Africa': 200, 'Europe': 100, 'Far East': 250, 'ANZ': 250, 'Americas': 200 }
+// EK/OAL Excess Baggage Rates (Except UA & AC)
+// Zone Classification for EK/OAL
+const EK_OAL_ZONE_MAPPING = {
+    'ME': ['BAH', 'IKA', 'BGW', 'AMM', 'KWI', 'BEY', 'MCT', 'DOH', 'RUH', 'DXB', 'TLV'],
+    'WAIO': ['KBL', 'DAC', 'AMD', 'MLE', 'KHI', 'CMB', 'KTM', 'ALA', 'FRU', 'DYU', 'ASB', 'ISB', 'DEL', 'BOM', 'BLR', 'HYD', 'MAA', 'COK', 'CCJ', 'TRV', 'CCU', 'LKO'],
+    'AFRICA': ['ALG', 'AGO', 'CI', 'CAI', 'ADD', 'GHA', 'GIN', 'LBY', 'MUS', 'NGA', 'SEN', 'SYC', 'ZAF', 'KRT', 'TZA', 'TUN', 'UGA', 'ZMB', 'ZWE', 'COG', 'DJI', 'ERI', 'SOM', 'SSD'],
+    'EUROPE': ['VIE', 'ESP', 'BEL', 'HRV', 'CYP', 'CZE', 'DNK', 'FRA', 'DEU', 'GRC', 'HUN', 'IRL', 'ITA', 'MLT', 'NLD', 'NOR', 'POL', 'PRT', 'RUS', 'SRB', 'SVK', 'SWE', 'CHE', 'TUR', 'UKR', 'GBR', 'ARM', 'AZE', 'BIH', 'BGR', 'GEO', 'MKD', 'MNE', 'ROU', 'FIN'],
+    'FAREAST': ['CHN', 'HKG', 'IDN', 'JPN', 'MYS', 'PHL', 'SGP', 'KOR', 'TWN', 'THA', 'VNM'],
+    'ANZ': ['AUS', 'NZL'],
+    'AMERICAS': ['ARG', 'BRA', 'CHL', 'CAN', 'USA', 'MEX']
+};
+
+// Map airport to EK/OAL region
+function getEKRegionForAirport(airport) {
+    const code = airport.toUpperCase();
+    
+    // Middle East
+    if (['BAH', 'IKA', 'THR', 'BGW', 'BSR', 'EBL', 'ISU', 'NJF', 'AMM', 'AQJ', 'KWI', 'BEY', 'MCT', 'OHS', 'SLL', 'DOH', 'RUH', 'JED', 'DMM', 'MED', 'AHB', 'ELQ', 'TIF', 'TUU', 'HAS', 'YNB', 'AJF', 'EAM', 'GIZ', 'HOF', 'NUM', 'RSI', 'ULH', 'DXB', 'DWC', 'AUH', 'SHJ', 'TLV'].includes(code)) {
+        return 'ME';
+    }
+    
+    // WAIO (West Asia, India, Others)
+    if (['KBL', 'KDH', 'DAC', 'CGP', 'ZYL', 'AMD', 'BOM', 'BLR', 'CCU', 'CCJ', 'COK', 'DEL', 'HYD', 'LKO', 'MAA', 'TRV', 'GOI', 'MLE', 'GAN', 'KHI', 'ISB', 'LHE', 'PEW', 'SKT', 'MUX', 'LYP', 'UET', 'CMB', 'HRI', 'KTM', 'BWA', 'ALA', 'NQZ', 'CIT', 'TSE', 'FRU', 'OSS', 'DYU', 'ASB', 'NMA', 'SKD', 'TAS'].includes(code)) {
+        return 'WAIO';
+    }
+    
+    // Africa
+    if (['CAI', 'HBE', 'SSH', 'LXR', 'HRG', 'SPX', 'DBB', 'HMB', 'ADD', 'ASM', 'JIB', 'NBO', 'MBA', 'DAR', 'JRO', 'ZNZ', 'EBB', 'KGL', 'BJM', 'FIH', 'JUB', 'KRT', 'PZU', 'HGA', 'MGQ', 'LOS', 'ABV', 'ACC', 'DKR', 'CMN', 'TUN', 'ALG', 'TIP', 'JNB', 'CPT'].includes(code)) {
+        return 'AFRICA';
+    }
+    
+    // Europe
+    if (['LHR', 'LGW', 'STN', 'LTN', 'MAN', 'CDG', 'ORY', 'NCE', 'FRA', 'MUC', 'AMS', 'BRU', 'ZRH', 'BSL', 'VIE', 'SZG', 'FCO', 'MXP', 'MAD', 'BCN', 'IST', 'SAW', 'AYT', 'ADB', 'ESB', 'TZX', 'BJV', 'SVO', 'DME', 'VKO', 'LED', 'AER', 'KUF', 'KZN', 'MCX', 'MRV', 'OVB', 'UFA', 'VOG', 'SVX', 'KRR', 'ROV', 'PEE', 'ZIA', 'WAW', 'KRK', 'POZ', 'PRG', 'BUD', 'OTP', 'CLJ', 'SOF', 'BEG', 'ZAG', 'DBV', 'SJJ', 'TIA', 'SKP', 'LJU', 'ATH', 'SKG', 'JMK', 'JTR', 'CFU', 'VNO', 'RIX', 'TLL', 'HEL', 'CTA', 'NAP', 'PSA', 'BGY', 'OLB', 'CAG', 'MLA', 'TIV', 'BTS', 'KBP', 'IEV', 'ODS', 'MSQ'].includes(code)) {
+        return 'EUROPE';
+    }
+    
+    // Far East
+    if (['BKK', 'DMK', 'HKT', 'CNX', 'KBV', 'UTP', 'KUL', 'LGK', 'PEN', 'SIN', 'CGK', 'DPS', 'MNL', 'HKG', 'PEK', 'PKX', 'PVG', 'SHA', 'CAN', 'CTU', 'SZX', 'NRT', 'HND', 'KIX', 'ICN', 'TPE', 'SGN', 'HAN', 'PNH'].includes(code)) {
+        return 'FAREAST';
+    }
+    
+    // ANZ (Australia/New Zealand)
+    if (['SYD', 'MEL', 'BNE', 'PER', 'AKL'].includes(code)) {
+        return 'ANZ';
+    }
+    
+    // Americas
+    if (['YYZ', 'YVR', 'YUL', 'YYC', 'JFK', 'EWR', 'LGA', 'BOS', 'IAD', 'DCA', 'ATL', 'MCO', 'MIA', 'FLL', 'ORD', 'DFW', 'IAH', 'DEN', 'LAX', 'SFO', 'SEA', 'LAS', 'MEX', 'CUN', 'BOG', 'EZE', 'SCL', 'LIM', 'GRU', 'GIG'].includes(code)) {
+        return 'AMERICAS';
+    }
+    
+    return null;
+}
+
+// EK/OAL Excess Baggage Rates per KG (USD)
+const EK_OAL_EXCESS_RATES_PER_KG = {
+    'ME': {
+        'ME': 15,
+        'WAIO': 25,
+        'AFRICA': 40,
+        'EUROPE': null,
+        'FAREAST': null,
+        'ANZ': null,
+        'AMERICAS': null
+    },
+    'WAIO': {
+        'ME': 15,
+        'WAIO': 25,
+        'AFRICA': 40,
+        'EUROPE': null,
+        'FAREAST': null,
+        'ANZ': null,
+        'AMERICAS': null
+    },
+    'EUROPE': {
+        'ME': 25,
+        'WAIO': 30,
+        'AFRICA': 40,
+        'EUROPE': 30,
+        'FAREAST': 50,
+        'ANZ': null,
+        'AMERICAS': null
+    },
+    'FAREAST': {
+        'ME': 25,
+        'WAIO': 30,
+        'AFRICA': null,
+        'EUROPE': 15,
+        'FAREAST': 30,
+        'ANZ': null,
+        'AMERICAS': null
+    },
+    'ANZ': {
+        'ME': 40,
+        'WAIO': 50,
+        'AFRICA': null,
+        'EUROPE': 30,
+        'FAREAST': 15,
+        'ANZ': null,
+        'AMERICAS': null
+    },
+    'AMERICAS': {
+        'ME': null,
+        'WAIO': null,
+        'AFRICA': null,
+        'EUROPE': null,
+        'FAREAST': null,
+        'ANZ': null,
+        'AMERICAS': null
     }
 };
 
-// Map zone to EK region
-function mapZoneToEKRegion(zone) {
-    const mapping = {
-        1: 'M.E.', 2: 'M.E.', 3: 'M.E.', 4: 'M.E.',
-        5: 'Africa',
-        6: 'WAIO',
-        7: 'Far East',
-        8: 'Europe'
-    };
-    return mapping[zone] || 'M.E.';
-}
+// EK/OAL Excess Baggage Rates per Piece (USD)
+const EK_OAL_EXCESS_RATES_PER_PIECE = {
+    'AFRICA': {
+        'ME': 200,
+        'WAIO': 200,
+        'AFRICA': 200,
+        'EUROPE': 200,
+        'FAREAST': 250,
+        'ANZ': 250,
+        'AMERICAS': 200
+    },
+    'AMERICAS': {
+        'ME': 225,
+        'WAIO': 225,
+        'AFRICA': 200,
+        'EUROPE': 100,
+        'FAREAST': 250,
+        'ANZ': 250,
+        'AMERICAS': 100
+    },
+    'CANADA': {
+        'ME': 280,
+        'WAIO': 280,
+        'AFRICA': 250,
+        'EUROPE': 125,
+        'FAREAST': 300,
+        'ANZ': 300,
+        'AMERICAS': 125,
+        'currency': 'CAD'
+    }
+};
+
