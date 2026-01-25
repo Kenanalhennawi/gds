@@ -74,7 +74,21 @@ if (els.clear) els.clear.addEventListener("click", () => {
 
 // Tab switching
 if (els.tabDecoder && els.tabExcessBaggage) {
-    els.tabDecoder.addEventListener("click", () => {
+    // Ensure buttons are clickable
+    els.tabDecoder.style.pointerEvents = "auto";
+    els.tabDecoder.style.cursor = "pointer";
+    els.tabDecoder.style.position = "relative";
+    els.tabDecoder.style.zIndex = "10";
+    
+    els.tabExcessBaggage.style.pointerEvents = "auto";
+    els.tabExcessBaggage.style.cursor = "pointer";
+    els.tabExcessBaggage.style.position = "relative";
+    els.tabExcessBaggage.style.zIndex = "10";
+    
+    els.tabDecoder.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
         els.tabDecoder.classList.add("active");
         els.tabDecoder.style.background = "rgba(74,158,255,0.2)";
         els.tabDecoder.style.borderColor = "var(--primary-blue)";
@@ -85,12 +99,15 @@ if (els.tabDecoder && els.tabExcessBaggage) {
         els.tabExcessBaggage.style.borderColor = "var(--glass-border)";
         els.tabExcessBaggage.style.color = "var(--text-muted)";
         
-        els.decoderSection.style.display = "block";
-        els.decoderOutput.style.display = "block";
-        els.excessBaggageSection.style.display = "none";
+        if (els.decoderSection) els.decoderSection.style.display = "block";
+        if (els.decoderOutput) els.decoderOutput.style.display = "block";
+        if (els.excessBaggageSection) els.excessBaggageSection.style.display = "none";
     });
     
-    els.tabExcessBaggage.addEventListener("click", () => {
+    els.tabExcessBaggage.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
         els.tabExcessBaggage.classList.add("active");
         els.tabExcessBaggage.style.background = "rgba(74,158,255,0.2)";
         els.tabExcessBaggage.style.borderColor = "var(--primary-blue)";
@@ -101,14 +118,19 @@ if (els.tabDecoder && els.tabExcessBaggage) {
         els.tabDecoder.style.borderColor = "var(--glass-border)";
         els.tabDecoder.style.color = "var(--text-muted)";
         
-        els.decoderSection.style.display = "none";
-        els.decoderOutput.style.display = "none";
-        els.excessBaggageSection.style.display = "block";
+        if (els.decoderSection) els.decoderSection.style.display = "none";
+        if (els.decoderOutput) els.decoderOutput.style.display = "none";
+        if (els.excessBaggageSection) els.excessBaggageSection.style.display = "block";
         
         // Initialize excess baggage calculator if not already done
         if (els.excessBaggageContainer && els.excessBaggageContainer.children.length === 0) {
             renderExcessBaggageCalculator(els.excessBaggageContainer);
         }
+    });
+} else {
+    console.error("Tab elements not found:", { 
+        tabDecoder: !!els.tabDecoder, 
+        tabExcessBaggage: !!els.tabExcessBaggage 
     });
 }
 
