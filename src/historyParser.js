@@ -65,6 +65,11 @@ const parseAirimpContext = (l) => {
       return { airlineContext: airline };
   }
 
+  const mGalileo = l.match(/^SWI([A-Z0-9]{2})\s+([A-Z0-9]{6})\//);
+  if (mGalileo) {
+      return { airlineContext: mGalileo[1], recordRef: mGalileo[2] };
+  }
+
   return null;
 };
 
