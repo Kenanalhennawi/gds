@@ -179,15 +179,16 @@ export const parseLog = (input) => {
         }
 
         // Try standard segment format: FZ123 24JAN DXBADD HK1
-        const segMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4}[A-Z]?)\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
+        const segMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4})([A-Z]?)\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
         if (segMatch) {
             currentBlock.segments.push({
                 carrier: segMatch[1],
                 flight: segMatch[2],
-                date: segMatch[3],
-                from: segMatch[4],
-                to: segMatch[5],
-                status: segMatch[6]
+                fareClass: segMatch[3] || '',
+                date: segMatch[4],
+                from: segMatch[5],
+                to: segMatch[6],
+                status: segMatch[7]
             });
             return;
         }
@@ -195,18 +196,24 @@ export const parseLog = (input) => {
         // Try format with slash: FZ1263M/EK2474B24JAN DXBVNO CH1
         // Pattern: OperatingCarrierFlight/MarketingCarrierMarketingFlightDate Route(6chars) Status
         // Example: FZ1263M/EK2474B24JAN DXBVNO CH1 or FZ1264O/EK2475X31JAN VNODXB CH1
-        const segSlashMatch = line.match(/^([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{6})\s+([A-Z]{2}\d+)$/);
+        const segSlashMatch = line.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{6})\s+([A-Z]{2}\d+)$/);
         if (segSlashMatch) {
-            const route = segSlashMatch[6]; // DXBVNO or VNODXB
+            const route = segSlashMatch[7]; // DXBVNO or VNODXB
             const from = route.substring(0, 3); // DXB or VNO
             const to = route.substring(3, 6); // VNO or DXB
+            const operatingFareClass = segSlashMatch[3] || ''; // M or O
+            const marketingCarrier = segSlashMatch[4]; // EK
             currentBlock.segments.push({
                 carrier: segSlashMatch[1], // FZ
-                flight: segSlashMatch[2], // 1263M
-                date: segSlashMatch[5], // 24JAN
+                flight: segSlashMatch[2], // 1263
+                fareClass: operatingFareClass, // M or O
+                date: segSlashMatch[6], // 24JAN
                 from: from, // DXB
                 to: to, // VNO
-                status: segSlashMatch[7] // CH1
+                status: segSlashMatch[8], // CH1
+                marketingCarrier: marketingCarrier, // EK
+                marketingFlight: segSlashMatch[5], // 2474B or 2475X
+                codeshare: `${operatingFareClass}/${marketingCarrier}` // M/EK or O/EK
             });
             return;
         }
