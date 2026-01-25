@@ -15,18 +15,19 @@ const processInput = () => {
     const raw = els.input.value;
     
     if (!raw || !raw.trim()) {
-        renderTimeline(els.timeline, []);
+        renderTimeline(els.timeline, { events: [], summary: null }); // Pass empty structure
         if(els.status) els.status.textContent = "Ready for input";
         return;
     }
 
     try {
-        const events = parseLog(raw);
-        renderTimeline(els.timeline, events);
+        // Now returns { events, summary }
+        const result = parseLog(raw); 
+        renderTimeline(els.timeline, result);
         
         if (els.status) {
-            els.status.textContent = events.length > 0 
-                ? `Analyzed ${events.length} event blocks` 
+            els.status.textContent = result.events.length > 0 
+                ? `Analyzed ${result.events.length} blocks | ${result.summary.status}` 
                 : "No valid data found";
         }
     } catch (e) {
@@ -35,9 +36,7 @@ const processInput = () => {
     }
 };
 
-if (els.btnParse) {
-    els.btnParse.addEventListener("click", processInput);
-}
+if (els.btnParse) els.btnParse.addEventListener("click", processInput);
 
 if (els.clear) {
     els.clear.addEventListener("click", () => {
@@ -49,9 +48,10 @@ if (els.clear) {
     });
 }
 
-// Also parse on paste for convenience
 if (els.input) {
     els.input.addEventListener("paste", () => {
         setTimeout(processInput, 100);
     });
 }
+
+processInput();
