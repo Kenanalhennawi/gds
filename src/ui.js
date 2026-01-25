@@ -67,9 +67,20 @@ export const renderTimeline = (container, data) => {
         let action = envelopeInfo.title;
         let actionDesc = envelopeInfo.desc;
         
+        // Parse header for additional context
+        let headerInfo = "";
+        if (evt.rawHeader) {
+            // Check for PEKRMCA format (Office + RM + Airline)
+            const officeRmMatch = evt.rawHeader.match(/([A-Z]{3})RM([A-Z0-9]{2})/);
+            if (officeRmMatch) {
+                headerInfo = `${translateCity(officeRmMatch[1])} (${officeRmMatch[1]}) - ${translateAirline(officeRmMatch[2])} (${officeRmMatch[2]})`;
+            }
+        }
+        
         let sourceName = "System";
         if (evt.context.airline) sourceName = translateAirline(evt.context.airline);
         if (evt.context.office) sourceName += ` (${translateCity(evt.context.office)})`;
+        if (headerInfo && !evt.context.office) sourceName = headerInfo;
 
         // Get header type explanation
         let headerTypeHtml = "";
@@ -84,12 +95,18 @@ export const renderTimeline = (container, data) => {
         }
 
         let contextHtml = "";
-        if (evt.context.recordLocator || evt.headerType) {
+        if (evt.context.recordLocator || evt.context.airline || evt.context.office || evt.headerType) {
             contextHtml = `<div class="card-context">
                 <div class="context-row">
                     <span class="ctx-label">Message Type:</span> 
                     <span class="ctx-val" title="${actionDesc}">${action}</span>
                 </div>`;
+            if (evt.context.office) {
+                contextHtml += `<div class="context-row">
+                    <span class="ctx-label">Office/Sign-in:</span> 
+                    <span class="ctx-val">${translateCity(evt.context.office)} (${evt.context.office})</span>
+                </div>`;
+            }
             if (evt.context.recordLocator) {
                 contextHtml += `<div class="context-row">
                     <span class="ctx-label">Active Record (PNR):</span> 
@@ -98,7 +115,7 @@ export const renderTimeline = (container, data) => {
             }
             if (evt.context.airline) {
                 contextHtml += `<div class="context-row">
-                    <span class="ctx-label">Context:</span> 
+                    <span class="ctx-label">Airline Context:</span> 
                     <span class="ctx-val">${translateAirline(evt.context.airline)} (${evt.context.airline})</span>
                 </div>`;
             }
