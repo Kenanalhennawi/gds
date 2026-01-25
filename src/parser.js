@@ -97,14 +97,52 @@ export const parseLog = (input) => {
 
     const extractPassengers = (line) => {
         const paxes = [];
-        const regex = /\d+([A-Z]+)\/([A-Z]+)(?:\s+([A-Z]{1,4}))?/g;
+        // Common titles that might appear at the end of names (sorted by length, longest first)
+        const titles = ['MASTER', 'MSTR', 'MISS', 'MRS', 'MR', 'MS', 'DR', 'PROF', 'REV', 'HON'];
+        
+        // Pattern: 1SURNAME/GIVEN or 1SURNAME/GIVENTITLE or 1SURNAME/GIVEN TITLE
+        // Also handle: 1AL FAHD/SHAMSA MUJALLI F A MS (with spaces in name)
+        const regex = /\d+([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?/g;
         let match;
         while ((match = regex.exec(line)) !== null) {
+            let surname = match[1].trim();
+            let given = match[2].trim();
+            let title = match[3] ? match[3].trim() : "";
+            
+            // Check if title is at the end of given name (e.g., SAUDMR -> SAUD + MR)
+            // Check longest titles first to avoid partial matches
+            if (!title) {
+                for (const t of titles) {
+                    const upperGiven = given.toUpperCase();
+                    if (upperGiven.endsWith(t)) {
+                        title = t;
+                        given = given.substring(0, given.length - t.length).trim();
+                        break;
+                    }
+                }
+            }
+            
+            // Also check surname for titles (less common but possible)
+            if (!title) {
+                for (const t of titles) {
+                    const upperSurname = surname.toUpperCase();
+                    if (upperSurname.endsWith(t)) {
+                        title = t;
+                        surname = surname.substring(0, surname.length - t.length).trim();
+                        break;
+                    }
+                }
+            }
+            
+            // Clean up any extra spaces
+            surname = surname.replace(/\s+/g, ' ');
+            given = given.replace(/\s+/g, ' ');
+            
             paxes.push({
                 raw: match[0],
-                surname: match[1],
-                given: match[2],
-                title: match[3] || ""
+                surname: surname,
+                given: given,
+                title: title
             });
         }
         return paxes;
@@ -156,12 +194,12 @@ export const parseLog = (input) => {
         
         // Try format with slash: FZ1263M/EK2474B24JAN DXBVNO CH1
         // Pattern: OperatingCarrierFlight/MarketingCarrierMarketingFlightDate Route(6chars) Status
-        // Example: FZ1263M/EK2474B24JAN DXBVNO CH1
-        const segSlashMatch = line.match(/([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{6})\s+([A-Z]{2}\d+)/);
+        // Example: FZ1263M/EK2474B24JAN DXBVNO CH1 or FZ1264O/EK2475X31JAN VNODXB CH1
+        const segSlashMatch = line.match(/^([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{6})\s+([A-Z]{2}\d+)$/);
         if (segSlashMatch) {
-            const route = segSlashMatch[6]; // DXBVNO
-            const from = route.substring(0, 3); // DXB
-            const to = route.substring(3, 6); // VNO
+            const route = segSlashMatch[6]; // DXBVNO or VNODXB
+            const from = route.substring(0, 3); // DXB or VNO
+            const to = route.substring(3, 6); // VNO or DXB
             currentBlock.segments.push({
                 carrier: segSlashMatch[1], // FZ
                 flight: segSlashMatch[2], // 1263M
@@ -174,29 +212,15 @@ export const parseLog = (input) => {
         }
         
         // Try format with separated route: FZ1263M/EK2474B24JAN DXB VNO CH1
-        const segSlashSeparatedMatch = line.match(/([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2}\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{2}\d+)/);
+        const segSlashSeparatedMatch = line.match(/^([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{2}\d+)$/);
         if (segSlashSeparatedMatch) {
             currentBlock.segments.push({
                 carrier: segSlashSeparatedMatch[1],
                 flight: segSlashSeparatedMatch[2],
-                date: segSlashSeparatedMatch[4],
-                from: segSlashSeparatedMatch[5],
-                to: segSlashSeparatedMatch[6],
-                status: segSlashSeparatedMatch[7]
-            });
-            return;
-        }
-        
-        // Try format with date in marketing part but route combined: FZ1263M/EK2474B24JAN DXBVNO CH1
-        const segSlashCombinedRoute = line.match(/([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2}\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
-        if (segSlashCombinedRoute) {
-            currentBlock.segments.push({
-                carrier: segSlashCombinedRoute[1],
-                flight: segSlashCombinedRoute[2],
-                date: segSlashCombinedRoute[4],
-                from: segSlashCombinedRoute[5],
-                to: segSlashCombinedRoute[6],
-                status: segSlashCombinedRoute[7]
+                date: segSlashSeparatedMatch[5],
+                from: segSlashSeparatedMatch[6],
+                to: segSlashSeparatedMatch[7],
+                status: segSlashSeparatedMatch[8]
             });
             return;
         }
