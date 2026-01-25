@@ -13,6 +13,9 @@ const cleanText = (text) => {
     // Fix glued PNR headers (e.g. 231737.DXB)
     clean = clean.replace(/(\d{6})\s*(\.?[A-Z]{2,3})/g, "$1\n$2");
     
+    // Fix glued segment dates/destinations in rare cases
+    clean = clean.replace(/([0-9A-Z]{2}\d{3,4}[A-Z]?\d{2}[A-Z]{3})([A-Z]{3})/g, "$1 $2");
+
     return clean
         .split(/\r\n|\r|\n/)
         .map(l => l.trim())
