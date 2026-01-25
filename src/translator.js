@@ -21,6 +21,7 @@ export const translateStatus = (code) => {
 };
 
 export const translateAirline = (code) => {
+  if (!code) return "";
   const map = {
     FZ: "Flydubai",
     EK: "Emirates",
@@ -43,13 +44,16 @@ export const translateAirline = (code) => {
     KL: "KLM",
     DL: "Delta",
     UA: "United",
-    AA: "American Airlines"
+    AA: "American Airlines",
+    ET: "Ethiopian Airlines",
+    CA: "Air China",
+    AC: "Air Canada"
   };
   return map[code.toUpperCase()] || code;
 };
 
 export const translateCity = (code) => {
-    // Basic list of common hubs to make it readable
+    if (!code) return "";
     const map = {
         DXB: "Dubai",
         DWC: "Dubai World Central",
@@ -70,7 +74,12 @@ export const translateCity = (code) => {
         KHI: "Karachi",
         CAI: "Cairo",
         IST: "Istanbul",
-        TLV: "Tel Aviv"
+        TLV: "Tel Aviv",
+        MCT: "Muscat",
+        KBL: "Kabul",
+        PEK: "Beijing",
+        YYZ: "Toronto",
+        JFK: "New York"
     };
     return map[code.toUpperCase()] || code;
 }
