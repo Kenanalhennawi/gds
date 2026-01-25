@@ -1,354 +1,329 @@
 /**
- * Excess Baggage Policy Calculator for Interline Bookings
- * Determines which airline's excess baggage rates apply based on itinerary
+ * Excess Baggage Rate Calculator
+ * Calculates excess baggage rates based on origin, destination, and airline
  */
 
 import { translateAirline, translateCity } from "./translator.js";
 
-// Transatlantic carriers (carriers that operate transatlantic routes)
-const TRANSATLANTIC_CARRIERS = ['AC', 'UA', 'DL', 'AA', 'BA', 'AF', 'LH', 'KL', 'VS', 'EI', 'SN', 'OS', 'LX', 'IB', 'TP', 'AZ'];
+// Zone mapping for airports (from PDF page 13-14)
+const ZONE_MAPPING = {
+    // Zone 1: UAE
+    'DXB': 1, 'DWC': 1,
+    
+    // Zone 2: Gulf Countries (GCC)
+    'KWI': 2, 'BAH': 2, 'MCT': 2, 'SLL': 2, 'OHS': 2,
+    
+    // Zone 3: Saudi Arabia (KSA)
+    'AHB': 3, 'AQI': 3, 'AJF': 3, 'DMM': 3, 'ELQ': 3, 'EAM': 3, 'GIZ': 3, 'HAS': 3, 'HOF': 3,
+    'JED': 3, 'NUM': 3, 'MED': 3, 'RUH': 3, 'RSI': 3, 'TUU': 3, 'TIF': 3, 'ULH': 3, 'YNB': 3,
+    
+    // Zone 4: Middle East (ME)
+    'BUZ': 4, 'GSM': 4, 'IFN': 4, 'IKA': 4, 'LRR': 4, 'MHD': 4, 'SYZ': 4, 'TBZ': 4, 'KIH': 4, 'KER': 4,
+    'BGW': 4, 'BSR': 4, 'EBL': 4, 'ISU': 4, 'NJF': 4, 'TLV': 4, 'AMM': 4, 'BEY': 4,
+    
+    // Zone 5: Africa (AF)
+    'JIB': 5, 'ASM': 5, 'ADD': 5, 'MBA': 5, 'HGA': 5, 'MGQ': 5, 'JUB': 5, 'KRT': 5, 'PZU': 5,
+    'DAR': 5, 'JRO': 5, 'ZNZ': 5, 'EBB': 5, 'HBE': 5, 'SSH': 5, 'HMB': 5, 'SPX': 5, 'DBB': 5,
+    
+    // Zone 6: Sub-Continent (SC)
+    'AMD': 6, 'BOM': 6, 'BLR': 6, 'CCJ': 6, 'CCU': 6, 'COK': 6, 'DEL': 6, 'HYD': 6, 'LKO': 6, 'MAA': 6, 'TRV': 6,
+    'KBL': 6, 'CGP': 6, 'DAC': 6, 'KTM': 6, 'BWA': 6,
+    'ISB': 6, 'KHI': 6, 'MUX': 6, 'LYP': 6, 'SKT': 6, 'UET': 6, 'LHE': 6, 'PEW': 6,
+    'CMB': 6, 'LGK': 6, 'PEN': 6,
+    
+    // Zone 7: South East Asia (SEA)
+    'MLE': 7, 'GAN': 7, 'RGN': 7, 'KBV': 7, 'UTP': 7,
+    
+    // Zone 8: Europe/CIS
+    'GYD': 8, 'MSQ': 8, 'BUS': 8, 'TBS': 8, 'GRV': 8, 'EVN': 8, 'ALA': 8, 'CIT': 8, 'TSE': 8,
+    'FRU': 8, 'OSS': 8, 'DYU': 8, 'ASB': 8, 'TAS': 8,
+    'SZG': 8, 'TIA': 8, 'SJJ': 8, 'SOF': 8, 'DBV': 8, 'ZAG': 8, 'PRG': 8, 'JMK': 8, 'JTR': 8, 'CFU': 8,
+    'TLL': 8, 'HEL': 8, 'CTA': 8, 'NAP': 8, 'PSA': 8, 'BGY': 8, 'CAG': 8, 'OLB': 8,
+    'RIX': 8, 'VNO': 8, 'MLA': 8, 'TIV': 8, 'SKP': 8, 'KRK': 8, 'WAW': 8, 'POZ': 8,
+    'OTP': 8, 'CLJ': 8, 'AER': 8, 'KUF': 8, 'KRR': 8, 'KZN': 8, 'MCX': 8, 'MRV': 8, 'OVB': 8,
+    'PEE': 8, 'ROV': 8, 'SVO': 8, 'SVX': 8, 'UFA': 8, 'VKO': 8, 'VOG': 8, 'ZIA': 8, 'LED': 8,
+    'BEG': 8, 'BTS': 8, 'LJU': 8, 'BSL': 8, 'ADB': 8, 'AYT': 8, 'SAW': 8, 'IST': 8, 'BJV': 8, 'TZX': 8,
+    'IEV': 8, 'KBP': 8, 'ODS': 8, 'SKD': 8, 'NMA': 8
+};
 
-// Excess Baggage Policy Rules
-const EXCESS_BAGGAGE_RULES = {
-    // Rule 1: FZ - EK → EK rates apply
-    'FZ_EK': {
-        condition: (segments) => {
-            const carriers = segments.map(s => s.carrier);
-            return carriers.includes('FZ') && carriers.includes('EK') && !hasTransatlanticCarrier(segments, ['AC', 'UA']);
-        },
-        applicableCarrier: 'EK',
-        description: 'FZ - EK: EK rates apply'
+// Currency mapping by destination (from PDF page 23)
+const CURRENCY_MAPPING = {
+    'AED': ['DXB', 'KRT', 'PZU'],
+    'BHD': ['BAH'],
+    'CHF': ['BSL'],
+    'CZK': ['PRG'],
+    'EGP': ['HBE', 'SSH', 'SPX', 'DBB'],
+    'EUR': ['BEG', 'BGY', 'BTS', 'CAG', 'CFU', 'CLJ', 'CTA', 'DBV', 'JMK', 'JTR', 'HEL', 'LJU', 'KIV', 'MLA', 'NAP', 'OTP', 'OLB', 'PSA', 'SJJ', 'SKP', 'SOF', 'SZG', 'TIA', 'TIV', 'ZAG'],
+    'HUF': ['BUD'],
+    'INR': ['AMD', 'BOM', 'BLR', 'CCU', 'CCJ', 'COK', 'DEL', 'HYD', 'LKO', 'MAA', 'TRV'],
+    'JOD': ['AMM', 'AQJ'],
+    'KWD': ['KWI'],
+    'KZT': ['ALA', 'CIT', 'TSE', 'NQZ'],
+    'LKR': ['CMB', 'HRI'],
+    'MYR': ['LGK', 'PEN'],
+    'NPR': ['KTM', 'BWA'],
+    'OMR': ['MCT', 'SLL', 'OHS'],
+    'PKR': ['ISB', 'KHI', 'LYP', 'MUX', 'SKT', 'UET', 'LHE', 'PEW'],
+    'PLN': ['KRK', 'WAW', 'POZ'],
+    'QAR': ['DOH'],
+    'RUB': ['AER', 'GOJ', 'GRV', 'KRR', 'KUF', 'KZN', 'LED', 'MCX', 'MRV', 'OVB', 'PEE', 'ROV', 'SVO', 'SVX', 'UFA', 'VKO', 'VOG', 'VOZ', 'ZIA'],
+    'SAR': ['AHB', 'AJF', 'AQI', 'DMM', 'EAM', 'ELQ', 'GIZ', 'HAS', 'HOF', 'JED', 'NUM', 'MED', 'RUH', 'RSI', 'TIF', 'TUU', 'ULH', 'YNB'],
+    'THB': ['KBV', 'UTP'],
+    'USD': ['ADB', 'ADD', 'ADE', 'ASB', 'ASM', 'AYT', 'AWZ', 'BGW', 'BJM', 'BJV', 'BND', 'BUS', 'BUZ', 'BSR', 'CGP', 'DAC', 'DAR', 'DOK', 'DYU', 'EBB', 'EBL', 'ESB', 'EVN', 'FIH', 'FRU', 'GAN', 'GBB', 'GSM', 'GYD', 'HDM', 'HGA', 'HRK', 'IEV', 'IFN', 'IKA', 'ISU', 'JIB', 'JRO', 'JUB', 'KBL', 'KBP', 'KDH', 'KER', 'KGL', 'KIH', 'KUT', 'LRR', 'MBA', 'MGQ', 'MHD', 'MLE', 'MSQ', 'NJF', 'NMA', 'ODS', 'OSS', 'RGN', 'SAH', 'SAW', 'SKD', 'SKG', 'TBS', 'TBZ', 'TGD', 'TLV', 'TZX', 'ZNZ', 'ZYL'],
+    'UZS': ['TAS']
+};
+
+// Get zone for airport
+export function getZoneForAirport(airport) {
+    if (!airport) return null;
+    return ZONE_MAPPING[airport.toUpperCase()] || null;
+}
+
+// Get currency for destination
+export function getCurrencyForDestination(destination) {
+    if (!destination) return 'USD';
+    const dest = destination.toUpperCase();
+    for (const [currency, airports] of Object.entries(CURRENCY_MAPPING)) {
+        if (airports.includes(dest)) {
+            return currency;
+        }
+    }
+    return 'USD'; // Default
+}
+
+// Excess Baggage Rates Table (from PDF pages 15-22)
+// Format: [From Zone][To Zone] = rate in base currency
+const EXCESS_BAGGAGE_RATES = {
+    'AED': {
+        1: { 1: 0, 2: 40, 3: 40, 4: 60, 5: 40, 6: 40, 7: 60, 8: 60 },
+        2: { 1: 40, 2: 60, 3: 60, 4: 60, 5: 60, 6: 60, 7: 80, 8: 80 },
+        3: { 1: 40, 2: 60, 3: 60, 4: 60, 5: 60, 6: 60, 7: 80, 8: 80 },
+        4: { 1: 60, 2: 60, 3: 60, 4: 60, 5: 60, 6: 60, 7: 60, 8: 60 },
+        5: { 1: 40, 2: 60, 3: 60, 4: 60, 5: 60, 6: 60, 7: 60, 8: 60 },
+        6: { 1: 40, 2: 60, 3: 60, 4: 60, 5: 60, 6: 60, 7: 80, 8: 80 },
+        7: { 1: 60, 2: 80, 3: 80, 4: 60, 5: 60, 6: 80, 7: 80, 8: 80 },
+        8: { 1: 60, 2: 80, 3: 80, 4: 60, 5: 60, 6: 80, 7: 80, 8: 80 }
     },
-    
-    // Rule 2: FZ - EK - AC (EK is Transatlantic) → EK rates apply
-    'FZ_EK_AC_EK_TRANSATLANTIC': {
-        condition: (segments) => {
-            const carriers = segments.map(s => s.carrier);
-            const hasEK = carriers.includes('EK');
-            const hasAC = carriers.includes('AC');
-            const hasFZ = carriers.includes('FZ');
-            if (hasFZ && hasEK && hasAC) {
-                // Check if EK operates the transatlantic segment
-                const transatlanticSeg = findTransatlanticSegment(segments);
-                return transatlanticSeg && transatlanticSeg.carrier === 'EK';
-            }
-            return false;
-        },
-        applicableCarrier: 'EK',
-        description: 'FZ - EK - AC (EK is Transatlantic carrier): EK rates apply'
+    'USD': {
+        1: { 1: 0, 2: 11, 3: 11, 4: 17, 5: 11, 6: 11, 7: 17, 8: 17 },
+        2: { 1: 11, 2: 17, 3: 17, 4: 17, 5: 17, 6: 17, 7: 22, 8: 22 },
+        3: { 1: 11, 2: 17, 3: 17, 4: 17, 5: 17, 6: 17, 7: 22, 8: 22 },
+        4: { 1: 17, 2: 17, 3: 17, 4: 17, 5: 17, 6: 17, 7: 17, 8: 17 },
+        5: { 1: 11, 2: 17, 3: 17, 4: 17, 5: 17, 6: 17, 7: 17, 8: 17 },
+        6: { 1: 11, 2: 17, 3: 17, 4: 17, 5: 17, 6: 17, 7: 22, 8: 22 },
+        7: { 1: 17, 2: 22, 3: 22, 4: 17, 5: 17, 6: 22, 7: 22, 8: 22 },
+        8: { 1: 17, 2: 22, 3: 22, 4: 17, 5: 17, 6: 22, 7: 22, 8: 22 }
     },
-    
-    // Rule 3: FZ - OAL (Other Airlines) → EK rates apply
-    'FZ_OAL': {
-        condition: (segments) => {
-            const carriers = segments.map(s => s.carrier);
-            const hasFZ = carriers.includes('FZ');
-            const hasOtherAirlines = carriers.some(c => c !== 'FZ' && c !== 'EK' && c !== 'AC' && c !== 'UA');
-            return hasFZ && hasOtherAirlines && !carriers.includes('EK') && !hasTransatlanticCarrier(segments, ['AC', 'UA']);
-        },
-        applicableCarrier: 'EK',
-        description: 'FZ - OAL (Other Airlines): EK configured rates apply'
+    'EUR': {
+        1: { 1: 0, 2: 10, 3: 10, 4: 15, 5: 10, 6: 10, 7: 15, 8: 15 },
+        2: { 1: 10, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 20, 8: 20 },
+        3: { 1: 10, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 20, 8: 20 },
+        4: { 1: 15, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 15, 8: 15 },
+        5: { 1: 10, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 15, 8: 15 },
+        6: { 1: 10, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 20, 8: 20 },
+        7: { 1: 15, 2: 20, 3: 20, 4: 15, 5: 15, 6: 20, 7: 20, 8: 20 },
+        8: { 1: 15, 2: 20, 3: 20, 4: 15, 5: 15, 6: 20, 7: 20, 8: 20 }
     },
-    
-    // Rule 4: FZ - AC (AC is Transatlantic) → AC rates apply
-    'FZ_AC_TRANSATLANTIC': {
-        condition: (segments) => {
-            const carriers = segments.map(s => s.carrier);
-            const hasFZ = carriers.includes('FZ');
-            const hasAC = carriers.includes('AC');
-            if (hasFZ && hasAC) {
-                const transatlanticSeg = findTransatlanticSegment(segments);
-                return transatlanticSeg && transatlanticSeg.carrier === 'AC';
-            }
-            return false;
-        },
-        applicableCarrier: 'AC',
-        description: 'FZ - AC (AC is Transatlantic carrier): AC rates apply'
+    'SAR': {
+        1: { 1: 0, 2: 40, 3: 40, 4: 65, 5: 40, 6: 40, 7: 65, 8: 65 },
+        2: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 85, 8: 85 },
+        3: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 85, 8: 85 },
+        4: { 1: 65, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 65, 8: 65 },
+        5: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 65, 8: 65 },
+        6: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 85, 8: 85 },
+        7: { 1: 65, 2: 85, 3: 85, 4: 65, 5: 65, 6: 85, 7: 85, 8: 85 },
+        8: { 1: 65, 2: 85, 3: 85, 4: 65, 5: 65, 6: 85, 7: 85, 8: 85 }
     },
-    
-    // Rule 5: FZ - UA (UA is Transatlantic) → UA rates apply
-    'FZ_UA_TRANSATLANTIC': {
-        condition: (segments) => {
-            const carriers = segments.map(s => s.carrier);
-            const hasFZ = carriers.includes('FZ');
-            const hasUA = carriers.includes('UA');
-            if (hasFZ && hasUA) {
-                const transatlanticSeg = findTransatlanticSegment(segments);
-                return transatlanticSeg && transatlanticSeg.carrier === 'UA';
-            }
-            return false;
-        },
-        applicableCarrier: 'UA',
-        description: 'FZ - UA (UA is Transatlantic carrier): UA rates apply'
+    'INR': {
+        1: { 1: 0, 2: 1055, 3: 1055, 4: 1585, 5: 1055, 6: 1055, 7: 1585, 8: 1585 },
+        2: { 1: 1055, 2: 1585, 3: 1585, 4: 1585, 5: 1585, 6: 1585, 7: 2115, 8: 2115 },
+        3: { 1: 1055, 2: 1585, 3: 1585, 4: 1585, 5: 1585, 6: 1585, 7: 2115, 8: 2115 },
+        4: { 1: 1585, 2: 1585, 3: 1585, 4: 1585, 5: 1585, 6: 1585, 7: 1585, 8: 1585 },
+        5: { 1: 1055, 2: 1585, 3: 1585, 4: 1585, 5: 1585, 6: 1585, 7: 1585, 8: 1585 },
+        6: { 1: 1055, 2: 1585, 3: 1585, 4: 1585, 5: 1585, 6: 1585, 7: 2115, 8: 2115 },
+        7: { 1: 1585, 2: 2115, 3: 2115, 4: 1585, 5: 1585, 6: 2115, 7: 2115, 8: 2115 },
+        8: { 1: 1585, 2: 2115, 3: 2115, 4: 1585, 5: 1585, 6: 2115, 7: 2115, 8: 2115 }
+    },
+    'PKR': {
+        1: { 1: 0, 2: 3165, 3: 3165, 4: 4750, 5: 3165, 6: 3165, 7: 4750, 8: 4750 },
+        2: { 1: 3165, 2: 4750, 3: 4750, 4: 4750, 5: 4750, 6: 4750, 7: 6335, 8: 6335 },
+        3: { 1: 3165, 2: 4750, 3: 4750, 4: 4750, 5: 4750, 6: 4750, 7: 6335, 8: 6335 },
+        4: { 1: 4750, 2: 4750, 3: 4750, 4: 4750, 5: 4750, 6: 4750, 7: 4750, 8: 4750 },
+        5: { 1: 3165, 2: 4750, 3: 4750, 4: 4750, 5: 4750, 6: 4750, 7: 4750, 8: 4750 },
+        6: { 1: 3165, 2: 4750, 3: 4750, 4: 4750, 5: 4750, 6: 4750, 7: 6335, 8: 6335 },
+        7: { 1: 4750, 2: 6335, 3: 6335, 4: 4750, 5: 4750, 6: 6335, 7: 6335, 8: 6335 },
+        8: { 1: 4750, 2: 6335, 3: 6335, 4: 4750, 5: 4750, 6: 6335, 7: 6335, 8: 6335 }
+    },
+    'QAR': {
+        1: { 1: 0, 2: 40, 3: 40, 4: 65, 5: 40, 6: 40, 7: 65, 8: 65 },
+        2: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 85, 8: 85 },
+        3: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 85, 8: 85 },
+        4: { 1: 65, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 65, 8: 65 },
+        5: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 65, 8: 65 },
+        6: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 85, 8: 85 },
+        7: { 1: 65, 2: 85, 3: 85, 4: 65, 5: 65, 6: 85, 7: 85, 8: 85 },
+        8: { 1: 65, 2: 85, 3: 85, 4: 65, 5: 65, 6: 85, 7: 85, 8: 85 }
+    },
+    'RUB': {
+        1: { 1: 0, 2: 1085, 3: 1085, 4: 1630, 5: 1085, 6: 1085, 7: 1630, 8: 1630 },
+        2: { 1: 1085, 2: 1630, 3: 1630, 4: 1630, 5: 1630, 6: 1630, 7: 2175, 8: 2175 },
+        3: { 1: 1085, 2: 1630, 3: 1630, 4: 1630, 5: 1630, 6: 1630, 7: 2175, 8: 2175 },
+        4: { 1: 1630, 2: 1630, 3: 1630, 4: 1630, 5: 1630, 6: 1630, 7: 1630, 8: 1630 },
+        5: { 1: 1085, 2: 1630, 3: 1630, 4: 1630, 5: 1630, 6: 1630, 7: 1630, 8: 1630 },
+        6: { 1: 1085, 2: 1630, 3: 1630, 4: 1630, 5: 1630, 6: 1630, 7: 2175, 8: 2175 },
+        7: { 1: 1630, 2: 2175, 3: 2175, 4: 1630, 5: 1630, 6: 2175, 7: 2175, 8: 2175 },
+        8: { 1: 1630, 2: 2175, 3: 2175, 4: 1630, 5: 1630, 6: 2175, 7: 2175, 8: 2175 }
     }
 };
 
-// Helper function to check if segments have transatlantic carriers
-function hasTransatlanticCarrier(segments, excludeCarriers = []) {
-    return segments.some(seg => 
-        TRANSATLANTIC_CARRIERS.includes(seg.carrier) && 
-        !excludeCarriers.includes(seg.carrier)
-    );
-}
-
-// Helper function to find transatlantic segment
-function findTransatlanticSegment(segments) {
-    // Common transatlantic routes: US/Canada to/from Europe/Middle East
-    const transatlanticRoutes = [
-        // North America to Europe/Middle East
-        { from: ['US', 'CA', 'MX'], to: ['GB', 'FR', 'DE', 'IT', 'ES', 'NL', 'BE', 'CH', 'AT', 'IE', 'PT', 'GR', 'AE', 'SA', 'QA', 'KW', 'BH', 'OM'] },
-        // Europe/Middle East to North America
-        { from: ['GB', 'FR', 'DE', 'IT', 'ES', 'NL', 'BE', 'CH', 'AT', 'IE', 'PT', 'GR', 'AE', 'SA', 'QA', 'KW', 'BH', 'OM'], to: ['US', 'CA', 'MX'] }
-    ];
-    
-    // Check for transatlantic routes
-    for (const seg of segments) {
-        const fromCountry = getCountryFromAirport(seg.from);
-        const toCountry = getCountryFromAirport(seg.to);
-        
-        for (const route of transatlanticRoutes) {
-            if (route.from.includes(fromCountry) && route.to.includes(toCountry)) {
-                return seg;
-            }
-        }
+// EK/AC/UA rates (from PDF pages 24-25)
+const EK_EXCESS_RATES = {
+    // Per KG rates (USD)
+    'per_kg': {
+        'M.E.': { 'M.E.': 15, 'WAIO': 15, 'Africa': 25, 'Europe': 25, 'Far East': 25, 'ANZ': 40, 'Americas': 40 },
+        'WAIO': { 'M.E.': 15, 'WAIO': 15, 'Africa': 25, 'Europe': 25, 'Far East': 25, 'ANZ': 40, 'Americas': 40 },
+        'Europe': { 'M.E.': 25, 'WAIO': 30, 'Africa': 30, 'Europe': 30, 'Far East': 40, 'ANZ': 30, 'Americas': 50 },
+        'Far East': { 'M.E.': 25, 'WAIO': 30, 'Africa': 15, 'Europe': 30, 'Far East': 30, 'ANZ': 15, 'Americas': 30 },
+        'ANZ': { 'M.E.': 40, 'WAIO': 50, 'Africa': 50, 'Europe': 30, 'Far East': 15, 'ANZ': 15, 'Americas': 30 },
+        'Americas': { 'M.E.': 40, 'WAIO': 40, 'Africa': 200, 'Europe': 100, 'Far East': 250, 'ANZ': 250, 'Americas': 200 }
+    },
+    // Per piece rates (USD)
+    'per_piece': {
+        'Africa': { 'Africa': 200, 'Americas': 200, 'Europe': 200, 'Far East': 200, 'ANZ': 250, 'M.E.': 250, 'WAIO': 200 },
+        'Americas': { 'Africa': 200, 'Americas': 100, 'Europe': 100, 'Far East': 250, 'ANZ': 250, 'M.E.': 225, 'WAIO': 225 },
+        'Canada': { 'Africa': 250, 'Americas': 125, 'Europe': 125, 'Far East': 300, 'ANZ': 300, 'M.E.': 280, 'WAIO': 280 }
     }
-    
-    // If no clear transatlantic route, check if carrier is transatlantic
-    return segments.find(seg => TRANSATLANTIC_CARRIERS.includes(seg.carrier));
-}
+};
 
-// Helper to get country from airport code (simplified)
-function getCountryFromAirport(code) {
-    // Major airport to country mapping
-    const airportCountries = {
-        // US
-        'JFK': 'US', 'LAX': 'US', 'MIA': 'US', 'ORD': 'US', 'DFW': 'US', 'ATL': 'US', 'SEA': 'US', 'SFO': 'US',
-        'EWR': 'US', 'LGA': 'US', 'BOS': 'US', 'IAD': 'US', 'DCA': 'US', 'MCO': 'US', 'FLL': 'US', 'DEN': 'US',
-        'IAH': 'US', 'LAS': 'US', 'PHX': 'US', 'CLT': 'US', 'MSP': 'US', 'DTW': 'US', 'PHL': 'US', 'BWI': 'US',
-        // Canada
-        'YYZ': 'CA', 'YVR': 'CA', 'YUL': 'CA', 'YYC': 'CA', 'YOW': 'CA', 'YHZ': 'CA', 'YEG': 'CA',
-        // UK
-        'LHR': 'GB', 'LGW': 'GB', 'MAN': 'GB', 'STN': 'GB', 'LTN': 'GB', 'EDI': 'GB', 'GLA': 'GB', 'BRS': 'GB',
-        // France
-        'CDG': 'FR', 'ORY': 'FR', 'NCE': 'FR', 'LYS': 'FR', 'MRS': 'FR', 'BOD': 'FR', 'TLS': 'FR',
-        // Germany
-        'FRA': 'DE', 'MUC': 'DE', 'BER': 'DE', 'DUS': 'DE', 'HAM': 'DE', 'STR': 'DE', 'CGN': 'DE',
-        // Italy
-        'FCO': 'IT', 'MXP': 'IT', 'LIN': 'IT', 'VCE': 'IT', 'BLQ': 'IT', 'NAP': 'IT', 'PMO': 'IT',
-        // Spain
-        'MAD': 'ES', 'BCN': 'ES', 'AGP': 'ES', 'PMI': 'ES', 'VLC': 'ES', 'SVQ': 'ES', 'BIO': 'ES',
-        // Netherlands
-        'AMS': 'NL', 'EIN': 'NL', 'RTM': 'NL',
-        // Belgium
-        'BRU': 'BE', 'CRL': 'BE',
-        // Switzerland
-        'ZRH': 'CH', 'GVA': 'CH', 'BSL': 'CH',
-        // Austria
-        'VIE': 'AT', 'SZG': 'AT', 'INN': 'AT',
-        // Ireland
-        'DUB': 'IE', 'SNN': 'IE', 'ORK': 'IE',
-        // Portugal
-        'LIS': 'PT', 'OPO': 'PT', 'FAO': 'PT',
-        // Greece
-        'ATH': 'GR', 'SKG': 'GR', 'HER': 'GR', 'RHO': 'GR',
-        // UAE
-        'DXB': 'AE', 'AUH': 'AE', 'DWC': 'AE', 'SHJ': 'AE',
-        // Saudi Arabia
-        'RUH': 'SA', 'JED': 'SA', 'DMM': 'SA', 'MED': 'SA', 'AHB': 'SA', 'TIF': 'SA', 'ELQ': 'SA',
-        // Qatar
-        'DOH': 'QA',
-        // Kuwait
-        'KWI': 'KW',
-        // Bahrain
-        'BAH': 'BH',
-        // Oman
-        'MCT': 'OM', 'SLL': 'OM',
-        // Turkey
-        'IST': 'TR', 'SAW': 'TR', 'ESB': 'TR', 'AYT': 'TR', 'ADB': 'TR',
-        // Egypt
-        'CAI': 'EG', 'HBE': 'EG', 'LXR': 'EG', 'SSH': 'EG', 'HRG': 'EG',
-        // Jordan
-        'AMM': 'JO', 'AQJ': 'JO',
-        // Lebanon
-        'BEY': 'LB',
-        // Morocco
-        'CMN': 'MA', 'RBA': 'MA', 'AGA': 'MA',
-        // Tunisia
-        'TUN': 'TN', 'DJE': 'TN',
-        // Algeria
-        'ALG': 'DZ',
-        // Russia
-        'SVO': 'RU', 'DME': 'RU', 'VKO': 'RU', 'LED': 'RU',
-        // India
-        'DEL': 'IN', 'BOM': 'IN', 'BLR': 'IN', 'MAA': 'IN', 'HYD': 'IN', 'CCU': 'IN', 'AMD': 'IN',
-        // Pakistan
-        'KHI': 'PK', 'LHE': 'PK', 'ISB': 'PK',
-        // Bangladesh
-        'DAC': 'BD', 'CGP': 'BD',
-        // Sri Lanka
-        'CMB': 'LK',
-        // Thailand
-        'BKK': 'TH', 'DMK': 'TH', 'HKT': 'TH', 'CNX': 'TH',
-        // Singapore
-        'SIN': 'SG',
-        // Malaysia
-        'KUL': 'MY', 'PEN': 'MY',
-        // Indonesia
-        'CGK': 'ID', 'DPS': 'ID',
-        // Philippines
-        'MNL': 'PH', 'CEB': 'PH',
-        // Vietnam
-        'SGN': 'VN', 'HAN': 'VN',
-        // China
-        'PEK': 'CN', 'PKX': 'CN', 'PVG': 'CN', 'SHA': 'CN', 'CAN': 'CN', 'CTU': 'CN', 'SZX': 'CN',
-        // Japan
-        'NRT': 'JP', 'HND': 'JP', 'KIX': 'JP', 'NGO': 'JP',
-        // South Korea
-        'ICN': 'KR', 'GMP': 'KR',
-        // Australia
-        'SYD': 'AU', 'MEL': 'AU', 'BNE': 'AU', 'PER': 'AU',
-        // New Zealand
-        'AKL': 'NZ', 'WLG': 'NZ',
-        // Mexico
-        'MEX': 'MX', 'CUN': 'MX', 'GDL': 'MX',
-        // Brazil
-        'GRU': 'BR', 'GIG': 'BR', 'BSB': 'BR',
-        // Argentina
-        'EZE': 'AR', 'AEP': 'AR',
-        // Chile
-        'SCL': 'CL',
-        // Colombia
-        'BOG': 'CO', 'MDE': 'CO',
-        // Central Asia
-        'TAS': 'UZ', 'ALA': 'KZ', 'NQZ': 'KZ', 'DYU': 'TJ', 'ASB': 'TM', 'GYD': 'AZ', 'EVN': 'AM', 'TBS': 'GE',
-        'VNO': 'LT', 'RIX': 'LV', 'TLL': 'EE'
-    };
-    
-    return airportCountries[code] || 'UNKNOWN';
-}
+const UA_AC_RATES = {
+    'free_allowance_eco': 23, // kg
+    'free_allowance_bus': 32, // kg
+    '1_excess_bag': 75, // USD
+    '2_excess_bag': 100, // USD
+    '3_or_more_excess_bag': 200, // USD
+    'oversize': 200, // USD
+    'overweight': 200 // USD
+};
 
-// Parse itinerary from text input
-export function parseItinerary(input) {
-    const lines = input.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-    const segments = [];
+// Calculate excess baggage rate
+export function calculateExcessBaggageRate(origin, destination, airline) {
+    const originZone = getZoneForAirport(origin);
+    const destZone = getZoneForAirport(destination);
+    const currency = getCurrencyForDestination(destination);
     
-    lines.forEach(line => {
-        // Try to parse segment format: FZ: TAS-DXB or FZ746L05JAN TIADXB HK1
-        // Format 1: CARRIER: FROM-TO
-        const format1 = line.match(/^([A-Z0-9]{2}):\s*([A-Z]{3})-([A-Z]{3})/i);
-        if (format1) {
-            segments.push({
-                carrier: format1[1].toUpperCase(),
-                from: format1[2].toUpperCase(),
-                to: format1[3].toUpperCase(),
-                raw: line
-            });
-            return;
-        }
-        
-        // Format 2: Standard GDS format: FZ746L05JAN TIADXB HK1
-        const format2 = line.match(/^([A-Z0-9]{2})(\d{1,4}[A-Z]?)\s*([0-9]{2}[A-Z]{3})?\s+([A-Z]{3})([A-Z]{3})/i);
-        if (format2) {
-            segments.push({
-                carrier: format2[1].toUpperCase(),
-                from: format2[4].toUpperCase(),
-                to: format2[5].toUpperCase(),
-                raw: line
-            });
-            return;
-        }
-        
-        // Format 3: Simple route: FZ TAS DXB
-        const format3 = line.match(/^([A-Z0-9]{2})\s+([A-Z]{3})\s+([A-Z]{3})/i);
-        if (format3) {
-            segments.push({
-                carrier: format3[1].toUpperCase(),
-                from: format3[2].toUpperCase(),
-                to: format3[3].toUpperCase(),
-                raw: line
-            });
-        }
-    });
-    
-    return segments;
-}
-
-// Determine which carrier's rates apply
-export function determineApplicableCarrier(segments) {
-    if (!segments || segments.length === 0) {
+    if (!originZone || !destZone) {
         return {
-            applicableCarrier: null,
-            rule: null,
-            description: 'No segments found',
-            segments: []
+            error: 'Invalid airport code. Please check origin and destination.',
+            originZone,
+            destZone
         };
     }
     
-    // Check each rule in order
-    for (const [ruleName, rule] of Object.entries(EXCESS_BAGGAGE_RULES)) {
-        if (rule.condition(segments)) {
+    // Handle FZ rates
+    if (airline === 'FZ') {
+        const rates = EXCESS_BAGGAGE_RATES[currency] || EXCESS_BAGGAGE_RATES['USD'];
+        const rate = rates[originZone] && rates[originZone][destZone];
+        
+        if (rate === undefined) {
             return {
-                applicableCarrier: rule.applicableCarrier,
-                rule: ruleName,
-                description: rule.description,
-                segments: segments,
-                carrierName: translateAirline(rule.applicableCarrier)
+                error: `Rate not available for ${currency} from Zone ${originZone} to Zone ${destZone}`,
+                originZone,
+                destZone,
+                currency
             };
         }
-    }
-    
-    // Default: If only FZ segments, FZ rates apply
-    const allFZ = segments.every(s => s.carrier === 'FZ');
-    if (allFZ) {
+        
         return {
-            applicableCarrier: 'FZ',
-            rule: 'FZ_ONLY',
-            description: 'FZ only itinerary: FZ rates apply',
-            segments: segments,
+            airline: 'FZ',
+            origin: origin.toUpperCase(),
+            destination: destination.toUpperCase(),
+            originZone,
+            destZone,
+            currency,
+            ratePerKg: rate,
+            rateDescription: `${rate} ${currency} per kg`,
             carrierName: translateAirline('FZ')
         };
     }
     
-    // Fallback: Use first non-FZ carrier
-    const firstNonFZ = segments.find(s => s.carrier !== 'FZ');
-    if (firstNonFZ) {
+    // Handle EK rates (for FZ-EK interline)
+    if (airline === 'EK') {
+        // Map zones to EK regions
+        const originRegion = mapZoneToEKRegion(originZone);
+        const destRegion = mapZoneToEKRegion(destZone);
+        
+        const perKgRate = EK_EXCESS_RATES.per_kg[originRegion] && 
+                         EK_EXCESS_RATES.per_kg[originRegion][destRegion];
+        
         return {
-            applicableCarrier: firstNonFZ.carrier,
-            rule: 'DEFAULT',
-            description: `Default: ${firstNonFZ.carrier} rates apply (first non-FZ carrier)`,
-            segments: segments,
-            carrierName: translateAirline(firstNonFZ.carrier)
+            airline: 'EK',
+            origin: origin.toUpperCase(),
+            destination: destination.toUpperCase(),
+            originZone,
+            destZone,
+            originRegion,
+            destRegion,
+            currency: 'USD',
+            ratePerKg: perKgRate || 'N/A',
+            rateDescription: perKgRate ? `$${perKgRate} USD per kg` : 'Rate not available',
+            carrierName: translateAirline('EK')
+        };
+    }
+    
+    // Handle AC/UA rates
+    if (airline === 'AC' || airline === 'UA') {
+        return {
+            airline,
+            origin: origin.toUpperCase(),
+            destination: destination.toUpperCase(),
+            originZone,
+            destZone,
+            currency: 'USD',
+            freeAllowanceEco: UA_AC_RATES.free_allowance_eco,
+            freeAllowanceBus: UA_AC_RATES.free_allowance_bus,
+            rates: {
+                '1_excess_bag': UA_AC_RATES['1_excess_bag'],
+                '2_excess_bag': UA_AC_RATES['2_excess_bag'],
+                '3_or_more_excess_bag': UA_AC_RATES['3_or_more_excess_bag'],
+                'oversize': UA_AC_RATES.oversize,
+                'overweight': UA_AC_RATES.overweight
+            },
+            carrierName: translateAirline(airline)
         };
     }
     
     return {
-        applicableCarrier: null,
-        rule: null,
-        description: 'Unable to determine applicable carrier',
-        segments: segments
+        error: `Rates not configured for airline ${airline}`,
+        airline
     };
 }
 
-// Get policy explanation
-export function getPolicyExplanation(result) {
-    if (!result || !result.applicableCarrier) {
-        return 'Unable to determine excess baggage policy. Please check your itinerary.';
-    }
-    
-    const carrier = result.carrierName || result.applicableCarrier;
-    let explanation = `**Applicable Carrier:** ${carrier} (${result.applicableCarrier})\n\n`;
-    explanation += `**Policy:** ${result.description}\n\n`;
-    
-    explanation += `**Itinerary:**\n`;
-    result.segments.forEach((seg, idx) => {
-        const carrierName = translateAirline(seg.carrier);
-        const fromCity = translateCity(seg.from);
-        const toCity = translateCity(seg.to);
-        explanation += `${idx + 1}. ${seg.carrier} (${carrierName}): ${seg.from} (${fromCity}) → ${seg.to} (${toCity})\n`;
-    });
-    
-    explanation += `\n**Note:** Excess baggage rates for ${carrier} will apply to this interline booking. `;
-    explanation += `Please refer to the carrier's excess baggage rate table for specific charges based on destination and weight.`;
-    
-    return explanation;
+// Map zone to EK region
+function mapZoneToEKRegion(zone) {
+    const mapping = {
+        1: 'M.E.', // UAE
+        2: 'M.E.', // Gulf
+        3: 'M.E.', // KSA
+        4: 'M.E.', // Middle East
+        5: 'Africa',
+        6: 'WAIO', // Sub-continent
+        7: 'Far East', // SEA
+        8: 'Europe' // Europe/CIS
+    };
+    return mapping[zone] || 'M.E.';
+}
+
+// Get zone name
+export function getZoneName(zone) {
+    const names = {
+        1: 'UAE',
+        2: 'Gulf Countries (GCC)',
+        3: 'Saudi Arabia (KSA)',
+        4: 'Middle East (ME)',
+        5: 'Africa (AF)',
+        6: 'Sub-Continent (SC)',
+        7: 'South East Asia (SEA)',
+        8: 'Europe/CIS'
+    };
+    return names[zone] || `Zone ${zone}`;
 }
