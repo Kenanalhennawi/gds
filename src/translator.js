@@ -5,12 +5,9 @@ export const translateStatus = (code) => {
         KK: { label: "Confirmed", class: "status-hk", icon: "✓" },
         KL: { label: "Confirmed", class: "status-hk", icon: "✓" },
         TK: { label: "Schedule Change", class: "status-tk", icon: "⚠" },
-        UN: { label: "Cancelled (Airline)", class: "status-hx", icon: "✕" },
-        UC: { label: "Unable Confirm", class: "status-hx", icon: "✕" },
+        UN: { label: "Cancelled", class: "status-hx", icon: "✕" },
+        UC: { label: "Unable", class: "status-hx", icon: "✕" },
         HX: { label: "Cancelled", class: "status-hx", icon: "✕" },
-        XX: { label: "Cancelled", class: "status-hx", icon: "✕" },
-        NO: { label: "No Action Taken", class: "status-hx", icon: "−" },
-        US: { label: "Unable to Sell", class: "status-hx", icon: "✕" },
         SS: { label: "Sold", class: "status-hk", icon: "✓" },
         DK: { label: "Holding", class: "status-tk", icon: "⧖" }
     };
@@ -18,10 +15,7 @@ export const translateStatus = (code) => {
 };
 
 const AIRLINES = {
-    // --- Major Systems ---
     "1A": "Amadeus", "1G": "Galileo", "1B": "Abacus", "1S": "Sabre", "1P": "Worldspan", "1F": "Infini",
-
-    // --- Middle East & Africa ---
     FZ: "Flydubai", EK: "Emirates", QR: "Qatar Airways", EY: "Etihad Airways",
     TK: "Turkish Airlines", MS: "EgyptAir", SV: "Saudia", XY: "Flynas",
     G9: "Air Arabia", J9: "Jazeera Airways", KU: "Kuwait Airways", WY: "Oman Air",
@@ -33,8 +27,6 @@ const AIRLINES = {
     MD: "Air Madagascar", UU: "Air Austral", HM: "Air Seychelles",
     WB: "RwandAir", TC: "Air Tanzania", HF: "Air Cote d'Ivoire",
     KP: "ASKY Airlines", UG: "Tunisair Express", RB: "Syrian Air",
-    
-    // --- Europe ---
     LH: "Lufthansa", AF: "Air France", KL: "KLM", BA: "British Airways",
     IB: "Iberia", TP: "TAP Air Portugal", AZ: "ITA Airways", LX: "Swiss Int. Air Lines",
     OS: "Austrian Airlines", SN: "Brussels Airlines", EI: "Aer Lingus",
@@ -47,16 +39,12 @@ const AIRLINES = {
     BT: "airBaltic", PS: "Ukraine Int. Airlines", B2: "Belavia",
     J2: "Azerbaijan Airlines", A9: "Georgian Airways", HY: "Uzbekistan Airways",
     KC: "Air Astana", DV: "SCAT Airlines", 
-
-    // --- Americas ---
     UA: "United Airlines", AA: "American Airlines", DL: "Delta Air Lines",
     AC: "Air Canada", TS: "Air Transat", WS: "WestJet", AS: "Alaska Airlines",
     B6: "JetBlue", NK: "Spirit Airlines", F9: "Frontier Airlines", WN: "Southwest",
     HA: "Hawaiian Airlines", AM: "Aeromexico", CM: "Copa Airlines",
     AV: "Avianca", LA: "LATAM Airlines", JJ: "LATAM Brasil", XL: "LATAM Ecuador",
     AR: "Aerolineas Argentinas", G3: "Gol", AD: "Azul", H2: "Sky Airline",
-
-    // --- Asia Pacific ---
     SQ: "Singapore Airlines", MH: "Malaysia Airlines", TG: "Thai Airways",
     VN: "Vietnam Airlines", GA: "Garuda Indonesia", PR: "Philippine Airlines",
     CX: "Cathay Pacific", BR: "EVA Air", CI: "China Airlines", HX: "Hong Kong Airlines",
@@ -77,7 +65,6 @@ export const translateAirline = (code) => {
 };
 
 const CITIES = {
-    // --- Middle East ---
     DXB: "Dubai (Intl)", DWC: "Dubai (World Central)", SHJ: "Sharjah", AUH: "Abu Dhabi",
     DOH: "Doha", BAH: "Bahrain", MCT: "Muscat", KWI: "Kuwait",
     RUH: "Riyadh", JED: "Jeddah", DMM: "Dammam", MED: "Madinah",
@@ -86,16 +73,12 @@ const CITIES = {
     AMM: "Amman", BEY: "Beirut", DAM: "Damascus", BGW: "Baghdad", EBL: "Erbil",
     NJF: "Najaf", BSR: "Basra", KWI: "Kuwait", TLV: "Tel Aviv",
     IKA: "Tehran (Imam Khomeini)", THR: "Tehran (Mehrabad)", MHD: "Mashhad", SYZ: "Shiraz",
-    
-    // --- Africa ---
     CAI: "Cairo", HBE: "Alexandria", LXR: "Luxor", SSH: "Sharm El Sheikh", HRG: "Hurghada",
     KRT: "Khartoum", JUB: "Juba", ADD: "Addis Ababa", JIB: "Djibouti",
     NBO: "Nairobi", MBA: "Mombasa", DAR: "Dar Es Salaam", JRO: "Kilimanjaro", ZNZ: "Zanzibar",
     EBB: "Entebbe", KGL: "Kigali", BJM: "Bujumbura", FIH: "Kinshasa",
     LOS: "Lagos", ABV: "Abuja", ACC: "Accra", DKR: "Dakar", CMN: "Casablanca",
     TUN: "Tunis", ALG: "Algiers", TIP: "Tripoli", JNB: "Johannesburg", CPT: "Cape Town",
-    
-    // --- Europe ---
     LHR: "London (Heathrow)", LGW: "London (Gatwick)", STN: "London (Stansted)", LTN: "Luton",
     MAN: "Manchester", BHX: "Birmingham", GLA: "Glasgow", EDI: "Edinburgh", DUB: "Dublin",
     CDG: "Paris (CDG)", ORY: "Paris (Orly)", NCE: "Nice", LYS: "Lyon", MRS: "Marseille",
@@ -109,8 +92,6 @@ const CITIES = {
     KBP: "Kyiv (Boryspil)", IEV: "Kyiv (Zhuliany)", WAW: "Warsaw", PRG: "Prague", BUD: "Budapest",
     OTP: "Bucharest", SOF: "Sofia", BEG: "Belgrade", ZAG: "Zagreb", SJJ: "Sarajevo",
     TIA: "Tirana", SKP: "Skopje", PRN: "Pristina", VNO: "Vilnius", RIX: "Riga", TLL: "Tallinn",
-
-    // --- Asia ---
     DEL: "Delhi", BOM: "Mumbai", BLR: "Bangalore", MAA: "Chennai", HYD: "Hyderabad",
     COK: "Kochi", CCJ: "Kozhikode", TRV: "Thiruvananthapuram", CCU: "Kolkata", AMD: "Ahmedabad",
     KHI: "Karachi", LHE: "Lahore", ISB: "Islamabad", PEW: "Peshawar", SKT: "Sialkot", Multan: "MUX",
@@ -123,8 +104,6 @@ const CITIES = {
     NRT: "Tokyo (Narita)", HND: "Tokyo (Haneda)", KIX: "Osaka", ICN: "Seoul (Incheon)",
     KBL: "Kabul", TAS: "Tashkent", ALA: "Almaty", NQZ: "Astana", DYU: "Dushanbe", ASB: "Ashgabat",
     GYD: "Baku", EVN: "Yerevan", TBS: "Tbilisi",
-
-    // --- Americas ---
     JFK: "New York (JFK)", EWR: "Newark", LGA: "LaGuardia", BOS: "Boston", IAD: "Washington (Dulles)",
     DCA: "Washington (Reagan)", ATL: "Atlanta", MCO: "Orlando", MIA: "Miami", FLL: "Fort Lauderdale",
     ORD: "Chicago (O'Hare)", DFW: "Dallas Fort Worth", IAH: "Houston", DEN: "Denver",
@@ -132,8 +111,6 @@ const CITIES = {
     YYZ: "Toronto", YVR: "Vancouver", YUL: "Montreal", YYC: "Calgary",
     MEX: "Mexico City", CUN: "Cancun", PTY: "Panama City", BOG: "Bogota",
     GRU: "Sao Paulo", GIG: "Rio de Janeiro", EZE: "Buenos Aires", SCL: "Santiago", LIM: "Lima",
-
-    // --- Oceania ---
     SYD: "Sydney", MEL: "Melbourne", BNE: "Brisbane", PER: "Perth", AKL: "Auckland"
 };
 
@@ -144,19 +121,18 @@ export const translateCity = (code) => {
 
 export const translateSSR = (text) => {
     const t = (text || "").toUpperCase();
-    if (t.includes("NOSHO")) return { title: "No Show", msg: "Passenger missed flight.", type: "critical" };
-    if (t.includes("ADTK") || t.includes("TIME LIMIT")) return { title: "Ticket Deadline", msg: "Issue ticket by deadline or booking cancels.", type: "warning" };
-    if (t.includes("UNABLE")) return { title: "Request Failed", msg: "System rejected request.", type: "critical" };
-    if (t.includes("CANCELLED") || t.includes("CANCELED") || t.includes("XLD")) return { title: "Cancellation", msg: "Booking/Segment cancelled.", type: "critical" };
     
-    if (t.includes("HK1") && t.includes("TKNE")) {
-        const ticketMatch = t.match(/.*?(\d{13}).*/);
+    if (t.includes("NOSHO")) return { title: "No Show", msg: "Passenger missed flight.", type: "critical" };
+    if (t.includes("UNABLE")) return { title: "Request Failed", msg: "System rejected request.", type: "critical" };
+    if (t.includes("CANCELLED") || t.includes("CANCELED")) return { title: "Cancellation", msg: "Segment cancelled.", type: "critical" };
+    
+    if (t.includes("TKNE")) {
+        const ticketMatch = t.match(/[.\-\s](\d{13})/);
         if (ticketMatch) {
-            return { title: "Ticket Issued", msg: `E-Ticket ${ticketMatch[1]}`, type: "info" };
+            return { title: "Ticket Issued", msg: `E-Ticket ${ticketMatch[1]}`, type: "success" };
         }
-        return null;
+        return null; 
     }
     
-    if (t.includes("NSST")) return { title: "Seat Data", msg: "Seat status transmitted.", type: "info" };
     return null;
 };
