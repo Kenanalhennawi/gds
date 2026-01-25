@@ -1,4 +1,4 @@
-import { translateAirline, translateCity, translateStatus, translateEnvelope, translateHeaderType } from "./translator.js";
+import { translateAirline, translateCity, translateStatus, translateEnvelope, translateHeaderType, translateOSI } from "./translator.js";
 
 export const renderTimeline = (container, data) => {
     container.innerHTML = "";
@@ -328,13 +328,42 @@ export const renderTimeline = (container, data) => {
                     ℹ️ Other Service Information (OSI):
                 </div>`;
             evt.osis.forEach(osi => {
-                const msg = evt.messages.find(m => m.title && m.title.includes('Contact'));
+                const osiInfo = translateOSI(osi.raw);
+                const carrierDisplay = osiInfo && osiInfo.carrier ? osiInfo.carrier : (osi.carrier === "YY" ? "YY (System/Any Carrier)" : osi.carrier);
+                const title = osiInfo ? osiInfo.title : "Other Service Information";
+                const explanation = osiInfo ? osiInfo.msg : osi.message;
+                
+                // Parse contact information details
+                let detailsHtml = '';
+                if (osi.message.includes('CTCP') || osi.message.includes('CTCT')) {
+                    const contactMatch = osi.message.match(/(CTCP|CTCT)\s*(.+)/i);
+                    if (contactMatch) {
+                        const contactType = contactMatch[1];
+                        const contactData = contactMatch[2].trim();
+                        const phoneMatch = contactData.match(/([\d\s\-\(\)]+)/);
+                        const phone = phoneMatch ? phoneMatch[1].trim() : '';
+                        const company = contactData.replace(phone, '').replace(/^[\s\-]+|[\s\-]+$/g, '').trim();
+                        
+                        detailsHtml = `<div style="font-size:10px; color:var(--text-muted); margin-top:4px; line-height:1.4;">
+                            <div><strong>Type:</strong> ${contactType === 'CTCP' ? 'Contact Phone (Primary)' : 'Contact Telephone'}</div>
+                            ${phone ? `<div><strong>Phone:</strong> ${phone}</div>` : ''}
+                            ${company ? `<div><strong>Company/Agency:</strong> ${company}</div>` : ''}
+                            <div><strong>Full Text:</strong> <span style="font-family:var(--font-code);">${contactData}</span></div>
+                        </div>`;
+                    }
+                }
+                
                 html += `
-                    <div style="margin-bottom:6px; padding:8px; background:rgba(74,222,128,0.1); border-radius:6px; border-left:3px solid var(--success-green);">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                            <span style="font-size:11px; color:var(--text-muted);">${osi.carrier}</span>
+                    <div style="margin-bottom:8px; padding:10px; background:rgba(74,222,128,0.1); border-radius:6px; border-left:3px solid var(--success-green);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <strong style="color:var(--success-green); font-size:12px;">${title}</strong>
+                            <span style="font-size:11px; color:var(--text-muted);">${carrierDisplay}</span>
                         </div>
-                        <div style="font-size:12px; color:var(--text-main);">${osi.message}</div>
+                        <div style="font-size:12px; color:var(--text-main); margin-top:4px;">${explanation}</div>
+                        ${detailsHtml}
+                        <div style="font-size:10px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.8; background:rgba(0,0,0,0.2); padding:4px; border-radius:3px;">
+                            Raw: ${osi.message}
+                        </div>
                     </div>
                 `;
             });
