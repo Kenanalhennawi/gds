@@ -47,18 +47,9 @@
         </header>
 
         <main class="workspace">
-            <!-- Hero Section for Empty State -->
-            <div class="hero-section" id="heroSection">
-                <div class="hero-content">
-                    <h1 class="hero-title">
-                        Unforgettable Travel Moments<br>
-                        <span class="hero-subtitle">by GDS Decoder</span>
-                    </h1>
-                    <p class="hero-description">
-                        We take you beyond the ordinary, to places where data comes alive, 
-                        insights leave you breathless, and every log becomes a story to tell.
-                    </p>
-                </div>
+            <!-- Hero Text Overlay -->
+            <div class="hero-overlay" id="heroSection">
+                <h1 class="hero-overlay-title">Unforgettable Travel Moments by GDS Decoder</h1>
             </div>
 
             <!-- GDS Decoder Section -->
@@ -83,9 +74,10 @@
             <section id="decoderOutput" class="output-section">
                 <div id="timeline" class="timeline-container">
                     <div class="empty-state modern-empty">
-                        <div class="empty-icon-large">✈️</div>
-                        <h3>Awaiting Data</h3>
-                        <p>Paste history logs to begin automatic analysis and unlock powerful insights.</p>
+                        <div class="empty-icon-large">📊</div>
+                        <h3>No Data Detected</h3>
+                        <p>We take you beyond the ordinary, to places where data comes alive, insights leave you breathless, and every log becomes a story to tell.</p>
+                        <p style="margin-top: 12px; font-size: 14px; color: var(--text-dim);">Paste a valid history log to begin analysis and unlock powerful insights.</p>
                         <div class="empty-actions">
                             <button class="btn-hero" onclick="document.getElementById('gdsInput')?.focus()">
                                 Start Analysis
