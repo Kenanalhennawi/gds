@@ -39,7 +39,7 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   }
   explainEmpty.style.display = "none";
 
-  // --- PART 1: TECHNICAL BREAKDOWN (Restored from your previous version) ---
+  // --- PART 1: TECHNICAL BREAKDOWN ---
   const grid = document.createElement("div");
   grid.className = "explain-grid";
 
@@ -57,12 +57,10 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
 
   addRow("Detected type", parsed.kind);
   addRow("Header", parsed.header ? wrapToken(parsed.header) : "—");
+  addRow("Airline Context", parsed.airlineContext ? wrapToken(parsed.airlineContext) : "—");
   addRow("Office / sign-in", parsed.office ? `${parsed.office}` : "—");
+  addRow("Record reference", parsed.recordLocator ? wrapToken(parsed.recordLocator) : "—");
   
-  if (parsed.recordLocator) {
-      addRow("Record reference", wrapToken(parsed.recordLocator));
-  }
-
   if (parsed.segments && parsed.segments.length > 0) {
     const segsHTML = parsed.segments.map(s => 
       wrapToken(`${s.carrier}${s.flight}${s.date} ${s.from}${s.to} ${s.status}`)
@@ -71,17 +69,9 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   }
 
   if (parsed.ssr && parsed.ssr.length > 0) {
-    // Unique SSR types
     const types = [...new Set(parsed.ssr.map(s => s.type))];
     const ssrHTML = types.map(t => wrapToken(t)).join(" ");
     addRow("SSR types", ssrHTML);
-  }
-
-  if (parsed.queueLogic && parsed.queueLogic.length > 0) {
-      const qlHTML = parsed.queueLogic.map(x => 
-        `<div>${wrapToken(x.code)} ${esc(x.meaning)}</div>`
-      ).join("");
-      addRow("Queue logic", qlHTML);
   }
 
   explainBody.appendChild(grid);
@@ -100,7 +90,7 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   explainBody.appendChild(timelineTitle);
 
 
-  // --- PART 3: HUMAN TIMELINE (The new readable version) ---
+  // --- PART 3: HUMAN TIMELINE ---
   const container = document.createElement("div");
   container.className = "timeline";
 
@@ -113,11 +103,18 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
     const header = document.createElement("div");
     header.className = "event-header";
     
-    let source = "System/Airline";
+    let source = "System";
+    let sub = "";
+    
     if (block.envelope === "QP") source = "Response (QP)";
     else if (block.envelope === "QK") source = "Request (QK)";
     else if (block.envelope === "QD") source = "Update (QD)";
-    else if (block.office) source = `Agent (${block.office})`;
+    
+    if (block.office) sub = ` • Agent: ${block.office}`;
+    if (block.airlineContext) sub += ` • Airline: ${block.airlineContext}`;
+    
+    // Combine Envelope Source + Detail
+    source = source + sub;
 
     const action = block.action ? block.action : (block.header || "");
     
@@ -128,6 +125,16 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
       </div>
     `;
     eventDiv.appendChild(header);
+
+    // Show Record Locator if specific to this block
+    if (block.recordLocator) {
+      const rloc = document.createElement("div");
+      rloc.style.fontSize = "11px";
+      rloc.style.color = "var(--accent)";
+      rloc.style.fontWeight = "bold";
+      rloc.textContent = `REF: ${block.recordLocator}`;
+      eventDiv.appendChild(rloc);
+    }
 
     if (block.pax) {
         const paxDiv = document.createElement("div");
