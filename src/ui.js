@@ -39,7 +39,6 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   }
   explainEmpty.style.display = "none";
 
-  // --- PART 1: OVERVIEW CARD ---
   const grid = document.createElement("div");
   grid.className = "explain-grid";
 
@@ -64,7 +63,6 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   
   explainBody.appendChild(grid);
 
-  // --- PART 2: SEPARATOR ---
   const hr = document.createElement("hr");
   hr.style.margin = "16px 0";
   hr.style.border = "none";
@@ -77,8 +75,6 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   timelineTitle.style.marginBottom = "10px";
   explainBody.appendChild(timelineTitle);
 
-
-  // --- PART 3: HUMAN TIMELINE ---
   const container = document.createElement("div");
   container.className = "timeline";
 
@@ -91,7 +87,6 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
     const header = document.createElement("div");
     header.className = "event-header";
     
-    // Determine WHO did it (Source)
     let who = "System";
     let detail = "";
 
@@ -103,7 +98,6 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
         detail = "System";
     }
 
-    // Determine WHAT they did (Action)
     let what = "Update";
     if (block.envelope === "QK") what = "Request";
     if (block.envelope === "QP") what = "Response";
@@ -119,7 +113,6 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
     `;
     eventDiv.appendChild(header);
 
-    // --- FIX: Explicitly explain the PNR/Context line here ---
     if (block.recordLocator || block.airlineContext) {
        const ctxDiv = document.createElement("div");
        ctxDiv.style.background = "rgba(255, 255, 255, 0.05)";
