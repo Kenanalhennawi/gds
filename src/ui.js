@@ -23,8 +23,8 @@ export const renderTimeline = (container, data) => {
         summaryCard.style.marginBottom = "20px";
         summaryCard.style.padding = "20px";
         summaryCard.style.borderLeft = "4px solid " + (
-            summary.alertLevel === 'critical' ? 'var(--neon-red)' : 
-            summary.alertLevel === 'success' ? 'var(--neon-green)' : 'var(--neon-gold)'
+            summary.alertLevel === 'critical' ? 'var(--error-red)' : 
+            summary.alertLevel === 'success' ? 'var(--success-green)' : 'var(--warning-amber)'
         );
         
         summaryCard.innerHTML = `
@@ -107,8 +107,8 @@ export const renderTimeline = (container, data) => {
         // Add change explanation section
         let changesHtml = "";
         if (hasChanges) {
-            changesHtml = `<div class="changes-section" style="margin-top:15px; padding:15px; background:linear-gradient(135deg, rgba(255,193,7,0.15), rgba(255,150,0,0.1)); border-radius:8px; border-left:3px solid var(--neon-gold); box-shadow:0 0 20px rgba(255,200,0,0.2);">
-                <div style="font-weight:700; color:var(--neon-gold); margin-bottom:10px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px; text-shadow:0 0 12px rgba(255,200,0,0.6);">
+            changesHtml = `<div class="changes-section" style="margin-top:15px; padding:15px; background:rgba(251,191,36,0.1); border-radius:8px; border-left:3px solid var(--warning-amber);">
+                <div style="font-weight:700; color:var(--warning-amber); margin-bottom:10px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
                     📋 What Happened:
                 </div>`;
             eventChanges.forEach(change => {
@@ -122,9 +122,9 @@ export const renderTimeline = (container, data) => {
                     'status_change': '🔄'
                 }[change.type] || '•';
                 
-                changesHtml += `<div style="margin-bottom:8px; padding:8px; background:linear-gradient(135deg, rgba(0,0,0,0.4), rgba(0,0,0,0.2)); border-radius:4px; font-size:13px; line-height:1.5; border-left:2px solid var(--neon-gold); box-shadow:0 0 10px rgba(255,200,0,0.1);">
+                changesHtml += `<div style="margin-bottom:8px; padding:8px; background:rgba(0,0,0,0.2); border-radius:4px; font-size:13px; line-height:1.5; border-left:2px solid var(--warning-amber);">
                     <span style="margin-right:6px; font-size:16px;">${changeIcon}</span>
-                    <span style="color:var(--text-main); text-shadow:0 0 5px rgba(255,255,255,0.2);">${change.description}</span>
+                    <span style="color:var(--text-main);">${change.description}</span>
                 </div>`;
             });
             changesHtml += `</div>`;
@@ -163,7 +163,7 @@ export const renderTimeline = (container, data) => {
                 const st = translateStatus(seg.status);
                 
                 html += `
-                    <div class="segment-row" style="border-color:${st.class === 'status-hk' ? 'var(--neon-green)' : 'var(--neon-red)'}">
+                    <div class="segment-row" style="border-left-color:${st.class === 'status-hk' ? 'var(--success-green)' : st.class === 'status-hx' ? 'var(--error-red)' : 'var(--warning-amber)'}">
                         <div class="seg-code" title="${carrier}">${seg.carrier}${seg.flight}</div>
                         <div class="seg-route">${from} ➝ ${to} <span style="opacity:0.5; margin-left:5px">${seg.date}</span></div>
                         <div class="seg-status ${st.class}">${st.icon} ${st.label}</div>
@@ -176,19 +176,19 @@ export const renderTimeline = (container, data) => {
         // Display SSR codes with explanations
         if (evt.ssrs && evt.ssrs.length > 0) {
             html += `<div class="ssr-container" style="margin-top:15px; padding-left:15px;">
-                <div style="font-weight:700; color:var(--neon-cyan); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; text-shadow:0 0 10px rgba(0,217,255,0.6);">
+                <div style="font-weight:700; color:var(--info-blue); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">
                     📋 Special Service Requests (SSR):
                 </div>`;
             evt.ssrs.forEach(ssr => {
                 const msg = evt.messages.find(m => m.ssrCode === ssr.code);
                 const explanation = msg ? msg.details || msg.msg : '';
                 html += `
-                    <div style="margin-bottom:8px; padding:10px; background:linear-gradient(135deg, rgba(0,243,255,0.08), rgba(176,38,255,0.05)); border-radius:6px; border-left:3px solid var(--neon-blue); box-shadow:0 0 15px rgba(0,243,255,0.1); transition:all 0.3s ease;">
+                    <div style="margin-bottom:8px; padding:10px; background:rgba(96,165,250,0.1); border-radius:6px; border-left:3px solid var(--info-blue); transition:all 0.3s ease;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                            <strong style="color:var(--neon-cyan); font-size:12px; text-shadow:0 0 8px rgba(0,217,255,0.5);">SSR ${ssr.code}</strong>
-                            <span style="font-size:11px; color:var(--neon-purple); text-shadow:0 0 6px rgba(176,38,255,0.4);">${ssr.carrier}</span>
+                            <strong style="color:var(--info-blue); font-size:12px;">SSR ${ssr.code}</strong>
+                            <span style="font-size:11px; color:var(--text-muted);">${ssr.carrier}</span>
                         </div>
-                        ${explanation ? `<div style="font-size:12px; color:var(--text-main); margin-top:4px; text-shadow:0 0 5px rgba(255,255,255,0.2);">${explanation}</div>` : ''}
+                        ${explanation ? `<div style="font-size:12px; color:var(--text-main); margin-top:4px;">${explanation}</div>` : ''}
                         ${ssr.details ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.8;">${ssr.details.substring(0, 100)}${ssr.details.length > 100 ? '...' : ''}</div>` : ''}
                     </div>
                 `;
@@ -199,17 +199,17 @@ export const renderTimeline = (container, data) => {
         // Display OSI messages
         if (evt.osis && evt.osis.length > 0) {
             html += `<div class="osi-container" style="margin-top:15px; padding-left:15px;">
-                <div style="font-weight:700; color:var(--neon-lime); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px; text-shadow:0 0 10px rgba(127,255,0,0.6);">
+                <div style="font-weight:700; color:var(--success-green); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">
                     ℹ️ Other Service Information (OSI):
                 </div>`;
             evt.osis.forEach(osi => {
                 const msg = evt.messages.find(m => m.title && m.title.includes('Contact'));
                 html += `
-                    <div style="margin-bottom:6px; padding:8px; background:linear-gradient(135deg, rgba(0,255,157,0.08), rgba(127,255,0,0.05)); border-radius:6px; border-left:3px solid var(--neon-green); box-shadow:0 0 15px rgba(0,255,157,0.1);">
+                    <div style="margin-bottom:6px; padding:8px; background:rgba(74,222,128,0.1); border-radius:6px; border-left:3px solid var(--success-green);">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                            <span style="font-size:11px; color:var(--neon-lime); text-shadow:0 0 6px rgba(127,255,0,0.4);">${osi.carrier}</span>
+                            <span style="font-size:11px; color:var(--text-muted);">${osi.carrier}</span>
                         </div>
-                        <div style="font-size:12px; color:var(--text-main); text-shadow:0 0 5px rgba(255,255,255,0.2);">${osi.message}</div>
+                        <div style="font-size:12px; color:var(--text-main);">${osi.message}</div>
                     </div>
                 `;
             });
