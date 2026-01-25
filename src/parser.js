@@ -4,11 +4,20 @@ const cleanText = (text) => {
     if (!text) return [];
     let clean = text.toString();
     
-    clean = clean.replace(/[\u0001\u0002\u0003\u0004]/g, "\n");
-    clean = clean.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "\n");
-    clean = clean.replace(/(\d{6})\s+(\.?[A-Z]{2,3})/g, "$1\n$2");
-    clean = clean.replace(/([0-9A-Z]{2}\d{3,4}[A-Z]?\d{2}[A-Z]{3})/g, "\n$1");
+    // 1. NUKE all control characters (The Blue Boxes)
+    // Replaces Start of Header, Start of Text, End of Text with newlines
+    clean = clean.replace(/[\u0000-\u0009\u000B-\u001F\u007F]+/g, "\n");
     
+    // 2. FORCE SPLIT glued headers (The "No Results" Fix)
+    // If it sees "QK" or "HDQ" attached to anything, it forces a newline before it.
+    // e.g., "textQK" becomes "text\nQK"
+    clean = clean.replace(/([^\n])\s*(QP|QK|QD|HDQ|SWI|TRL|AKA|NAR|DVD)/g, "$1\n$2");
+    
+    // 3. FORCE SPLIT glued PNRs
+    // e.g. "123456.AB" becomes "123456\n.AB"
+    clean = clean.replace(/(\d{6})\s*(\.?[A-Z]{2,3})/g, "$1\n$2");
+
+    // 4. Clean up double newlines
     return clean
         .split(/\r\n|\r|\n/)
         .map(l => l.trim())
@@ -64,23 +73,15 @@ export const parseLog = (input) => {
     };
 
     const parseContextFromHeader = (block, header, line) => {
-        const mCompressed = line.match(/HDQ([A-Z0-9]{2})[A-Z0-9]*[\/\s]([A-Z0-9]{6})/);
-        if (mCompressed) {
-            block.context.airline = mCompressed[1];
-            block.context.recordLocator = mCompressed[2];
-            return;
-        }
-
-        const mSwi = line.match(/\.?SWI([A-Z0-9]{2})\s+([A-Z0-9]{6})/);
-        if (mSwi) {
-            block.context.airline = mSwi[1];
-            block.context.recordLocator = mSwi[2];
-            return;
-        }
-
-        if (header && header.startsWith('HDQ')) {
-            block.context.airline = header.substring(3, 5);
-        }
+        // Loose Match: Finds HDQ anywhere in the line
+        const mComp = line.match(/HDQ([A-Z0-9]{2})([A-Z0-9]{6})/);
+        if (mComp) { block.context.airline = mComp[1]; block.context.recordLocator = mComp[2]; return; }
+        
+        const mSwi = line.match(/SWI([A-Z0-9]{2})\s+([A-Z0-9]{6})/);
+        if (mSwi) { block.context.airline = mSwi[1]; block.context.recordLocator = mSwi[2]; return; }
+        
+        const mCity = line.match(/^([A-Z]{3})([A-Z0-9]{2})\s+([A-Z0-9]{6})$/);
+        if (mCity) { block.context.office = mCity[1]; block.context.airline = mCity[2]; block.context.recordLocator = mCity[3]; }
     };
 
     const extractPassengers = (line) => {
@@ -99,32 +100,35 @@ export const parseLog = (input) => {
     };
 
     lines.forEach(line => {
-        const envMatch = line.match(/(?:^|\s)(QP|QK|QD)\s+(\S+)/);
+        // 1. Envelope Detection (QP/QK)
+        const envMatch = line.match(/^(QP|QK|QD)\s*(\S*)/);
         if (envMatch) {
             startNewBlock(envMatch[1], envMatch[2], line);
             return;
         }
 
-        const swiMatch = line.match(/(?:^|\s)\.?SWI([A-Z0-9]{2})\s+/);
-        if (swiMatch) {
-            if (!currentBlock) startNewBlock('SYS', 'SWI_LOG', line);
-            currentBlock.context.airline = swiMatch[1];
-            const pnr = line.match(/\/([A-Z0-9]{6})\//);
-            if (pnr) currentBlock.context.recordLocator = pnr[1];
-            return;
+        // 2. Context Detection (HDQ/SWI)
+        // If we see a Context line but no block exists, create a default "SYS" block
+        if (line.includes("HDQ") || line.includes("SWI")) {
+            if (!currentBlock) startNewBlock("SYS", "Context", line);
+            parseContextFromHeader(currentBlock, null, line);
+            // Don't return here; the same line might contain segment data if it was glued
         }
 
         if (!currentBlock) {
+            // Filter out tiny noise lines
             if (line.length > 4) startNewBlock('UNK', 'FRAGMENT', line);
             else return; 
         }
 
+        // 3. Passenger Detection
         const foundPaxes = extractPassengers(line);
         if (foundPaxes.length > 0) {
             currentBlock.passengers.push(...foundPaxes);
             return;
         }
 
+        // 4. Segment Detection
         const segMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4}[A-Z]?)\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
         if (segMatch) {
             currentBlock.segments.push({
@@ -138,6 +142,7 @@ export const parseLog = (input) => {
             return;
         }
 
+        // 5. SSR Detection
         const ssrInfo = translateSSR(line);
         if (ssrInfo) {
             currentBlock.messages.push(ssrInfo);
