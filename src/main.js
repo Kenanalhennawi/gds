@@ -1,5 +1,6 @@
 import { parseLog } from "./parser.js";
 import { renderTimeline } from "./ui.js";
+import { analyzeBookingChanges } from "./analyzer.js";
 
 const els = {
     input: document.getElementById("gdsInput"),
@@ -20,13 +21,26 @@ const processInput = () => {
     }
 
     try {
-        const result = parseLog(raw);
-        renderTimeline(els.timeline, result);
+        const events = parseLog(raw);
         
-        // FIXED: Check if result is an array (old parser) or object (new parser) to avoid crashes
-        const count = Array.isArray(result) ? result.length : (result.events ? result.events.length : 0);
+        // Analyze booking changes
+        const analysis = analyzeBookingChanges(events);
         
-        if (els.status) els.status.textContent = `Analyzed ${count} blocks`;
+        // Render with summary and change details
+        renderTimeline(els.timeline, {
+            events: analysis.events,
+            summary: analysis.summary,
+            changes: analysis.changes
+        });
+        
+        const count = analysis.events.length;
+        const changeCount = analysis.changes.length;
+        
+        if (els.status) {
+            els.status.textContent = changeCount > 0 
+                ? `Analyzed ${count} events, ${changeCount} change(s) detected`
+                : `Analyzed ${count} events`;
+        }
     } catch (e) {
         console.error(e);
         if (els.status) els.status.textContent = "Error parsing log";
