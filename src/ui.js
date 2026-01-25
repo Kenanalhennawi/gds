@@ -38,12 +38,23 @@ export const renderTimeline = (container, data) => {
     // 2. Empty State
     if (!events || events.length === 0) {
         container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">nodata</div>
+            <div class="empty-state modern-empty">
+                <div class="empty-icon-large">📊</div>
                 <h3>No Data Detected</h3>
-                <p>Paste a valid history log to begin analysis.</p>
+                <p>Paste a valid history log to begin analysis and unlock powerful insights.</p>
+                <div class="empty-actions">
+                    <button class="btn-hero" onclick="document.getElementById('gdsInput')?.focus()">
+                        Start Analysis
+                    </button>
+                </div>
             </div>`;
         return;
+    }
+    
+    // Hide hero section when data is present
+    const heroSection = document.getElementById('heroSection');
+    if (heroSection) {
+        heroSection.classList.add('hidden');
     }
     
 
