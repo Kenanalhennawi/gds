@@ -25,6 +25,21 @@ export const renderTimeline = (container, events) => {
         if (evt.context.airline) sourceName = translateAirline(evt.context.airline);
         if (evt.context.office) sourceName += ` (${translateCity(evt.context.office)})`;
 
+        // Build Context Line
+        let contextHtml = "";
+        if (evt.context.recordLocator) {
+            contextHtml = `<div class="context-row">
+                <span class="ctx-label">Active Record (PNR):</span> 
+                <span class="ctx-val pnr">${evt.context.recordLocator}</span>
+            </div>`;
+        }
+        if (evt.context.airline) {
+            contextHtml += `<div class="context-row">
+                <span class="ctx-label">Airline Context:</span> 
+                <span class="ctx-val">${translateAirline(evt.context.airline)} (${evt.context.airline})</span>
+            </div>`;
+        }
+
         let html = `
             <div class="card-header">
                 <div class="header-main">
@@ -35,17 +50,19 @@ export const renderTimeline = (container, events) => {
                     <div class="action-title">${action}</div>
                 </div>
                 <div class="header-meta">
-                    ${evt.context.recordLocator ? `<span class="context-pill">PNR: ${evt.context.recordLocator}</span>` : ''}
                     <span class="context-pill">${evt.envelope || 'LOG'}</span>
                 </div>
             </div>
+            
+            ${contextHtml ? `<div class="card-context">${contextHtml}</div>` : ''}
         `;
 
-        if (evt.passengers && evt.passengers.length > 0) {
-            html += `<div class="alerts-container" style="margin-bottom:15px; border-left:2px solid var(--neon-gold); background:rgba(255,200,0,0.05); padding:10px;">
-                <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">PASSENGERS (${evt.passengers.length})</div>`;
-            evt.passengers.forEach(p => {
-                html += `<div style="font-size:13px; font-weight:700; color:#fff;">👤 ${p.surname}/${p.given} ${p.title}</div>`;
+        if (evt.pax) {
+            // Handle multiple passengers
+            const paxes = evt.pax.split(',').map(p => p.trim());
+            html += `<div class="pax-list">`;
+            paxes.forEach(p => {
+                 html += `<div class="pax-item">👤 ${p.replace(/^\d+/, '')}</div>`;
             });
             html += `</div>`;
         }
