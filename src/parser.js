@@ -6,14 +6,9 @@ const cleanText = (text) => {
     
     clean = clean.replace(/[\u0001\u0002\u0003\u0004]/g, "\n");
     clean = clean.replace(/[\u0000-\u0008\u000B-\u001F\u007F]/g, "\n");
+    clean = clean.replace(/(\d{6})\s+(\.?[A-Z]{2,3})/g, "$1\n$2");
+    clean = clean.replace(/([0-9A-Z]{2}\d{3,4}[A-Z]?\d{2}[A-Z]{3})/g, "\n$1");
     
-    clean = clean.replace(/(QP|QK|QD)(HDQ)/g, "$1 $2");
-    clean = clean.replace(/(TRL|AKA|NAR|DVD)(HDQ)/g, "$1 $2");
-    
-    clean = clean.replace(/([A-Z0-9])(QP|QK|QD|HDQ|SWI|TRL)/g, "$1\n$2");
-    
-    clean = clean.replace(/(\d{6})\s*(\.?[A-Z]{2,3})/g, "$1\n$2");
-
     return clean
         .split(/\r\n|\r|\n/)
         .map(l => l.trim())
@@ -69,23 +64,53 @@ export const parseLog = (input) => {
     };
 
     const parseContextFromHeader = (block, header, line) => {
-        const mComp = line.match(/HDQ([A-Z0-9]{2})([A-Z0-9]{6})/);
-        if (mComp) { block.context.airline = mComp[1]; block.context.recordLocator = mComp[2]; return; }
-        
-        const mSwi = line.match(/SWI([A-Z0-9]{2})\s+([A-Z0-9]{6})/);
-        if (mSwi) { block.context.airline = mSwi[1]; block.context.recordLocator = mSwi[2]; return; }
-        
-        const mCity = line.match(/^([A-Z]{3})([A-Z0-9]{2})\s+([A-Z0-9]{6})$/);
-        if (mCity) { block.context.office = mCity[1]; block.context.airline = mCity[2]; block.context.recordLocator = mCity[3]; }
+        const mCompressed = line.match(/HDQ([A-Z0-9]{2})[A-Z0-9]*[\/\s]([A-Z0-9]{6})/);
+        if (mCompressed) {
+            block.context.airline = mCompressed[1];
+            block.context.recordLocator = mCompressed[2];
+            return;
+        }
+
+        const mSwi = line.match(/\.?SWI([A-Z0-9]{2})\s+([A-Z0-9]{6})/);
+        if (mSwi) {
+            block.context.airline = mSwi[1];
+            block.context.recordLocator = mSwi[2];
+            return;
+        }
+
+        if (header && header.startsWith('HDQ')) {
+            block.context.airline = header.substring(3, 5);
+        }
+    };
+
+    const extractPassengers = (line) => {
+        const paxes = [];
+        const regex = /\d+([A-Z]+)\/([A-Z]+)(?:\s+([A-Z]{1,4}))?/g;
+        let match;
+        while ((match = regex.exec(line)) !== null) {
+            paxes.push({
+                raw: match[0],
+                surname: match[1],
+                given: match[2],
+                title: match[3] || ""
+            });
+        }
+        return paxes;
     };
 
     lines.forEach(line => {
         const envMatch = line.match(/(?:^|\s)(QP|QK|QD)\s+(\S+)/);
-        if (envMatch) { startNewBlock(envMatch[1], envMatch[2], line); return; }
+        if (envMatch) {
+            startNewBlock(envMatch[1], envMatch[2], line);
+            return;
+        }
 
-        if (line.startsWith("SWI") || line.startsWith("HDQ")) {
-            if (!currentBlock) startNewBlock("SYS", line.split(' ')[0], line);
-            parseContextFromHeader(currentBlock, null, line);
+        const swiMatch = line.match(/(?:^|\s)\.?SWI([A-Z0-9]{2})\s+/);
+        if (swiMatch) {
+            if (!currentBlock) startNewBlock('SYS', 'SWI_LOG', line);
+            currentBlock.context.airline = swiMatch[1];
+            const pnr = line.match(/\/([A-Z0-9]{6})\//);
+            if (pnr) currentBlock.context.recordLocator = pnr[1];
             return;
         }
 
@@ -94,26 +119,29 @@ export const parseLog = (input) => {
             else return; 
         }
 
-        if (/^\d+[A-Z]+\/[A-Z]+/.test(line)) {
-            const paxes = line.match(/\d+[A-Z]+\/[A-Z]+(?:\s+[A-Z]+)?(?:\s+[A-Z]{1,3})?/g);
-            if (paxes) currentBlock.passengers.push(...paxes.map(p => {
-                const parts = p.match(/^\d+([A-Z]+)\/([A-Z]+)\s*(.*)/);
-                return { surname: parts[1], given: parts[2], title: parts[3] };
-            }));
+        const foundPaxes = extractPassengers(line);
+        if (foundPaxes.length > 0) {
+            currentBlock.passengers.push(...foundPaxes);
             return;
         }
 
         const segMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4}[A-Z]?)\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
         if (segMatch) {
             currentBlock.segments.push({
-                carrier: segMatch[1], flight: segMatch[2], date: segMatch[3],
-                from: segMatch[4], to: segMatch[5], status: segMatch[6]
+                carrier: segMatch[1],
+                flight: segMatch[2],
+                date: segMatch[3],
+                from: segMatch[4],
+                to: segMatch[5],
+                status: segMatch[6]
             });
             return;
         }
 
         const ssrInfo = translateSSR(line);
-        if (ssrInfo) currentBlock.messages.push(ssrInfo);
+        if (ssrInfo) {
+            currentBlock.messages.push(ssrInfo);
+        }
     });
 
     finalizeBlock();
