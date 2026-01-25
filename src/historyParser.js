@@ -1,15 +1,16 @@
 import { uniq } from "./utils.js";
 
-const stripControls = (s) => (s || "").toString().replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, "");
-
+// Clean messy copy-pastes with hidden control characters
 const toLines = (text) => {
   if (!text) return [];
   
   let clean = text.toString();
   
+  // FIX: Replace SOH () and STX () and other control chars with newlines
   clean = clean.replace(/[\u0001\u0002\u0003\u0004]/g, "\n");
   
-  clean = clean.replace(/([0-9]{6})\s+(\.?[A-Z]{2,3})/g, "$1\n$2");
+  // Heuristic: If we see a 6-digit number followed by dot/chars (like 231737 .DXB), split it
+  clean = clean.replace(/(\d{6})\s+(\.?[A-Z]{2,3})/g, "$1\n$2");
   
   return clean
     .split(/\r\n|\r|\n/)
@@ -17,11 +18,11 @@ const toLines = (text) => {
     .filter(l => l.length > 0);
 };
 
-const isEnvelopeLine = (l) => /^(QP|QK|QD)\s+/.test(l);
+const isEnvelopeLine = (l) => /^(QP|QK|QD)(\s+|$)/.test(l);
 
 const parseEnvelopeLine = (l) => {
   const m = l.match(/^(QP|QK|QD)\s+(\S+)(?:\s+.*)?$/);
-  if (!m) return null;
+  if (!m) return { envelope: l.substring(0,2), header: null };
   return { envelope: m[1], header: m[2] };
 };
 
@@ -37,18 +38,14 @@ const parseActionLine = (l) => {
 };
 
 const parseOfficeLine = (l) => {
+  // Matches: MUC1A BAB9HM/YTO6W2140/6759931/YTO/1A/T/CA//SU
   const m = l.match(/^([A-Z0-9]{2,3})\s+([A-Z0-9]{5,8})\/(\S+)/);
   if (!m) return null;
   return { office: m[1], recordLocator: m[2], signIn: m[3] };
 };
 
-const parseAirimpContext = (l) => {
-  const m = l.match(/^(\S{2}Q\S{4})\s+([A-Z0-9]{6})\/(\S+)\/(\d{6,})\/(\S+)\/(\S{2})\/(\S)\/(\S{2})\/(\S{3})/);
-  if (!m) return null;
-  return { airlineContext: m[1], recordRef: m[2] };
-};
-
 const parsePassengerLine = (l) => {
+  // Matches: 1LEVY/YUVALMR
   const m = l.match(/^(\d+)([A-Z'\-\s]+)\/([A-Z'\-\s]+)$/);
   if (!m) return null;
   return { index: Number(m[1]), surname: m[2].trim(), given: m[3].trim() };
@@ -56,8 +53,10 @@ const parsePassengerLine = (l) => {
 
 const parseSsrLine = (l) => {
   if (!l.startsWith("SSR")) return null;
+  // Matches: SSR TKNE EK HK1 ...
   const m = l.match(/^SSR\s+([A-Z0-9]{3,4})\s+([A-Z0-9]{2})\s+([A-Z]{2})(\d+)\/?(.*)$/);
   if (!m) {
+    // Matches: SSR OTHS EK ...
     const m2 = l.match(/^SSR\s+([A-Z0-9]{3,4})\s+([A-Z0-9]{2})\s+(.*)$/);
     if (!m2) return { raw: l };
     return { type: m2[1], carrier: m2[2], raw: l, text: (m2[3] || "").trim() };
@@ -76,9 +75,11 @@ const splitStatus = (s) => {
 };
 
 const parseSegment = (l) => {
+  // Matches: EK0374K29JAN DXBBKK SS1/2235 0735/1
   const m = l.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z])\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)(?:\/(\d{4})\s+(\d{4})(?:\/(\d))?)?/);
   
   if (!m) {
+    // Short format fallback
     const m2 = l.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z])\s+([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)$/);
     if(m2) {
        const status = m2[7];
@@ -136,7 +137,8 @@ export const parseHistory = (input) => {
       osi: [],
       pax: null,
       office: null,
-      action: null
+      action: null,
+      recordLocator: null
     };
   };
 
@@ -159,6 +161,7 @@ export const parseHistory = (input) => {
     const off = parseOfficeLine(l);
     if (off) {
       current.office = off.office;
+      current.recordLocator = off.recordLocator;
       return;
     }
 
@@ -194,15 +197,34 @@ export const parseHistory = (input) => {
 
   if (current) blocks.push(current);
 
+  // Aggregates for the technical breakdown
   const allSegments = blocks.flatMap(b => b.segments);
   const allSsr = blocks.flatMap(b => b.ssr);
   const allOsi = blocks.flatMap(b => b.osi);
+  const envelopes = uniq(blocks.map(b => b.envelope).filter(Boolean));
+  const header = blocks.find(b => b.header)?.header || null;
+  const office = blocks.find(b => b.office)?.office || null;
+  const recordLocator = blocks.find(b => b.recordLocator)?.recordLocator || null;
+
+  // Reconstruct basic queue logic tokens for explanation
+  let queueLogic = [];
+  if (header && header.startsWith("HDQ")) {
+    queueLogic.push({ code: "HDQ", meaning: "Queue Handling Message" });
+    if (header.includes("RM")) queueLogic.push({ code: "RM", meaning: "Record Message Snapshot" });
+    const carrier = header.replace(/^HDQRM?/, "").substring(0,2);
+    if (carrier) queueLogic.push({ code: carrier, meaning: "Carrier Context" });
+  }
 
   return {
     kind: "GDS_HISTORY",
     blocks,
+    header,
+    office,
+    recordLocator,
+    envelopes,
     segments: allSegments,
     ssr: allSsr,
-    osi: allOsi
+    osi: allOsi,
+    queueLogic
   };
 };
