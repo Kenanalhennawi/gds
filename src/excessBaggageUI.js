@@ -16,6 +16,7 @@ import {
     getUpgradeRate
 } from "./excessBaggage.js";
 import { translateAirline, translateCity } from "./translator.js";
+import { searchAirports, getAirportByCode } from "./airportSearch.js";
 
 export function renderExcessBaggageCalculator(container) {
     container.innerHTML = `
@@ -54,31 +55,33 @@ export function renderExcessBaggageCalculator(container) {
                     <!-- Excess Baggage Section -->
                     <div id="excessSection" class="service-section">
                         <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:15px; margin-bottom:20px;">
-                            <div>
+                            <div style="position:relative;">
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
                                     Origin Airport
                                 </label>
                                 <input 
                                     type="text" 
                                     id="originInput" 
-                                    placeholder="e.g., DXB, TAS, DEL"
-                                    maxlength="3"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; text-transform:uppercase; outline:none;"
+                                    placeholder="Search by code, city, or country..."
+                                    autocomplete="off"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
+                                <div id="originAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                                 <div id="originInfo" style="margin-top:5px; font-size:11px; color:var(--text-muted);"></div>
                             </div>
                             
-                            <div>
+                            <div style="position:relative;">
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
                                     Destination Airport
                                 </label>
                                 <input 
                                     type="text" 
                                     id="destinationInput" 
-                                    placeholder="e.g., DXB, YYZ, LHR"
-                                    maxlength="3"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; text-transform:uppercase; outline:none;"
+                                    placeholder="Search by code, city, or country..."
+                                    autocomplete="off"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
+                                <div id="destinationAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                                 <div id="destinationInfo" style="margin-top:5px; font-size:11px; color:var(--text-muted);"></div>
                             </div>
                             
@@ -114,17 +117,18 @@ export function renderExcessBaggageCalculator(container) {
                     <!-- Go-Show Section -->
                     <div id="goshowSection" class="service-section" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
-                            <div>
+                            <div style="position:relative;">
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
                                     Origin Airport
                                 </label>
                                 <input 
                                     type="text" 
                                     id="goshowOrigin" 
-                                    placeholder="e.g., TAS, DEL, AMM"
-                                    maxlength="3"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; text-transform:uppercase; outline:none;"
+                                    placeholder="Search by code, city, or country..."
+                                    autocomplete="off"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
+                                <div id="goshowAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                             </div>
                             <div>
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
@@ -218,17 +222,18 @@ export function renderExcessBaggageCalculator(container) {
                     <!-- Upgrade Section -->
                     <div id="upgradeSection" class="service-section" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
-                            <div>
+                            <div style="position:relative;">
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
                                     Origin Airport
                                 </label>
                                 <input 
                                     type="text" 
                                     id="upgradeOrigin" 
-                                    placeholder="e.g., DXB, TAS, DEL"
-                                    maxlength="3"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; text-transform:uppercase; outline:none;"
+                                    placeholder="Search by code, city, or country..."
+                                    autocomplete="off"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
+                                <div id="upgradeAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                             </div>
                             <div>
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
@@ -244,9 +249,14 @@ export function renderExcessBaggageCalculator(container) {
                         </div>
                     </div>
                     
-                    <button id="calculateBtn" class="btn-primary" style="width:100%; margin-bottom:20px;">
-                        Calculate
-                    </button>
+                    <div style="display:flex; gap:10px; margin-bottom:20px;">
+                        <button id="calculateBtn" class="btn-primary" style="flex:1;">
+                            Calculate
+                        </button>
+                        <button id="clearBtn" class="btn-glass" style="padding:12px 24px; white-space:nowrap;">
+                            Clear All
+                        </button>
+                    </div>
                     
                     <div id="rateResult" style="display:none;"></div>
                 </div>
@@ -319,37 +329,165 @@ export function renderExcessBaggageCalculator(container) {
     const airlineSelect = container.querySelector('#airlineSelect');
     const currencySelect = container.querySelector('#currencySelect');
     const btn = container.querySelector('#calculateBtn');
+    const clearBtn = container.querySelector('#clearBtn');
     const resultDiv = container.querySelector('#rateResult');
     const originInfo = container.querySelector('#originInfo');
     const destInfo = container.querySelector('#destinationInfo');
+    const originAutocomplete = container.querySelector('#originAutocomplete');
+    const destAutocomplete = container.querySelector('#destinationAutocomplete');
     
-    // Auto-update info
-    originInput.addEventListener('input', () => {
-        const code = originInput.value.toUpperCase();
-        if (code.length === 3) {
-            const city = translateCity(code);
-            const zone = getZoneForAirport(code);
-            originInfo.textContent = city !== code ? `${city} - ${zone ? getZoneName(zone) : 'Zone not found'}` : '';
-        } else {
-            originInfo.textContent = '';
-        }
-    });
+    // Debounce function for performance
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
     
-    destInput.addEventListener('input', () => {
-        const code = destInput.value.toUpperCase();
-        if (code.length === 3) {
-            const city = translateCity(code);
-            const zone = getZoneForAirport(code);
-            const currency = getCurrencyForDestination(code);
-            destInfo.textContent = city !== code ? `${city} - ${zone ? getZoneName(zone) : 'Zone not found'} (${currency})` : '';
-            // Update currency select if auto
-            if (currencySelect.value === 'AUTO') {
-                currencySelect.value = currency;
+    // Create autocomplete handler
+    function createAutocompleteHandler(input, dropdown, infoDiv, onSelect) {
+        let debounceTimer;
+        let selectedAirport = null;
+        
+        input.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            const query = input.value.trim();
+            
+            if (query.length < 1) {
+                dropdown.style.display = 'none';
+                selectedAirport = null;
+                if (infoDiv) infoDiv.textContent = '';
+                return;
             }
-        } else {
-            destInfo.textContent = '';
+            
+            debounceTimer = setTimeout(() => {
+                const results = searchAirports(query, 8);
+                
+                if (results.length === 0) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+                
+                dropdown.innerHTML = '';
+                results.forEach(airport => {
+                    const item = document.createElement('div');
+                    item.style.cssText = 'padding:10px 12px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s;';
+                    item.innerHTML = `
+                        <div style="font-weight:700; color:var(--text-main); font-size:13px;">${airport.code} - ${airport.name}</div>
+                        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${airport.city}, ${airport.country}</div>
+                    `;
+                    
+                    item.addEventListener('mouseenter', () => {
+                        item.style.background = 'rgba(74,158,255,0.2)';
+                    });
+                    item.addEventListener('mouseleave', () => {
+                        item.style.background = 'transparent';
+                    });
+                    
+                    item.addEventListener('click', () => {
+                        input.value = airport.code;
+                        selectedAirport = airport;
+                        dropdown.style.display = 'none';
+                        if (onSelect) onSelect(airport);
+                    });
+                    
+                    dropdown.appendChild(item);
+                });
+                
+                dropdown.style.display = 'block';
+            }, 150);
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+        
+        // Handle Enter key
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const firstItem = dropdown.querySelector('div');
+                if (firstItem) firstItem.click();
+            } else if (e.key === 'Escape') {
+                dropdown.style.display = 'none';
+            }
+        });
+        
+        return () => selectedAirport;
+    }
+    
+    // Setup autocomplete for origin
+    createAutocompleteHandler(originInput, originAutocomplete, originInfo, (airport) => {
+        const zone = getZoneForAirport(airport.code);
+        originInfo.textContent = `${airport.city}, ${airport.country} - ${zone ? getZoneName(zone) : 'Zone not found'}`;
+    });
+    
+    // Setup autocomplete for destination
+    createAutocompleteHandler(destInput, destAutocomplete, destInfo, (airport) => {
+        const zone = getZoneForAirport(airport.code);
+        const currency = getCurrencyForDestination(airport.code);
+        destInfo.textContent = `${airport.city}, ${airport.country} - ${zone ? getZoneName(zone) : 'Zone not found'} (${currency})`;
+        if (currencySelect && currencySelect.value === 'AUTO') {
+            currencySelect.value = currency;
         }
     });
+    
+    // Setup autocomplete for go-show origin
+    const goshowOrigin = container.querySelector('#goshowOrigin');
+    const goshowAutocomplete = container.querySelector('#goshowAutocomplete');
+    if (goshowOrigin && goshowAutocomplete) {
+        createAutocompleteHandler(goshowOrigin, goshowAutocomplete, null, null);
+    }
+    
+    // Setup autocomplete for upgrade origin
+    const upgradeOrigin = container.querySelector('#upgradeOrigin');
+    const upgradeAutocomplete = container.querySelector('#upgradeAutocomplete');
+    if (upgradeOrigin && upgradeAutocomplete) {
+        createAutocompleteHandler(upgradeOrigin, upgradeAutocomplete, null, null);
+    }
+    
+    // Clear button handler
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            // Clear all inputs
+            originInput.value = '';
+            destInput.value = '';
+            if (goshowOrigin) goshowOrigin.value = '';
+            if (upgradeOrigin) upgradeOrigin.value = '';
+            
+            // Reset selects
+            if (airlineSelect) airlineSelect.value = 'FZ';
+            if (currencySelect) currencySelect.value = 'AUTO';
+            if (container.querySelector('#goshowClass')) container.querySelector('#goshowClass').value = 'ECONOMY';
+            if (container.querySelector('#sportsCurrency')) container.querySelector('#sportsCurrency').value = 'AED';
+            if (container.querySelector('#sportsType')) container.querySelector('#sportsType').value = 'SPEQ';
+            if (container.querySelector('#reportingCurrency')) container.querySelector('#reportingCurrency').value = 'AED';
+            if (container.querySelector('#reportingType')) container.querySelector('#reportingType').value = 'LRTP';
+            if (container.querySelector('#transferLocation')) container.querySelector('#transferLocation').value = 'DXB';
+            if (container.querySelector('#upgradeCurrency')) container.querySelector('#upgradeCurrency').value = 'AED';
+            
+            // Clear info displays
+            originInfo.textContent = '';
+            destInfo.textContent = '';
+            
+            // Hide autocomplete dropdowns
+            originAutocomplete.style.display = 'none';
+            destAutocomplete.style.display = 'none';
+            if (goshowAutocomplete) goshowAutocomplete.style.display = 'none';
+            if (upgradeAutocomplete) upgradeAutocomplete.style.display = 'none';
+            
+            // Hide results
+            resultDiv.style.display = 'none';
+        });
+    }
     
     // Calculate button
     btn.addEventListener('click', () => {
@@ -360,23 +498,48 @@ export function renderExcessBaggageCalculator(container) {
             let result;
             
             if (service === 'excess') {
-                const origin = originInput.value.trim().toUpperCase();
-                const destination = destInput.value.trim().toUpperCase();
+                // Extract airport code from input (might be full text or just code)
+                let origin = originInput.value.trim().toUpperCase();
+                let destination = destInput.value.trim().toUpperCase();
+                
+                // Try to extract code if it's a longer string
+                const originMatch = origin.match(/\b([A-Z]{3})\b/);
+                const destMatch = destination.match(/\b([A-Z]{3})\b/);
+                
+                if (originMatch) origin = originMatch[1];
+                if (destMatch) destination = destMatch[1];
+                
+                // If still not 3 chars, try to get from airport data
+                if (origin.length !== 3) {
+                    const airport = getAirportByCode(origin) || searchAirports(origin, 1)[0];
+                    if (airport) origin = airport.code;
+                }
+                if (destination.length !== 3) {
+                    const airport = getAirportByCode(destination) || searchAirports(destination, 1)[0];
+                    if (airport) destination = airport.code;
+                }
+                
                 const airline = airlineSelect.value;
                 const currency = currencySelect.value === 'AUTO' ? null : currencySelect.value;
                 
                 if (!origin || origin.length !== 3 || !destination || destination.length !== 3) {
-                    showError(resultDiv, 'Please enter valid 3-letter airport codes for origin and destination.');
+                    showError(resultDiv, 'Please enter valid airport codes for origin and destination.');
                     return;
                 }
                 
                 result = calculateExcessBaggageRate(origin, destination, airline, currency);
             } else if (service === 'goshow') {
-                const origin = container.querySelector('#goshowOrigin').value.trim().toUpperCase();
+                let origin = container.querySelector('#goshowOrigin').value.trim().toUpperCase();
+                const originMatch = origin.match(/\b([A-Z]{3})\b/);
+                if (originMatch) origin = originMatch[1];
+                if (origin.length !== 3) {
+                    const airport = getAirportByCode(origin) || searchAirports(origin, 1)[0];
+                    if (airport) origin = airport.code;
+                }
                 const classType = container.querySelector('#goshowClass').value;
                 
                 if (!origin || origin.length !== 3) {
-                    showError(resultDiv, 'Please enter a valid 3-letter origin airport code.');
+                    showError(resultDiv, 'Please enter a valid origin airport code.');
                     return;
                 }
                 
@@ -396,11 +559,17 @@ export function renderExcessBaggageCalculator(container) {
                 
                 result = getTransferBaggageFee(location);
             } else if (service === 'upgrade') {
-                const origin = container.querySelector('#upgradeOrigin').value.trim().toUpperCase();
+                let origin = container.querySelector('#upgradeOrigin').value.trim().toUpperCase();
+                const originMatch = origin.match(/\b([A-Z]{3})\b/);
+                if (originMatch) origin = originMatch[1];
+                if (origin.length !== 3) {
+                    const airport = getAirportByCode(origin) || searchAirports(origin, 1)[0];
+                    if (airport) origin = airport.code;
+                }
                 const currency = container.querySelector('#upgradeCurrency').value;
                 
                 if (!origin || origin.length !== 3) {
-                    showError(resultDiv, 'Please enter a valid 3-letter origin airport code.');
+                    showError(resultDiv, 'Please enter a valid origin airport code.');
                     return;
                 }
                 
