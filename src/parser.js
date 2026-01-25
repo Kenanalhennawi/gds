@@ -43,28 +43,58 @@ export const parseLog = (input) => {
             header: header,
             rawHeader: rawLine,
             headerType: null, // TRL, AKA, ASC, NAR, DVD, NCO
+            timestamp: null, // Extract timestamp if present
             context: { airline: null, recordLocator: null, office: null },
             segments: [],
             messages: [],
             ssrs: [], // Store SSR details
             osis: [], // Store OSI messages
-            passengers: []
+            passengers: [],
+            rawLines: [] // Store all raw lines for detailed explanation
         };
         parseContextFromHeader(currentBlock, header, rawLine);
+        
+        // Extract timestamp from header line (e.g., "050437" or "161459")
+        const timeMatch = rawLine.match(/\s+(\d{6})\s*$/);
+        if (timeMatch) {
+            currentBlock.timestamp = timeMatch[1];
+        }
     };
 
     const parseContextFromHeader = (block, header, line) => {
         // Handle HDQRMFZ or HDQKQ format (HDQ + RM + airline OR HDQ + airline)
         // HDQRMFZ = HDQ (Host Data Queue) + RM (Record Message) + FZ (Flydubai)
         // HDQKQ = HDQ (Host Data Queue) + KQ (Kenya Airways)
-        const mHdqRm = line.match(/HDQ(?:RM)?([A-Z0-9]{2})/);
+        // Also handle: HDQFZ, HDQEK, etc.
+        
+        // First try: HDQRM + airline (e.g., HDQRMFZ, HDQRMKQ)
+        const mHdqRm = line.match(/HDQRM([A-Z0-9]{2})/);
         if (mHdqRm) {
             block.context.airline = mHdqRm[1];
             // Try to extract PNR if available (6 chars after airline code)
-            const mHdqPnr = line.match(/HDQ(?:RM)?([A-Z0-9]{2})([A-Z0-9]{6})/);
+            const mHdqPnr = line.match(/HDQRM([A-Z0-9]{2})([A-Z0-9]{6})/);
             if (mHdqPnr) {
                 block.context.recordLocator = mHdqPnr[2];
             }
+            return;
+        }
+        
+        // Second try: HDQ + airline directly (e.g., HDQKQ, HDQFZ)
+        const mHdqDirect = line.match(/HDQ([A-Z0-9]{2})(?:\s|$|[^A-Z0-9])/);
+        if (mHdqDirect) {
+            block.context.airline = mHdqDirect[1];
+            // Try to extract PNR if available (6 chars after airline code)
+            const mHdqPnr = line.match(/HDQ([A-Z0-9]{2})([A-Z0-9]{6})/);
+            if (mHdqPnr) {
+                block.context.recordLocator = mHdqPnr[2];
+            }
+            return;
+        }
+        
+        // Third try: HDQ with space-separated format: HDQ KQ or HDQ RM FZ
+        const mHdqSpace = line.match(/HDQ\s+(?:RM\s+)?([A-Z0-9]{2})/);
+        if (mHdqSpace) {
+            block.context.airline = mHdqSpace[1];
             return;
         }
 
@@ -173,6 +203,11 @@ export const parseLog = (input) => {
     };
 
     lines.forEach(line => {
+        // Store all lines for detailed explanation
+        if (currentBlock) {
+            currentBlock.rawLines.push(line);
+        }
+        
         const envMatch = line.match(/^(QP|QK|QD)\s+(\S+)/);
         if (envMatch) {
             startNewBlock(envMatch[1], envMatch[2], line);
@@ -185,7 +220,14 @@ export const parseLog = (input) => {
             currentBlock.headerType = headerTypeMatch[1];
         }
 
-        if (line.startsWith("SWI") || line.startsWith("HDQ")) {
+        // Handle lines starting with HDQ (including HDQKQ, HDQRMFZ, etc.)
+        if (line.startsWith("HDQ") || line.match(/^[.\s]*HDQ/)) {
+            if (!currentBlock) startNewBlock("SYS", "HDQ", line);
+            parseContextFromHeader(currentBlock, null, line);
+            return;
+        }
+
+        if (line.startsWith("SWI")) {
             if (!currentBlock) startNewBlock("SYS", line.split(' ')[0], line);
             parseContextFromHeader(currentBlock, null, line);
             return;
