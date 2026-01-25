@@ -90,7 +90,7 @@ if (els.tabDecoder && els.tabExcessBaggage) {
         e.stopPropagation();
         
         els.tabDecoder.classList.add("active");
-        els.tabDecoder.style.background = "rgba(74,158,255,0.2)";
+        els.tabDecoder.style.background = "rgba(59,130,246,0.2)";
         els.tabDecoder.style.borderColor = "var(--primary-blue)";
         els.tabDecoder.style.color = "var(--primary-blue)";
         
@@ -109,7 +109,7 @@ if (els.tabDecoder && els.tabExcessBaggage) {
         e.stopPropagation();
         
         els.tabExcessBaggage.classList.add("active");
-        els.tabExcessBaggage.style.background = "rgba(74,158,255,0.2)";
+        els.tabExcessBaggage.style.background = "rgba(59,130,246,0.2)";
         els.tabExcessBaggage.style.borderColor = "var(--primary-blue)";
         els.tabExcessBaggage.style.color = "var(--primary-blue)";
         
