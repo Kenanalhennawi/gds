@@ -1,5 +1,5 @@
 import { esc, wrapToken } from "./utils.js";
-import { translateStatus, translateSSR } from "./translator.js";
+import { translateStatus, translateSSR, translateAirline, translateCity } from "./translator.js";
 
 export const ensureVisible = (el, container) => {
   if (!el || !container) return;
@@ -39,12 +39,12 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   }
   explainEmpty.style.display = "none";
 
-  // --- PART 1: TECHNICAL BREAKDOWN ---
+  // --- PART 1: OVERVIEW CARD (Human Friendly) ---
   const grid = document.createElement("div");
   grid.className = "explain-grid";
 
   const addRow = (k, v) => {
-    if (!v) return;
+    if (!v || v === "—") return;
     const kk = document.createElement("div");
     kk.className = "explain-k";
     kk.textContent = k;
@@ -55,25 +55,13 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
     grid.appendChild(vv);
   };
 
-  addRow("Detected type", parsed.kind);
-  addRow("Header", parsed.header ? wrapToken(parsed.header) : "—");
-  addRow("Airline Context", parsed.airlineContext ? wrapToken(parsed.airlineContext) : "—");
-  addRow("Office / sign-in", parsed.office ? `${parsed.office}` : "—");
-  addRow("Record reference", parsed.recordLocator ? wrapToken(parsed.recordLocator) : "—");
+  const airlineName = parsed.airlineContext ? translateAirline(parsed.airlineContext) : null;
+  const officeName = parsed.office ? translateCity(parsed.office.substring(0,3)) : null;
+
+  addRow("Airline", airlineName ? `<b>${airlineName}</b> (${parsed.airlineContext})` : "—");
+  addRow("Location", officeName ? `${officeName} (${parsed.office})` : (parsed.office || "—"));
+  addRow("Record Ref", parsed.recordLocator ? wrapToken(parsed.recordLocator) : "—");
   
-  if (parsed.segments && parsed.segments.length > 0) {
-    const segsHTML = parsed.segments.map(s => 
-      wrapToken(`${s.carrier}${s.flight}${s.date} ${s.from}${s.to} ${s.status}`)
-    ).join(" ");
-    addRow("Segments", segsHTML);
-  }
-
-  if (parsed.ssr && parsed.ssr.length > 0) {
-    const types = [...new Set(parsed.ssr.map(s => s.type))];
-    const ssrHTML = types.map(t => wrapToken(t)).join(" ");
-    addRow("SSR types", ssrHTML);
-  }
-
   explainBody.appendChild(grid);
 
   // --- PART 2: SEPARATOR ---
@@ -85,7 +73,7 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
 
   const timelineTitle = document.createElement("div");
   timelineTitle.className = "explain-title";
-  timelineTitle.textContent = "Timeline Story";
+  timelineTitle.textContent = "History of Events";
   timelineTitle.style.marginBottom = "10px";
   explainBody.appendChild(timelineTitle);
 
@@ -103,43 +91,38 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
     const header = document.createElement("div");
     header.className = "event-header";
     
-    let source = "System";
-    let sub = "";
-    
-    if (block.envelope === "QP") source = "Response (QP)";
-    else if (block.envelope === "QK") source = "Request (QK)";
-    else if (block.envelope === "QD") source = "Update (QD)";
-    
-    if (block.office) sub = ` • Agent: ${block.office}`;
-    if (block.airlineContext) sub += ` • Airline: ${block.airlineContext}`;
-    
-    // Combine Envelope Source + Detail
-    source = source + sub;
+    // Determine WHO did it (Source)
+    let who = "System";
+    let detail = "";
 
-    const action = block.action ? block.action : (block.header || "");
+    if (block.office) {
+        who = "Agent";
+        detail = translateCity(block.office.substring(0,3));
+    } else if (block.airlineContext) {
+        who = translateAirline(block.airlineContext);
+        detail = "System";
+    }
+
+    // Determine WHAT they did (Action)
+    let what = "Update";
+    if (block.envelope === "QK") what = "Request";
+    if (block.envelope === "QP") what = "Response";
+    if (block.action === "TRL") what = "Transaction Log";
+    if (block.action === "AKA") what = "Acknowledged";
+    if (block.action === "DVD") what = "Split PNR";
     
     header.innerHTML = `
       <div class="event-meta">
-        <span class="event-source">${esc(source)}</span>
-        <span class="event-action">${esc(action)}</span>
+        <span class="event-source">${esc(who)} ${esc(detail)}</span>
+        <span class="event-action">${esc(what)}</span>
       </div>
     `;
     eventDiv.appendChild(header);
 
-    // Show Record Locator if specific to this block
-    if (block.recordLocator) {
-      const rloc = document.createElement("div");
-      rloc.style.fontSize = "11px";
-      rloc.style.color = "var(--accent)";
-      rloc.style.fontWeight = "bold";
-      rloc.textContent = `REF: ${block.recordLocator}`;
-      eventDiv.appendChild(rloc);
-    }
-
     if (block.pax) {
         const paxDiv = document.createElement("div");
         paxDiv.className = "event-pax";
-        paxDiv.textContent = `👤 ${block.pax.surname}/${block.pax.given}`;
+        paxDiv.textContent = `👤 Passenger: ${block.pax.surname} / ${block.pax.given}`;
         eventDiv.appendChild(paxDiv);
     }
 
@@ -149,19 +132,23 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
       
       block.segments.forEach(seg => {
         const trans = translateStatus(seg.status);
+        const carrierName = translateAirline(seg.carrier);
+        const depCity = translateCity(seg.from);
+        const arrCity = translateCity(seg.to);
+
         const item = document.createElement("div");
         item.className = "segment-item";
         item.style.borderLeftColor = trans.color;
 
         item.innerHTML = `
           <div class="seg-main">
-            <span class="seg-code">${esc(seg.carrier)}${esc(seg.flight)}</span>
-            <span class="seg-route">${esc(seg.from)} ➔ ${esc(seg.to)}</span>
+            <span class="seg-code" title="${carrierName}">${esc(seg.carrier)}${esc(seg.flight)}</span>
+            <span class="seg-route">${esc(depCity)} ➔ ${esc(arrCity)}</span>
             <span class="seg-date">${esc(seg.date)}</span>
           </div>
           <div class="seg-status" style="color: ${trans.color}">
             <span class="status-icon">${trans.icon}</span>
-            <span>${trans.label} (${esc(seg.status)})</span>
+            <span>${trans.label}</span>
           </div>
         `;
         segList.appendChild(item);
