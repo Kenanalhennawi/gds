@@ -6,6 +6,15 @@ export const renderTimeline = (container, data) => {
     // Handle both new format {events, summary} and old format [events]
     const events = Array.isArray(data) ? data : (data.events || []);
     const summary = Array.isArray(data) ? null : data.summary;
+    const changes = Array.isArray(data) ? null : (data.changes || []);
+    
+    // Create a map of changes by event index for quick lookup
+    const changesByEventIndex = new Map();
+    if (changes) {
+        changes.forEach(changeGroup => {
+            changesByEventIndex.set(changeGroup.eventIndex, changeGroup.changes);
+        });
+    }
 
     // 1. Render Summary Dashboard
     if (summary && events.length > 0) {
@@ -37,9 +46,18 @@ export const renderTimeline = (container, data) => {
     }
 
     // 3. Render Events
-    events.forEach(evt => {
+    events.forEach((evt, eventIndex) => {
         const card = document.createElement("div");
         card.className = "timeline-card";
+        
+        // Check if this event has changes
+        const eventChanges = changesByEventIndex.get(eventIndex) || [];
+        const hasChanges = eventChanges.length > 0;
+        
+        if (hasChanges) {
+            card.style.borderLeft = "4px solid var(--neon-gold)";
+            card.style.boxShadow = "0 0 15px rgba(255, 193, 7, 0.2)";
+        }
 
         let action = "Update";
         if (evt.envelope === "QK") action = "Request (Input)";
@@ -63,6 +81,32 @@ export const renderTimeline = (container, data) => {
                 </div>`;
             }
             contextHtml += `</div>`;
+        }
+        
+        // Add change explanation section
+        let changesHtml = "";
+        if (hasChanges) {
+            changesHtml = `<div class="changes-section" style="margin-top:15px; padding:15px; background:rgba(255,193,7,0.1); border-radius:8px; border-left:3px solid var(--neon-gold);">
+                <div style="font-weight:700; color:var(--neon-gold); margin-bottom:10px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
+                    📋 What Happened:
+                </div>`;
+            eventChanges.forEach(change => {
+                const changeIcon = {
+                    'booking_cancelled': '❌',
+                    'segment_cancelled': '✕',
+                    'segment_dropped': '🗑️',
+                    'segment_added': '➕',
+                    'segment_reissued': '🔄',
+                    'fdis': '⚠️',
+                    'status_change': '🔄'
+                }[change.type] || '•';
+                
+                changesHtml += `<div style="margin-bottom:8px; padding:8px; background:rgba(0,0,0,0.3); border-radius:4px; font-size:13px; line-height:1.5;">
+                    <span style="margin-right:6px;">${changeIcon}</span>
+                    <span style="color:var(--text-main);">${change.description}</span>
+                </div>`;
+            });
+            changesHtml += `</div>`;
         }
 
         let html = `
@@ -119,6 +163,9 @@ export const renderTimeline = (container, data) => {
             });
             html += `</div>`;
         }
+        
+        // Add changes section before closing
+        html += changesHtml;
 
         card.innerHTML = html;
         container.appendChild(card);
