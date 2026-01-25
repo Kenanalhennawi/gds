@@ -50,7 +50,8 @@ export const translateAirline = (code) => {
     AC: "Air Canada",
     "1A": "Amadeus",
     "1G": "Galileo",
-    "1B": "Abacus"
+    "1B": "Abacus",
+    "1S": "Sabre"
   };
   return map[code.toUpperCase()] || code;
 };
@@ -85,7 +86,9 @@ export const translateCity = (code) => {
         JFK: "New York",
         TIA: "Tirana",
         BJM: "Bujumbura",
-        ADD: "Addis Ababa"
+        ADD: "Addis Ababa",
+        DYU: "Dushanbe",
+        VNO: "Vilnius"
     };
     return map[code.toUpperCase()] || code;
 }
