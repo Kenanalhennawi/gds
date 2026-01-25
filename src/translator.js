@@ -5,6 +5,8 @@ export const translateStatus = (code) => {
         KK: { label: "Confirmed", class: "status-hk", icon: "✓" },
         KL: { label: "Confirmed", class: "status-hk", icon: "✓" },
         TK: { label: "Schedule Change", class: "status-tk", icon: "⚠" },
+        CH: { label: "Change/Hold", class: "status-tk", icon: "🔄" },
+        CS: { label: "Change Status", class: "status-tk", icon: "🔄" },
         UN: { label: "Cancelled (Airline)", class: "status-hx", icon: "✕" },
         UC: { label: "Unable Confirm", class: "status-hx", icon: "✕" },
         HX: { label: "Cancelled", class: "status-hx", icon: "✕" },
