@@ -5,8 +5,8 @@ export const translateStatus = (code) => {
         KK: { label: "Confirmed", class: "status-hk", icon: "✓" },
         KL: { label: "Confirmed", class: "status-hk", icon: "✓" },
         TK: { label: "Schedule Change", class: "status-tk", icon: "⚠" },
-        UN: { label: "Cancelled", class: "status-hx", icon: "✕" },
-        UC: { label: "Unable", class: "status-hx", icon: "✕" },
+        UN: { label: "Cancelled (Airline)", class: "status-hx", icon: "✕" },
+        UC: { label: "Unable Confirm", class: "status-hx", icon: "✕" },
         HX: { label: "Cancelled", class: "status-hx", icon: "✕" },
         XX: { label: "Cancelled", class: "status-hx", icon: "✕" },
         NO: { label: "No Action Taken", class: "status-hx", icon: "−" },
@@ -144,16 +144,15 @@ export const translateCity = (code) => {
 
 export const translateSSR = (text) => {
     const t = (text || "").toUpperCase();
-    
     if (t.includes("NOSHO")) return { title: "No Show", msg: "Passenger missed flight.", type: "critical" };
     if (t.includes("ADTK") || t.includes("TIME LIMIT")) return { title: "Ticket Deadline", msg: "Issue ticket by deadline or booking cancels.", type: "warning" };
     if (t.includes("UNABLE")) return { title: "Request Failed", msg: "System rejected request.", type: "critical" };
     if (t.includes("CANCELLED") || t.includes("CANCELED") || t.includes("XLD")) return { title: "Cancellation", msg: "Booking/Segment cancelled.", type: "critical" };
     
-    if (t.includes("TKNE")) {
-        const ticketMatch = t.match(/[.\-\s](\d{13})/);
+    if (t.includes("HK1") && t.includes("TKNE")) {
+        const ticketMatch = t.match(/.*?(\d{13}).*/);
         if (ticketMatch) {
-            return { title: "Ticket Issued", msg: `E-Ticket ${ticketMatch[1]}`, type: "success" };
+            return { title: "Ticket Issued", msg: `E-Ticket ${ticketMatch[1]}`, type: "info" };
         }
         return null;
     }
