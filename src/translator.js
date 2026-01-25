@@ -45,18 +45,24 @@ export const translateCity = (code) => {
 
 export const translateSSR = (text) => {
     const t = (text || "").toUpperCase();
+    
     if (t.includes("NOSHO")) return { title: "No Show", msg: "Passenger missed flight.", type: "critical" };
     if (t.includes("ADTK") || t.includes("TIME LIMIT")) return { title: "Ticket Deadline", msg: "Issue ticket by deadline or booking cancels.", type: "warning" };
     if (t.includes("UNABLE")) return { title: "Request Failed", msg: "System rejected request.", type: "critical" };
     if (t.includes("CANCELLED") || t.includes("CANCELED") || t.includes("XLD")) return { title: "Cancellation", msg: "Booking/Segment cancelled.", type: "critical" };
     
-    // Improved TKNE handling: attempts to extract ticket number
-    if (t.includes("HK1") && t.includes("TKNE")) {
-        const ticketMatch = t.match(/(\d{13})/);
-        const ticketNum = ticketMatch ? ticketMatch[1] : "attached";
-        return { title: "Ticket Issued", msg: `E-Ticket ${ticketNum}`, type: "info" };
+    // FIXED: Smart Ticket Number Extraction
+    if (t.includes("TKNE")) {
+        // Look for exactly 13 digits, ignoring surrounding junk chars like '/' or '.'
+        const ticketMatch = t.match(/.*?(\d{13}).*/);
+        if (ticketMatch) {
+            return { title: "Ticket Issued", msg: `E-Ticket ${ticketMatch[1]}`, type: "info" };
+        }
+        // If we see TKNE but no number, return NULL to hide the "E-Ticket attached" spam
+        return null;
     }
     
     if (t.includes("NSST")) return { title: "Seat Data", msg: "Seat status transmitted.", type: "info" };
+    
     return null;
 };
