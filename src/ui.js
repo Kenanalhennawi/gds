@@ -1,4 +1,4 @@
-import { translateAirline, translateCity, translateStatus } from "./translator.js";
+import { translateAirline, translateCity, translateStatus, translateEnvelope, translateHeaderType } from "./translator.js";
 
 export const renderTimeline = (container, data) => {
     container.innerHTML = "";
@@ -59,27 +59,47 @@ export const renderTimeline = (container, data) => {
             card.style.boxShadow = "0 0 15px rgba(255, 193, 7, 0.2)";
         }
 
-        let action = "Update";
-        if (evt.envelope === "QK") action = "Request (Input)";
-        if (evt.envelope === "QP") action = "Response (Output)";
+        // Get envelope explanation
+        const envelopeInfo = translateEnvelope(evt.envelope);
+        let action = envelopeInfo.title;
+        let actionDesc = envelopeInfo.desc;
         
         let sourceName = "System";
         if (evt.context.airline) sourceName = translateAirline(evt.context.airline);
         if (evt.context.office) sourceName += ` (${translateCity(evt.context.office)})`;
 
+        // Get header type explanation
+        let headerTypeHtml = "";
+        if (evt.headerType) {
+            const headerInfo = translateHeaderType(evt.headerType);
+            if (headerInfo) {
+                headerTypeHtml = `<div class="context-row">
+                    <span class="ctx-label">Message Type:</span> 
+                    <span class="ctx-val" title="${headerInfo.desc}">${headerInfo.title}</span>
+                </div>`;
+            }
+        }
+
         let contextHtml = "";
-        if (evt.context.recordLocator) {
+        if (evt.context.recordLocator || evt.headerType) {
             contextHtml = `<div class="card-context">
                 <div class="context-row">
+                    <span class="ctx-label">Message Type:</span> 
+                    <span class="ctx-val" title="${actionDesc}">${action}</span>
+                </div>`;
+            if (evt.context.recordLocator) {
+                contextHtml += `<div class="context-row">
                     <span class="ctx-label">Active Record (PNR):</span> 
                     <span class="ctx-val pnr">${evt.context.recordLocator}</span>
                 </div>`;
+            }
             if (evt.context.airline) {
                 contextHtml += `<div class="context-row">
                     <span class="ctx-label">Context:</span> 
                     <span class="ctx-val">${translateAirline(evt.context.airline)} (${evt.context.airline})</span>
                 </div>`;
             }
+            contextHtml += headerTypeHtml;
             contextHtml += `</div>`;
         }
         
@@ -152,9 +172,56 @@ export const renderTimeline = (container, data) => {
             html += `</div>`;
         }
 
+        // Display SSR codes with explanations
+        if (evt.ssrs && evt.ssrs.length > 0) {
+            html += `<div class="ssr-container" style="margin-top:15px; padding-left:15px;">
+                <div style="font-weight:700; color:var(--neon-blue); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">
+                    📋 Special Service Requests (SSR):
+                </div>`;
+            evt.ssrs.forEach(ssr => {
+                const msg = evt.messages.find(m => m.ssrCode === ssr.code);
+                const explanation = msg ? msg.details || msg.msg : '';
+                html += `
+                    <div style="margin-bottom:8px; padding:10px; background:rgba(0,243,255,0.05); border-radius:6px; border-left:3px solid var(--neon-blue);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <strong style="color:var(--neon-blue); font-size:12px;">SSR ${ssr.code}</strong>
+                            <span style="font-size:11px; color:var(--text-muted);">${ssr.carrier}</span>
+                        </div>
+                        ${explanation ? `<div style="font-size:12px; color:var(--text-main); margin-top:4px;">${explanation}</div>` : ''}
+                        ${ssr.details ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code);">${ssr.details.substring(0, 100)}${ssr.details.length > 100 ? '...' : ''}</div>` : ''}
+                    </div>
+                `;
+            });
+            html += `</div>`;
+        }
+
+        // Display OSI messages
+        if (evt.osis && evt.osis.length > 0) {
+            html += `<div class="osi-container" style="margin-top:15px; padding-left:15px;">
+                <div style="font-weight:700; color:var(--neon-green); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">
+                    ℹ️ Other Service Information (OSI):
+                </div>`;
+            evt.osis.forEach(osi => {
+                const msg = evt.messages.find(m => m.title && m.title.includes('Contact'));
+                html += `
+                    <div style="margin-bottom:6px; padding:8px; background:rgba(0,255,157,0.05); border-radius:6px; border-left:3px solid var(--neon-green);">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
+                            <span style="font-size:11px; color:var(--text-muted);">${osi.carrier}</span>
+                        </div>
+                        <div style="font-size:12px; color:var(--text-main);">${osi.message}</div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+        }
+
         if (evt.messages.length > 0) {
-            html += `<div class="alerts-container">`;
+            html += `<div class="alerts-container" style="margin-top:15px;">`;
             evt.messages.forEach(msg => {
+                // Skip SSR and OSI messages that are already displayed above
+                if (msg.ssrCode || msg.title && (msg.title.includes('Contact') || msg.title.includes('E-Ticket'))) {
+                    return;
+                }
                 html += `
                     <div class="alert-box alert-${msg.type}">
                         <strong>${msg.title}:</strong> ${msg.msg}
