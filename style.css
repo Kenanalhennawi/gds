@@ -34,14 +34,15 @@ body {
     position: fixed;
     inset: 0;
     background: url('assets/flydubai-bg.jpg') center/cover no-repeat;
+    background-attachment: fixed;
     z-index: -2;
 }
 
 .app-overlay {
     position: fixed;
     inset: 0;
-    background: linear-gradient(135deg, rgba(15, 20, 25, 0.95) 0%, rgba(20, 25, 30, 0.95) 50%, rgba(15, 20, 25, 0.95) 100%);
-    backdrop-filter: blur(30px);
+    background: linear-gradient(135deg, rgba(15, 20, 25, 0.75) 0%, rgba(20, 25, 30, 0.80) 50%, rgba(15, 20, 25, 0.75) 100%);
+    backdrop-filter: blur(2px);
     z-index: -1;
 }
 
