@@ -13,6 +13,7 @@ const ZONE_MAPPING = {
     
     'KWI': 2, 'BAH': 2, 'MCT': 2, 'SLL': 2, 'OHS': 2,
     'ADE': 2, 'AHB': 2, 'AJF': 2, 'AMD': 2, 'AMM': 2, 'AQJ': 2, 'BEY': 2, 'BGW': 2, 'BOM': 2, 'BLR': 2,
+    'DAM': 2, 'ALP': 2, 'LTK': 2,
     'BUS': 2, 'BUZ': 2, 'CCJ': 2, 'CCU': 2, 'COK': 2, 'DEL': 2, 'EAM': 2, 'EBL': 2, 'EVN': 2, 'GBB': 2,
     'GIZ': 2, 'GSM': 2, 'GYD': 2, 'HDM': 2, 'HRI': 2, 'HYD': 2, 'IKA': 2, 'ISB': 2, 'ISU': 2, 'JED': 2,
     'JIB': 2, 'KBL': 2, 'KDH': 2, 'LKO': 2, 'LHE': 2, 'LYP': 2, 'MAA': 2, 'MED': 2, 'MHD': 2, 'MRV': 2,
@@ -58,7 +59,7 @@ const CURRENCY_MAPPING = {
     'RUB': ['AER', 'GOJ', 'GRV', 'KRR', 'KUF', 'KZN', 'LED', 'MCX', 'MRV', 'OVB', 'PEE', 'ROV', 'SVO', 'SVX', 'UFA', 'VKO', 'VOG', 'VOZ', 'ZIA'],
     'SAR': ['AHB', 'AJF', 'AQI', 'DMM', 'EAM', 'ELQ', 'GIZ', 'HAS', 'HOF', 'JED', 'NUM', 'MED', 'RUH', 'RSI', 'TIF', 'TUU', 'ULH', 'YNB'],
     'THB': ['KBV', 'UTP'],
-    'USD': ['ADB', 'ADD', 'ADE', 'ASB', 'ASM', 'AYT', 'AWZ', 'BGW', 'BJM', 'BJV', 'BND', 'BUS', 'BUZ', 'BSR', 'CGP', 'DAC', 'DAR', 'DOK', 'DYU', 'EBB', 'EBL', 'ESB', 'EVN', 'FIH', 'FRU', 'GAN', 'GBB', 'GSM', 'GYD', 'HDM', 'HGA', 'HRK', 'IEV', 'IFN', 'IKA', 'ISU', 'JIB', 'JRO', 'JUB', 'KBL', 'KBP', 'KDH', 'KER', 'KGL', 'KIH', 'KUT', 'LRR', 'MBA', 'MGQ', 'MHD', 'MLE', 'MSQ', 'NJF', 'NMA', 'ODS', 'OSS', 'RGN', 'SAH', 'SAW', 'SKD', 'SKG', 'TBS', 'TBZ', 'TGD', 'TLV', 'TZX', 'ZNZ', 'ZYL'],
+    'USD': ['ADB', 'ADD', 'ADE', 'ALP', 'ASB', 'ASM', 'AYT', 'AWZ', 'BGW', 'BJM', 'BJV', 'BND', 'BUS', 'BUZ', 'BSR', 'CGP', 'DAC', 'DAM', 'DAR', 'DOK', 'DYU', 'EBB', 'EBL', 'ESB', 'EVN', 'FIH', 'FRU', 'GAN', 'GBB', 'GSM', 'GYD', 'HDM', 'HGA', 'HRK', 'IEV', 'IFN', 'IKA', 'ISU', 'JIB', 'JRO', 'JUB', 'KBL', 'KBP', 'KDH', 'KER', 'KGL', 'KIH', 'KUT', 'LRR', 'LTK', 'MBA', 'MGQ', 'MHD', 'MLE', 'MSQ', 'NJF', 'NMA', 'ODS', 'OSS', 'RGN', 'SAH', 'SAW', 'SKD', 'SKG', 'TBS', 'TBZ', 'TGD', 'TLV', 'TZX', 'ZNZ', 'ZYL'],
     'UZS': ['TAS']
 };
 
