@@ -54,6 +54,21 @@ export const parseLog = (input) => {
     };
 
     const parseContextFromHeader = (block, header, line) => {
+        // Handle HDQRMFZ or HDQKQ format (HDQ + RM + airline OR HDQ + airline)
+        // HDQRMFZ = HDQ (Host Data Queue) + RM (Record Message) + FZ (Flydubai)
+        // HDQKQ = HDQ (Host Data Queue) + KQ (Kenya Airways)
+        const mHdqRm = line.match(/HDQ(?:RM)?([A-Z0-9]{2})/);
+        if (mHdqRm) {
+            block.context.airline = mHdqRm[1];
+            // Try to extract PNR if available (6 chars after airline code)
+            const mHdqPnr = line.match(/HDQ(?:RM)?([A-Z0-9]{2})([A-Z0-9]{6})/);
+            if (mHdqPnr) {
+                block.context.recordLocator = mHdqPnr[2];
+            }
+            return;
+        }
+
+        // Original format: HDQ + airline + PNR (6 chars)
         const mComp = line.match(/HDQ([A-Z0-9]{2})([A-Z0-9]{6})/);
         if (mComp) {
             block.context.airline = mComp[1];
@@ -91,6 +106,15 @@ export const parseLog = (input) => {
             block.context.office = mSimple[1];
             block.context.airline = mSimple[2];
             block.context.recordLocator = mSimple[3];
+            return;
+        }
+        
+        // Handle PEKRMCA format (Office + RM + Airline)
+        // PEK = Beijing office, RM = Record Message, CA = Air China
+        const mOfficeRm = line.match(/^([A-Z]{3})RM([A-Z0-9]{2})$/);
+        if (mOfficeRm) {
+            block.context.office = mOfficeRm[1];
+            block.context.airline = mOfficeRm[2];
             return;
         }
     };
