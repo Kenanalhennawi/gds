@@ -5,51 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GDS Decoder | Enterprise</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app-background"></div>
     <div class="app-overlay"></div>
+    <div class="hero-particles"></div>
 
     <div class="app-container">
         <header class="app-header">
             <div class="logo">
-                <div class="logo-icon">GDS</div>
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
                 <div class="logo-text">
-                    <h1>Decoder</h1>
+                    <h1>GDS Decoder</h1>
                     <span>Enterprise Edition</span>
                 </div>
             </div>
-            <div class="header-tabs" style="display:flex; gap:10px; margin-left:30px; position:relative; z-index:10;">
-                <button id="tabDecoder" class="tab-btn active" style="padding:8px 16px; background:rgba(59,130,246,0.2); border:1px solid var(--primary-blue); border-radius:6px; color:var(--primary-blue); font-weight:600; cursor:pointer; transition:all 0.3s; position:relative; z-index:11; pointer-events:auto;">
-                    GDS Decoder
-                </button>
-                <button id="tabExcessBaggage" class="tab-btn" style="padding:8px 16px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:6px; color:var(--text-muted); font-weight:600; cursor:pointer; transition:all 0.3s; position:relative; z-index:11; pointer-events:auto;">
-                    Excess Baggage Policy
-                </button>
-            </div>
+            <nav class="main-nav">
+                <div class="header-tabs">
+                    <button id="tabDecoder" class="tab-btn active">
+                        <span class="tab-icon">📊</span>
+                        <span>GDS Decoder</span>
+                    </button>
+                    <button id="tabExcessBaggage" class="tab-btn">
+                        <span class="tab-icon">✈️</span>
+                        <span>Excess Baggage</span>
+                    </button>
+                </div>
+            </nav>
             <div class="actions">
-                <button id="btnClear" class="btn-glass">Clear Console</button>
+                <button id="btnClear" class="btn-glass">
+                    <span>Clear Console</span>
+                </button>
             </div>
         </header>
 
         <main class="workspace">
+            <!-- Hero Section for Empty State -->
+            <div class="hero-section" id="heroSection">
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <span class="badge-icon">✨</span>
+                        <span>Enterprise Solution</span>
+                    </div>
+                    <h1 class="hero-title">
+                        <span class="gradient-text">Intelligent GDS</span><br>
+                        <span class="gradient-text">Analysis Platform</span>
+                    </h1>
+                    <p class="hero-description">
+                        Transform raw GDS history logs into actionable insights. 
+                        Advanced parsing, real-time analysis, and comprehensive rate calculations 
+                        for the modern aviation industry.
+                    </p>
+                    <div class="hero-features">
+                        <div class="feature-item">
+                            <div class="feature-icon">⚡</div>
+                            <span>Real-time Analysis</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🔒</div>
+                            <span>Enterprise Security</span>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">📈</div>
+                            <span>Advanced Analytics</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- GDS Decoder Section -->
             <section id="decoderSection" class="input-section">
-                <div class="glass-panel">
-                    <textarea id="gdsInput" placeholder="Paste raw GDS history, PNR logs, or EDIFACT messages here... Auto-analysis starts automatically."></textarea>
+                <div class="glass-panel modern-panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">
+                            <span class="title-icon">📝</span>
+                            Input Console
+                        </h3>
+                    </div>
+                    <textarea id="gdsInput" placeholder="Paste raw GDS history, PNR logs, or EDIFACT messages here...&#10;&#10;Auto-analysis starts automatically as you type."></textarea>
                     <div class="panel-footer">
-                        <div class="input-status" id="inputStatus">Ready - Auto-Analyzing</div>
+                        <div class="input-status" id="inputStatus">
+                            <span class="status-dot"></span>
+                            <span>Ready - Auto-Analyzing</span>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <section id="decoderOutput" class="output-section">
                 <div id="timeline" class="timeline-container">
-                    <div class="empty-state">
-                        <div class="empty-icon">waiting</div>
+                    <div class="empty-state modern-empty">
+                        <div class="empty-icon-large">✈️</div>
                         <h3>Awaiting Data</h3>
-                        <p>Paste history logs to begin automatic analysis.</p>
+                        <p>Paste history logs to begin automatic analysis and unlock powerful insights.</p>
+                        <div class="empty-actions">
+                            <button class="btn-hero" onclick="document.getElementById('gdsInput')?.focus()">
+                                Start Analysis
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
