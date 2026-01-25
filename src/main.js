@@ -6,8 +6,7 @@ const els = {
     input: document.getElementById("gdsInput"),
     timeline: document.getElementById("timeline"),
     status: document.getElementById("inputStatus"),
-    clear: document.getElementById("btnClear"),
-    btnParse: document.getElementById("btnParse")
+    clear: document.getElementById("btnClear")
 };
 
 const processInput = () => {
@@ -16,7 +15,7 @@ const processInput = () => {
     
     if (!raw || !raw.trim()) {
         renderTimeline(els.timeline, []);
-        if (els.status) els.status.textContent = "Ready";
+        if (els.status) els.status.textContent = "Ready - Auto-Analyzing";
         return;
     }
 
@@ -47,8 +46,23 @@ const processInput = () => {
     }
 };
 
-if (els.btnParse) els.btnParse.addEventListener("click", processInput);
-if (els.clear) els.clear.addEventListener("click", () => { els.input.value = ""; processInput(); });
-if (els.input) els.input.addEventListener("paste", () => setTimeout(processInput, 100));
+// Auto-analyze on input, paste, or typing
+if (els.input) {
+    let debounceTimer;
+    els.input.addEventListener("input", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(processInput, 300);
+    });
+    els.input.addEventListener("paste", () => setTimeout(processInput, 100));
+    els.input.addEventListener("keyup", () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(processInput, 500);
+    });
+}
+
+if (els.clear) els.clear.addEventListener("click", () => { 
+    els.input.value = ""; 
+    processInput(); 
+});
 
 processInput();
