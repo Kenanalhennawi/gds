@@ -374,8 +374,8 @@ const OSI_TYPES = {
     'CTCE': { title: 'Contact Email', desc: 'Email contact information.' },
     'CTCM': { title: 'Contact Mobile', desc: 'Mobile phone contact information.' },
     'CTCH': { title: 'Contact Home', desc: 'Home phone contact information.' },
-    'CTCT': { title: 'Contact Telephone', desc: 'Telephone contact information.' },
-    'CTCP': { title: 'Contact Phone (Primary)', desc: 'Primary phone contact information.' },
+    'CTCT': { title: 'Contact Telephone', desc: 'Contact telephone number. Often includes travel agency or company name along with the phone number.' },
+    'CTCP': { title: 'Contact Phone (Primary)', desc: 'Primary phone contact information. Usually the main contact number for the booking or travel agency.' },
     'CTCF': { title: 'Contact Fax', desc: 'Fax contact information.' },
     'RLOC': { title: 'Related Record Locator', desc: 'Related booking reference (PNR).' },
     'RMKS': { title: 'Remarks', desc: 'General remarks or notes.' },
@@ -479,13 +479,61 @@ export const translateOSI = (text) => {
     const carrier = osiMatch[1];
     const message = osiMatch[2];
     
+    // Explain YY carrier code
+    let carrierExplanation = "";
+    if (carrier === "YY") {
+        carrierExplanation = " (YY = System/Any Carrier - applies to all airlines)";
+    } else {
+        const carrierName = translateAirline(carrier);
+        if (carrierName !== carrier) {
+            carrierExplanation = ` (${carrierName})`;
+        }
+    }
+    
+    // Parse CTCP (Contact Phone Primary)
+    if (message.includes("CTCP")) {
+        const ctcpMatch = message.match(/CTCP\s*(.+)/i);
+        const contactInfo = ctcpMatch ? ctcpMatch[1].trim() : message.replace(/CTCP\s*/i, '');
+        // Try to extract phone number and company name
+        const phoneMatch = contactInfo.match(/([\d\s\-\(\)]+)/);
+        const phone = phoneMatch ? phoneMatch[1].trim() : '';
+        const company = contactInfo.replace(phone, '').replace(/^[\s\-]+|[\s\-]+$/g, '').trim();
+        
+        return {
+            title: "Contact Phone (Primary)",
+            msg: `Primary contact phone number${phone ? `: ${phone}` : ''}${company ? ` - ${company}` : ''}`,
+            type: "info",
+            carrier: carrier + carrierExplanation,
+            details: contactInfo
+        };
+    }
+    
+    // Parse CTCT (Contact Telephone)
+    if (message.includes("CTCT")) {
+        const ctctMatch = message.match(/CTCT\s*(.+)/i);
+        const contactInfo = ctctMatch ? ctctMatch[1].trim() : message.replace(/CTCT\s*/i, '');
+        // Try to extract phone number and company name
+        const phoneMatch = contactInfo.match(/([\d\s\-\(\)]+)/);
+        const phone = phoneMatch ? phoneMatch[1].trim() : '';
+        const company = contactInfo.replace(phone, '').replace(/^[\s\-]+|[\s\-]+$/g, '').trim();
+        
+        return {
+            title: "Contact Telephone",
+            msg: `Contact telephone${phone ? `: ${phone}` : ''}${company ? ` - ${company}` : ''}`,
+            type: "info",
+            carrier: carrier + carrierExplanation,
+            details: contactInfo
+        };
+    }
+    
     // Check for known OSI types
     for (const [code, info] of Object.entries(OSI_TYPES)) {
         if (message.includes(code)) {
             return {
                 title: info.title,
                 msg: `${info.desc} ${message}`,
-                type: "info"
+                type: "info",
+                carrier: carrier + carrierExplanation
             };
         }
     }
@@ -495,7 +543,8 @@ export const translateOSI = (text) => {
         return {
             title: "Contact Email",
             msg: `Email contact information: ${message}`,
-            type: "info"
+            type: "info",
+            carrier: carrier + carrierExplanation
         };
     }
     
@@ -503,15 +552,8 @@ export const translateOSI = (text) => {
         return {
             title: "Contact Phone",
             msg: `Phone contact information: ${message}`,
-            type: "info"
-        };
-    }
-    
-    if (message.includes("CTCP")) {
-        return {
-            title: "Contact Phone (Primary)",
-            msg: `Primary phone contact: ${message.replace(/CTCP\s*/i, '')}`,
-            type: "info"
+            type: "info",
+            carrier: carrier + carrierExplanation
         };
     }
     
@@ -519,14 +561,16 @@ export const translateOSI = (text) => {
         return {
             title: "Related Record Locator",
             msg: `Related booking reference: ${message}`,
-            type: "info"
+            type: "info",
+            carrier: carrier + carrierExplanation
         };
     }
     
     return {
         title: "Other Service Information",
         msg: message,
-        type: "info"
+        type: "info",
+        carrier: carrier + carrierExplanation
     };
 };
 
