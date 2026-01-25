@@ -39,18 +39,72 @@ export const renderExplain = ({ explainBody, explainEmpty }, parsed) => {
   }
   explainEmpty.style.display = "none";
 
+  // --- PART 1: TECHNICAL BREAKDOWN (Restored from your previous version) ---
+  const grid = document.createElement("div");
+  grid.className = "explain-grid";
+
+  const addRow = (k, v) => {
+    if (!v) return;
+    const kk = document.createElement("div");
+    kk.className = "explain-k";
+    kk.textContent = k;
+    const vv = document.createElement("div");
+    vv.className = "explain-v";
+    vv.innerHTML = v;
+    grid.appendChild(kk);
+    grid.appendChild(vv);
+  };
+
+  addRow("Detected type", parsed.kind);
+  addRow("Header", parsed.header ? wrapToken(parsed.header) : "—");
+  addRow("Office / sign-in", parsed.office ? `${parsed.office}` : "—");
+  
+  if (parsed.recordLocator) {
+      addRow("Record reference", wrapToken(parsed.recordLocator));
+  }
+
+  if (parsed.segments && parsed.segments.length > 0) {
+    const segsHTML = parsed.segments.map(s => 
+      wrapToken(`${s.carrier}${s.flight}${s.date} ${s.from}${s.to} ${s.status}`)
+    ).join(" ");
+    addRow("Segments", segsHTML);
+  }
+
+  if (parsed.ssr && parsed.ssr.length > 0) {
+    // Unique SSR types
+    const types = [...new Set(parsed.ssr.map(s => s.type))];
+    const ssrHTML = types.map(t => wrapToken(t)).join(" ");
+    addRow("SSR types", ssrHTML);
+  }
+
+  if (parsed.queueLogic && parsed.queueLogic.length > 0) {
+      const qlHTML = parsed.queueLogic.map(x => 
+        `<div>${wrapToken(x.code)} ${esc(x.meaning)}</div>`
+      ).join("");
+      addRow("Queue logic", qlHTML);
+  }
+
+  explainBody.appendChild(grid);
+
+  // --- PART 2: SEPARATOR ---
+  const hr = document.createElement("hr");
+  hr.style.margin = "16px 0";
+  hr.style.border = "none";
+  hr.style.borderTop = "1px solid var(--stroke)";
+  explainBody.appendChild(hr);
+
+  const timelineTitle = document.createElement("div");
+  timelineTitle.className = "explain-title";
+  timelineTitle.textContent = "Timeline Story";
+  timelineTitle.style.marginBottom = "10px";
+  explainBody.appendChild(timelineTitle);
+
+
+  // --- PART 3: HUMAN TIMELINE (The new readable version) ---
   const container = document.createElement("div");
   container.className = "timeline";
 
   const blocks = parsed.blocks || [];
-
-  if (blocks.length === 0) {
-    const msg = document.createElement("div");
-    msg.className = "explain-empty";
-    msg.textContent = "No history blocks detected.";
-    container.appendChild(msg);
-    return;
-  }
 
   blocks.forEach((block) => {
     const eventDiv = document.createElement("div");
