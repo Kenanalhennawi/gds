@@ -71,7 +71,7 @@ export function renderExcessBaggageCalculator(container) {
                                     class="styled-input"
                                     placeholder="Search by code, city, or country..."
                                     autocomplete="off"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
                                 <div id="originAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                                 <div id="originInfo" style="margin-top:5px; font-size:11px; color:var(--text-muted);"></div>
@@ -87,7 +87,7 @@ export function renderExcessBaggageCalculator(container) {
                                     class="styled-input"
                                     placeholder="Search by code, city, or country..."
                                     autocomplete="off"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
                                 <div id="destinationAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                                 <div id="destinationInfo" style="margin-top:5px; font-size:11px; color:var(--text-muted);"></div>
@@ -100,7 +100,7 @@ export function renderExcessBaggageCalculator(container) {
                                 <select 
                                     id="airlineSelect"
                                     class="styled-select"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
                                     <option value="FZ">Flydubai (FZ)</option>
                                     <option value="EK">Emirates (EK)</option>
@@ -117,7 +117,7 @@ export function renderExcessBaggageCalculator(container) {
                                 <select 
                                     id="currencySelect"
                                     class="styled-select"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
                                     <option value="AUTO">Auto (by destination)</option>
                                 </select>
@@ -138,7 +138,7 @@ export function renderExcessBaggageCalculator(container) {
                                     class="styled-input"
                                     placeholder="Search by code, city, or country..."
                                     autocomplete="off"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
                                 <div id="goshowAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                             </div>
@@ -149,7 +149,7 @@ export function renderExcessBaggageCalculator(container) {
                                 <select 
                                     id="goshowClass"
                                     class="styled-select"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
                                     <option value="ECONOMY">Economy</option>
                                     <option value="BUSINESS">Business</option>
@@ -168,7 +168,7 @@ export function renderExcessBaggageCalculator(container) {
                                 <select 
                                     id="sportsCurrency"
                                     class="styled-select"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
                                     <option value="AED">AED - UAE Dirham</option>
                                 </select>
@@ -180,7 +180,7 @@ export function renderExcessBaggageCalculator(container) {
                                 <select 
                                     id="sportsType"
                                     class="styled-select"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
                                     <option value="SPEQ">SPEQ - Standard</option>
                                     <option value="SPEX">SPEX - Oversized</option>
@@ -199,7 +199,7 @@ export function renderExcessBaggageCalculator(container) {
                                 <select 
                                     id="reportingCurrency"
                                     class="styled-select"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
                                     <option value="AED">AED - UAE Dirham</option>
                                 </select>
@@ -211,7 +211,7 @@ export function renderExcessBaggageCalculator(container) {
                                 <select 
                                     id="reportingType"
                                     class="styled-select"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
                                     <option value="LRTP">LRTP - Late Reporting</option>
                                     <option value="ERTP">ERTP - Early Reporting</option>
@@ -250,7 +250,7 @@ export function renderExcessBaggageCalculator(container) {
                                     class="styled-input"
                                     placeholder="Search by code, city, or country..."
                                     autocomplete="off"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
                                 <div id="upgradeAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                             </div>
@@ -261,7 +261,7 @@ export function renderExcessBaggageCalculator(container) {
                                 <select 
                                     id="upgradeCurrency"
                                     class="styled-select"
-                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer; transition:all 0.3s ease;"
+                                    style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
                                     <option value="AED">AED - UAE Dirham</option>
                                 </select>
@@ -284,54 +284,31 @@ export function renderExcessBaggageCalculator(container) {
         </div>
     `;
     
-    // Optimized currency dropdown initialization using document fragments
+    // Pre-populate currency dropdowns immediately - single pass for maximum performance
     const currencies = getAllCurrencies();
-    const currencySelects = ['currencySelect', 'sportsCurrency', 'reportingCurrency'];
+    const currencyOptionsHTML = currencies.map(curr => `<option value="${curr}">${curr}</option>`).join('');
     
-    // Use requestIdleCallback for better performance
-    const initCurrencyDropdowns = () => {
-        currencySelects.forEach(selectId => {
-            const select = container.querySelector(`#${selectId}`);
-            if (select) {
-                const fragment = document.createDocumentFragment();
-                currencies.forEach(curr => {
-                    const option = document.createElement('option');
-                    option.value = curr;
-                    option.textContent = curr;
-                    fragment.appendChild(option);
-                });
-                select.appendChild(fragment);
-            }
-        });
-    };
+    // Populate all currency selects in one batch operation
+    const currencySelect = container.querySelector('#currencySelect');
+    const sportsCurrency = container.querySelector('#sportsCurrency');
+    const reportingCurrency = container.querySelector('#reportingCurrency');
+    const upgradeSelect = container.querySelector('#upgradeCurrency');
     
-    // Initialize upgrade currencies separately
+    // Set innerHTML directly (fastest DOM operation)
+    if (currencySelect) {
+        currencySelect.innerHTML = '<option value="AUTO">Auto (by destination)</option>' + currencyOptionsHTML;
+    }
+    if (sportsCurrency) {
+        sportsCurrency.innerHTML = '<option value="AED">AED</option>' + currencyOptionsHTML;
+    }
+    if (reportingCurrency) {
+        reportingCurrency.innerHTML = '<option value="AED">AED</option>' + currencyOptionsHTML;
+    }
+    
+    // Initialize upgrade currencies
     const upgradeCurrencies = ['AED', 'PKR', 'BHD', 'BYN', 'CHF', 'CZK', 'EGP', 'EUR', 'HUF', 'INR', 'JOD', 'KWD', 'KZT', 'LBP', 'LKR', 'MYR', 'NPR', 'OMR', 'PLN', 'QAR', 'RUB', 'SAR', 'TJS', 'THB', 'USD', 'UZS', 'IRR'];
-    const initUpgradeCurrency = () => {
-        const upgradeSelect = container.querySelector('#upgradeCurrency');
-        if (upgradeSelect) {
-            const fragment = document.createDocumentFragment();
-            upgradeCurrencies.forEach(curr => {
-                const option = document.createElement('option');
-                option.value = curr;
-                option.textContent = curr;
-                fragment.appendChild(option);
-            });
-            upgradeSelect.appendChild(fragment);
-        }
-    };
-    
-    // Use requestIdleCallback or setTimeout for non-blocking initialization
-    if (window.requestIdleCallback) {
-        requestIdleCallback(() => {
-            initCurrencyDropdowns();
-            initUpgradeCurrency();
-        });
-    } else {
-        setTimeout(() => {
-            initCurrencyDropdowns();
-            initUpgradeCurrency();
-        }, 0);
+    if (upgradeSelect) {
+        upgradeSelect.innerHTML = upgradeCurrencies.map(curr => `<option value="${curr}">${curr}</option>`).join('');
     }
     
     // Tab switching
