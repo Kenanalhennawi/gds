@@ -51,7 +51,7 @@ export function renderExcessBaggageCalculator(container) {
                     
                     <!-- Service Tabs -->
                     <div class="service-tabs-container" style="display:flex; gap:10px; margin-bottom:20px; border-bottom:2px solid var(--glass-border); padding-bottom:2px;">
-                        <button class="service-tab active" data-service="excess" style="padding:10px 20px; background:rgba(74,158,255,0.25); border:none; border-bottom:2px solid var(--primary-blue); color:var(--primary-blue); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab active" data-service="excess" style="padding:10px 20px; background:rgba(59,130,246,0.25); border:none; border-bottom:2px solid var(--primary-blue); color:var(--primary-blue); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Excess Baggage
                         </button>
                         <button class="service-tab" data-service="goshow" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
@@ -340,10 +340,10 @@ export function renderExcessBaggageCalculator(container) {
                 t.style.color = 'var(--text-muted)';
             });
             tab.classList.add('active');
-            tab.style.background = 'rgba(74,158,255,0.25)';
+            tab.style.background = 'rgba(59,130,246,0.25)';
             tab.style.borderBottom = '2px solid var(--primary-blue)';
             tab.style.color = 'var(--primary-blue)';
-            tab.style.boxShadow = '0 4px 12px rgba(74, 158, 255, 0.2)';
+            tab.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.2)';
             
             // Update sections
             sections.forEach(s => s.style.display = 'none');
@@ -414,7 +414,7 @@ export function renderExcessBaggageCalculator(container) {
                     `;
                     
                     item.addEventListener('mouseenter', () => {
-                        item.style.background = 'rgba(74,158,255,0.2)';
+                        item.style.background = 'rgba(59,130,246,0.2)';
                     });
                     item.addEventListener('mouseleave', () => {
                         item.style.background = 'transparent';
