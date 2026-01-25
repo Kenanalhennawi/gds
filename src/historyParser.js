@@ -1,169 +1,208 @@
-import { stripControl } from "./utils.js";
+import { uniq } from "./utils.js";
 
-const normLine = (l) => stripControl((l || "").trim());
+const stripControls = (s) => (s || "").toString().replace(/[\u0000-\u0009\u000B-\u001F\u007F]/g, "");
 
-const splitLines = (raw) =>
-  (raw || "")
-    .replace(/\r\n/g, "\n")
-    .replace(/\r/g, "\n")
-    .split("\n")
-    .map(normLine)
-    .filter((x) => x.length);
-
-const detectProvider = (lines) => {
-  const blob = lines.join(" ");
-  const m = blob.match(/\b[A-Z]{3}(1A|1G|1S|1B)\b/);
-  if (m) {
-    const code = m[1];
-    if (code === "1A") return { code: "1A", name: "Amadeus" };
-    if (code === "1G") return { code: "1G", name: "Galileo/Travelport" };
-    if (code === "1S") return { code: "1S", name: "Sabre" };
-    if (code === "1B") return { code: "1B", name: "Abacus/Travelport" };
-  }
-  if (/\bGALILEO\b/i.test(blob)) return { code: "1G", name: "Galileo/Travelport" };
-  if (/\bSABRE\b/i.test(blob)) return { code: "1S", name: "Sabre" };
-  if (/\bAMADEUS\b/i.test(blob)) return { code: "1A", name: "Amadeus" };
-  return null;
+const toLines = (text) => {
+  if (!text) return [];
+  
+  let clean = text.toString();
+  
+  clean = clean.replace(/[\u0001\u0002\u0003\u0004]/g, "\n");
+  
+  clean = clean.replace(/([0-9]{6})\s+(\.?[A-Z]{2,3})/g, "$1\n$2");
+  
+  return clean
+    .split(/\r\n|\r|\n/)
+    .map(l => l.trim())
+    .filter(l => l.length > 0);
 };
 
-const parseEnvelopeLine = (line) => {
-  const m = line.match(/^(QP|QK|QD|QQ)\s+([A-Z0-9]{3,12})(?:\s+(.*))?$/);
+const isEnvelopeLine = (l) => /^(QP|QK|QD)\s+/.test(l);
+
+const parseEnvelopeLine = (l) => {
+  const m = l.match(/^(QP|QK|QD)\s+(\S+)(?:\s+.*)?$/);
   if (!m) return null;
-  const env = m[1];
-  const header = m[2] || "";
-  const rest = (m[3] || "").trim();
-  const airline = header.match(/([A-Z]{2})$/) ? header.slice(-2) : null;
-  return { env, header, airline, rest };
+  return { envelope: m[1], header: m[2] };
 };
 
-const parseOfficeLine = (line) => {
-  const m = line.match(/^\.(\S{6})(?:\s+(\d{6}))?(?:\/(\S+))?$/);
+const parseDotLine = (l) => {
+  const m = l.match(/^\.(\S+)(?:\s+(\S+))?$/);
   if (!m) return null;
-  return { office: m[1], time: m[2] || null, extra: m[3] || null };
+  return { dotHeader: m[1], stamp: m[2] || null };
 };
 
-const parseRecordLine = (line) => {
-  const m = line.match(/^([A-Z0-9]{5,6})\s+([A-Z0-9]{5,6})(?:\/([A-Z0-9]{6,12}))?$/);
+const parseActionLine = (l) => {
+  const m = l.match(/^(TRL|AKA|NAR|DVD|ASC|NCO)$/);
+  return m ? m[1] : null;
+};
+
+const parseOfficeLine = (l) => {
+  const m = l.match(/^([A-Z0-9]{2,3})\s+([A-Z0-9]{5,8})\/(\S+)/);
   if (!m) return null;
-  return { station: m[1], locator: m[2], ref: m[3] || null };
+  return { office: m[1], recordLocator: m[2], signIn: m[3] };
 };
 
-const normalizeSsrOsiLine = (line) => {
-  if (/^SSR[A-Z0-9]{4}[A-Z0-9]{2}[A-Z]{2}\d/.test(line)) {
-    const a = line.slice(0, 3);
-    const b = line.slice(3, 7);
-    const c = line.slice(7, 9);
-    const d = line.slice(9, 12);
-    const rest = line.slice(12);
-    return `${a} ${b} ${c} ${d}${rest}`;
-  }
-  if (/^OSI[A-Z0-9]{2}\s/.test(line)) return `OSI ${line.slice(3)}`;
-  if (/^OSIFZ/.test(line) && !/^OSI\s/.test(line)) {
-    const rest = line.slice(5);
-    return `OSI FZ ${rest.startsWith(" ") ? rest.trimStart() : rest}`;
-  }
-  return line;
+const parseAirimpContext = (l) => {
+  const m = l.match(/^(\S{2}Q\S{4})\s+([A-Z0-9]{6})\/(\S+)\/(\d{6,})\/(\S+)\/(\S{2})\/(\S)\/(\S{2})\/(\S{3})/);
+  if (!m) return null;
+  return { airlineContext: m[1], recordRef: m[2] };
 };
 
-const parseSsrLine = (line) => {
-  const l = normalizeSsrOsiLine(line);
+const parsePassengerLine = (l) => {
+  const m = l.match(/^(\d+)([A-Z'\-\s]+)\/([A-Z'\-\s]+)$/);
+  if (!m) return null;
+  return { index: Number(m[1]), surname: m[2].trim(), given: m[3].trim() };
+};
+
+const parseSsrLine = (l) => {
   if (!l.startsWith("SSR")) return null;
-  const m = l.match(/^SSR\s+([A-Z0-9]{4})\s+([A-Z0-9]{2})\s+([A-Z]{2}\d)(?:\/(.*))?$/);
-  if (m) return { type: m[1], carrier: m[2], status: m[3], data: (m[4] || "").trim() };
-  const m2 = l.match(/^SSR\s+([A-Z0-9]{4})\s+([A-Z0-9]{2})\s+(.*)$/);
-  if (m2) return { type: m2[1], carrier: m2[2], status: null, data: (m2[3] || "").trim() };
-  const m3 = l.match(/^SSR\s+([A-Z0-9]{4})([A-Z0-9]{2})([A-Z]{2}\d)(.*)$/);
-  if (m3) return { type: m3[1], carrier: m3[2], status: m3[3], data: (m3[4] || "").replace(/^\//, "").trim() };
-  return { type: null, carrier: null, status: null, data: l.slice(3).trim() };
+  const m = l.match(/^SSR\s+([A-Z0-9]{3,4})\s+([A-Z0-9]{2})\s+([A-Z]{2})(\d+)\/?(.*)$/);
+  if (!m) {
+    const m2 = l.match(/^SSR\s+([A-Z0-9]{3,4})\s+([A-Z0-9]{2})\s+(.*)$/);
+    if (!m2) return { raw: l };
+    return { type: m2[1], carrier: m2[2], raw: l, text: (m2[3] || "").trim() };
+  }
+  return { type: m[1], carrier: m[2], status: `${m[3]}${m[4]}`, raw: l, text: (m[5] || "").trim() };
 };
 
-const parseOsiLine = (line) => {
-  const l = normalizeSsrOsiLine(line);
+const parseOsiLine = (l) => {
   if (!l.startsWith("OSI")) return null;
-  const m = l.match(/^OSI\s+([A-Z0-9]{2})\s+(.*)$/);
-  if (!m) return null;
-  return { carrier: m[1], data: (m[2] || "").trim() };
+  return { raw: l, text: l.replace(/^OSI\s+/, "") };
 };
 
-const parseSegmentLine = (line) => {
-  const m = line.match(/^([A-Z0-9]{2})\s*([0-9]{1,4})([A-Z])([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d)(?:\/([0-9]{3,4})\s+([0-9]{3,4})(?:\/1)?)?/);
-  if (!m) return null;
+const splitStatus = (s) => {
+  const m = (s || "").match(/^([A-Z]{2})(\d+)$/);
+  return m ? { code: m[1], num: Number(m[2]) } : null;
+};
+
+const parseSegment = (l) => {
+  const m = l.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z])\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)(?:\/(\d{4})\s+(\d{4})(?:\/(\d))?)?/);
+  
+  if (!m) {
+    const m2 = l.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z])\s+([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)$/);
+    if(m2) {
+       const status = m2[7];
+       return {
+        kind: "SEG",
+        carrier: m2[1],
+        flight: m2[2],
+        bookingClass: m2[3],
+        date: m2[4],
+        from: m2[5],
+        to: m2[6],
+        status,
+        statusCode: splitStatus(status)?.code || null
+       };
+    }
+    return null;
+  }
+  
+  const status = m[7];
   return {
+    kind: "SEG",
     carrier: m[1],
     flight: m[2],
-    cls: m[3],
+    bookingClass: m[3],
     date: m[4],
     from: m[5],
     to: m[6],
-    status: m[7],
-    dep: m[8] || null,
-    arr: m[9] || null
+    status,
+    statusCode: splitStatus(status)?.code || null,
+    depTime: m[8] || null,
+    arrTime: m[9] || null
   };
 };
 
-const uniq = (arr) => Array.from(new Set((arr || []).filter(Boolean)));
+const parseTicketNumber = (s) => {
+  const m = s.match(/\b(\d{13})\b/);
+  return m ? m[1] : null;
+};
 
-export const parseHistory = (raw) => {
-  const lines = splitLines(raw);
-  if (!lines.length) {
-    return { kind: "UNKNOWN", sentences: ["No content detected."] };
-  }
+export const parseHistory = (input) => {
+  const lines = toLines(input);
+  if (!lines.length) return {};
 
-  const envelope = parseEnvelopeLine(lines[0]);
-  const office = lines.find((l) => l.startsWith(".")) ? parseOfficeLine(lines.find((l) => l.startsWith("."))) : null;
+  const blocks = [];
+  let current = null;
 
-  let record = null;
-  for (const l of lines) {
-    const r = parseRecordLine(l);
-    if (r) {
-      record = r;
-      break;
+  const startBlock = (l, env = null, head = null) => {
+    if (current) blocks.push(current);
+    current = {
+      envelope: env,
+      header: head,
+      lines: [l],
+      segments: [],
+      ssr: [],
+      osi: [],
+      pax: null,
+      office: null,
+      action: null
+    };
+  };
+
+  lines.forEach((l) => {
+    if (isEnvelopeLine(l)) {
+      const p = parseEnvelopeLine(l);
+      startBlock(l, p.envelope, p.header);
+      return;
     }
-  }
 
-  const provider = detectProvider(lines);
+    if (!current) startBlock(l);
+    else current.lines.push(l);
 
-  const segments = [];
-  const ssrs = [];
-  const osis = [];
+    const act = parseActionLine(l);
+    if (act) {
+      current.action = act;
+      return;
+    }
 
-  for (const l0 of lines) {
-    const l = normalizeSsrOsiLine(l0);
-    const seg = parseSegmentLine(l);
-    if (seg) segments.push(seg);
-    const s = parseSsrLine(l);
-    if (s) ssrs.push(s);
-    const o = parseOsiLine(l);
-    if (o) osis.push(o);
-  }
+    const off = parseOfficeLine(l);
+    if (off) {
+      current.office = off.office;
+      return;
+    }
 
-  const airlineFromSegs = uniq(segments.map((s) => s.carrier));
-  const airlineFromSsr = uniq(ssrs.map((s) => s.carrier));
-  const airlineFromOsi = uniq(osis.map((o) => o.carrier));
-  const airlines = uniq([envelope?.airline, ...airlineFromSegs, ...airlineFromSsr, ...airlineFromOsi]);
+    const dot = parseDotLine(l);
+    if (dot && !current.header) {
+      current.header = dot.dotHeader;
+    }
 
-  const kind = envelope ? "GDS_HISTORY" : /UNB\+|UNH\+|UNT\+|UNZ\+/.test(lines.join(" ")) ? "EDIFACT" : "TEXT";
+    const pax = parsePassengerLine(l);
+    if (pax) {
+      current.pax = pax;
+      return;
+    }
 
-  const sentences = [];
-  sentences.push(`Detected type: ${kind}`);
-  if (provider) sentences.push(`Detected GDS: ${provider.name} (${provider.code})`);
-  if (envelope?.env) sentences.push(`Envelope: ${envelope.env}`);
-  if (envelope?.header) sentences.push(`Header: ${envelope.header}`);
-  if (office?.office) sentences.push(`Office/sign-in: ${office.office}`);
-  if (record?.locator) sentences.push(`Record locator: ${record.locator}`);
-  if (airlines.length) sentences.push(`Airlines: ${airlines.join(", ")}`);
+    const seg = parseSegment(l);
+    if (seg) {
+      current.segments.push(seg);
+      return;
+    }
+
+    const ssr = parseSsrLine(l);
+    if (ssr) {
+      current.ssr.push(ssr);
+      return;
+    }
+
+    const osi = parseOsiLine(l);
+    if (osi) {
+      current.osi.push(osi);
+      return;
+    }
+  });
+
+  if (current) blocks.push(current);
+
+  const allSegments = blocks.flatMap(b => b.segments);
+  const allSsr = blocks.flatMap(b => b.ssr);
+  const allOsi = blocks.flatMap(b => b.osi);
 
   return {
-    kind,
-    provider,
-    envelope,
-    header: envelope?.header || null,
-    airlineContext: airlines.length ? airlines : null,
-    office,
-    record,
-    segments,
-    ssrs,
-    osis,
-    sentences
+    kind: "GDS_HISTORY",
+    blocks,
+    segments: allSegments,
+    ssr: allSsr,
+    osi: allOsi
   };
 };
