@@ -41,6 +41,9 @@ const parseOfficeLine = (l) => {
   m = l.match(/^([A-Z]{3})([A-Z0-9]{2})\s+([A-Z0-9]{6})$/);
   if (m) return { office: m[1], airline: m[2], recordLocator: m[3] };
 
+  m = l.match(/^([A-Z0-9]{4,5})\s+([A-Z0-9]{6})\//);
+  if (m) return { office: m[1], recordLocator: m[2] };
+
   return null;
 };
 
@@ -179,6 +182,7 @@ export const parseHistory = (input) => {
     if (off) {
       if (off.office) current.office = off.office;
       if (off.recordLocator) current.recordLocator = off.recordLocator;
+      if (off.airline) current.airlineContext = off.airline;
       return;
     }
 
