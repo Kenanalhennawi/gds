@@ -1,12 +1,19 @@
 import { parseLog } from "./parser.js";
 import { renderTimeline } from "./ui.js";
 import { analyzeBookingChanges } from "./analyzer.js";
+import { renderExcessBaggageCalculator } from "./excessBaggageUI.js";
 
 const els = {
     input: document.getElementById("gdsInput"),
     timeline: document.getElementById("timeline"),
     status: document.getElementById("inputStatus"),
-    clear: document.getElementById("btnClear")
+    clear: document.getElementById("btnClear"),
+    tabDecoder: document.getElementById("tabDecoder"),
+    tabExcessBaggage: document.getElementById("tabExcessBaggage"),
+    decoderSection: document.getElementById("decoderSection"),
+    decoderOutput: document.getElementById("decoderOutput"),
+    excessBaggageSection: document.getElementById("excessBaggageSection"),
+    excessBaggageContainer: document.getElementById("excessBaggageContainer")
 };
 
 const processInput = () => {
@@ -64,5 +71,45 @@ if (els.clear) els.clear.addEventListener("click", () => {
     els.input.value = ""; 
     processInput(); 
 });
+
+// Tab switching
+if (els.tabDecoder && els.tabExcessBaggage) {
+    els.tabDecoder.addEventListener("click", () => {
+        els.tabDecoder.classList.add("active");
+        els.tabDecoder.style.background = "rgba(74,158,255,0.2)";
+        els.tabDecoder.style.borderColor = "var(--primary-blue)";
+        els.tabDecoder.style.color = "var(--primary-blue)";
+        
+        els.tabExcessBaggage.classList.remove("active");
+        els.tabExcessBaggage.style.background = "rgba(255,255,255,0.05)";
+        els.tabExcessBaggage.style.borderColor = "var(--glass-border)";
+        els.tabExcessBaggage.style.color = "var(--text-muted)";
+        
+        els.decoderSection.style.display = "block";
+        els.decoderOutput.style.display = "block";
+        els.excessBaggageSection.style.display = "none";
+    });
+    
+    els.tabExcessBaggage.addEventListener("click", () => {
+        els.tabExcessBaggage.classList.add("active");
+        els.tabExcessBaggage.style.background = "rgba(74,158,255,0.2)";
+        els.tabExcessBaggage.style.borderColor = "var(--primary-blue)";
+        els.tabExcessBaggage.style.color = "var(--primary-blue)";
+        
+        els.tabDecoder.classList.remove("active");
+        els.tabDecoder.style.background = "rgba(255,255,255,0.05)";
+        els.tabDecoder.style.borderColor = "var(--glass-border)";
+        els.tabDecoder.style.color = "var(--text-muted)";
+        
+        els.decoderSection.style.display = "none";
+        els.decoderOutput.style.display = "none";
+        els.excessBaggageSection.style.display = "block";
+        
+        // Initialize excess baggage calculator if not already done
+        if (els.excessBaggageContainer && els.excessBaggageContainer.children.length === 0) {
+            renderExcessBaggageCalculator(els.excessBaggageContainer);
+        }
+    });
+}
 
 processInput();
