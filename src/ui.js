@@ -101,22 +101,18 @@ export const renderTimeline = (container, data) => {
             }
         }
 
-        // Build detailed explanation section
-        let contextHtml = "";
-        let hasContext = evt.context.recordLocator || evt.context.airline || evt.context.office || evt.headerType || evt.timestamp || evt.rawHeader;
+        // Build detailed explanation section - ALWAYS show context section
+        let contextHtml = `<div class="card-context">
+            <div class="context-row">
+                <span class="ctx-label">Detected Type:</span> 
+                <span class="ctx-val">GDS_HISTORY</span>
+            </div>
+            <div class="context-row">
+                <span class="ctx-label">Message Type:</span> 
+                <span class="ctx-val" title="${actionDesc}">${action || evt.envelope || 'N/A'}</span>
+            </div>`;
         
-        if (hasContext) {
-            contextHtml = `<div class="card-context">
-                <div class="context-row">
-                    <span class="ctx-label">Detected Type:</span> 
-                    <span class="ctx-val">GDS_HISTORY</span>
-                </div>
-                <div class="context-row">
-                    <span class="ctx-label">Message Type:</span> 
-                    <span class="ctx-val" title="${actionDesc}">${action}</span>
-                </div>`;
-            
-            if (evt.rawHeader) {
+        if (evt.rawHeader) {
                 // Parse header components for detailed explanation
                 const headerParts = [];
                 if (evt.rawHeader.includes('HDQ')) {
@@ -144,48 +140,58 @@ export const renderTimeline = (container, data) => {
                     }
                 }
                 
-                contextHtml += `<div class="context-row">
-                    <span class="ctx-label">Header:</span> 
-                    <span class="ctx-val" style="font-family:var(--font-code);">${evt.rawHeader}</span>
-                </div>`;
-                if (headerParts.length > 0) {
-                    contextHtml += `<div class="context-row" style="font-size:11px; color:var(--text-muted); margin-top:4px;">
-                        <span>${headerParts.join(' + ')}</span>
-                    </div>`;
-                }
-            }
-            
-            if (evt.timestamp) {
-                // Format timestamp: 050437 -> 05:04:37 or date format
-                const ts = evt.timestamp;
-                const formattedTime = ts.length === 6 ? `${ts.substring(0,2)}:${ts.substring(2,4)}:${ts.substring(4,6)}` : ts;
-                contextHtml += `<div class="context-row">
-                    <span class="ctx-label">Timestamp:</span> 
-                    <span class="ctx-val">${formattedTime}</span>
+            contextHtml += `<div class="context-row">
+                <span class="ctx-label">Header:</span> 
+                <span class="ctx-val" style="font-family:var(--font-code);">${evt.rawHeader || 'N/A'}</span>
+            </div>`;
+            if (headerParts.length > 0) {
+                contextHtml += `<div class="context-row" style="font-size:11px; color:var(--text-muted); margin-top:4px;">
+                    <span>${headerParts.join(' + ')}</span>
                 </div>`;
             }
-            
-            if (evt.context.office) {
-                contextHtml += `<div class="context-row">
-                    <span class="ctx-label">Office/Sign-in:</span> 
-                    <span class="ctx-val">${translateCity(evt.context.office)} (${evt.context.office})</span>
-                </div>`;
-            }
-            if (evt.context.recordLocator) {
-                contextHtml += `<div class="context-row">
-                    <span class="ctx-label">Active Record (PNR):</span> 
-                    <span class="ctx-val pnr">${evt.context.recordLocator}</span>
-                </div>`;
-            }
-            if (evt.context.airline) {
-                contextHtml += `<div class="context-row">
-                    <span class="ctx-label">Airline Context:</span> 
-                    <span class="ctx-val">${translateAirline(evt.context.airline)} (${evt.context.airline})</span>
-                </div>`;
-            }
-            contextHtml += headerTypeHtml;
-            contextHtml += `</div>`;
+        } else {
+            contextHtml += `<div class="context-row">
+                <span class="ctx-label">Header:</span> 
+                <span class="ctx-val" style="font-family:var(--font-code);">N/A</span>
+            </div>`;
         }
+        
+        if (evt.timestamp) {
+            // Format timestamp: 050437 -> 05:04:37 or date format
+            const ts = evt.timestamp;
+            const formattedTime = ts.length === 6 ? `${ts.substring(0,2)}:${ts.substring(2,4)}:${ts.substring(4,6)}` : ts;
+            contextHtml += `<div class="context-row">
+                <span class="ctx-label">Timestamp:</span> 
+                <span class="ctx-val">${formattedTime}</span>
+            </div>`;
+        }
+        
+        if (evt.context.office) {
+            contextHtml += `<div class="context-row">
+                <span class="ctx-label">Office/Sign-in:</span> 
+                <span class="ctx-val">${translateCity(evt.context.office)} (${evt.context.office})</span>
+            </div>`;
+        }
+        if (evt.context.recordLocator) {
+            contextHtml += `<div class="context-row">
+                <span class="ctx-label">Active Record (PNR):</span> 
+                <span class="ctx-val pnr">${evt.context.recordLocator}</span>
+            </div>`;
+        }
+        if (evt.context.airline) {
+            contextHtml += `<div class="context-row">
+                <span class="ctx-label">Airline Context:</span> 
+                <span class="ctx-val">${translateAirline(evt.context.airline)} (${evt.context.airline})</span>
+            </div>`;
+        } else {
+            // Always show Airline Context field, even if empty
+            contextHtml += `<div class="context-row">
+                <span class="ctx-label">Airline Context:</span> 
+                <span class="ctx-val">N/A</span>
+            </div>`;
+        }
+        contextHtml += headerTypeHtml;
+        contextHtml += `</div>`;
         
         // Add change explanation section
         let changesHtml = "";
