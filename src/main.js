@@ -16,40 +16,81 @@ const els = {
     excessBaggageContainer: document.getElementById("excessBaggageContainer")
 };
 
+// Show loading state
+const showLoading = () => {
+    if (els.status) {
+        els.status.innerHTML = `<span class="status-dot" style="animation:pulse 1.5s infinite;"></span><span>Analyzing...</span>`;
+    }
+    if (els.timeline) {
+        els.timeline.innerHTML = `
+            <div class="empty-state">
+                <div class="loading-spinner"></div>
+                <h3>Processing...</h3>
+                <p style="color:var(--text-muted); margin-top:10px;">Analyzing GDS log data</p>
+            </div>`;
+    }
+};
+
 const processInput = () => {
     if (!els.input) return;
     const raw = els.input.value;
     
     if (!raw || !raw.trim()) {
         renderTimeline(els.timeline, []);
-        if (els.status) els.status.textContent = "Ready - Auto-Analyzing";
+        if (els.status) els.status.innerHTML = `<span class="status-dot"></span><span>Ready - Auto-Analyzing</span>`;
         return;
     }
 
-    try {
-        const events = parseLog(raw);
-        
-        // Analyze booking changes
-        const analysis = analyzeBookingChanges(events);
-        
-        // Render with summary and change details
-        renderTimeline(els.timeline, {
-            events: analysis.events,
-            summary: analysis.summary,
-            changes: analysis.changes
-        });
-        
-        const count = analysis.events.length;
-        const changeCount = analysis.changes.length;
-        
-        if (els.status) {
-            els.status.textContent = changeCount > 0 
-                ? `Analyzed ${count} events, ${changeCount} change(s) detected`
-                : `Analyzed ${count} events`;
+    // Show loading state
+    showLoading();
+
+    // Use requestIdleCallback for better performance on heavy operations
+    const processHeavy = () => {
+        try {
+            const events = parseLog(raw);
+            
+            // Analyze booking changes
+            const analysis = analyzeBookingChanges(events);
+            
+            // Render with summary and change details
+            renderTimeline(els.timeline, {
+                events: analysis.events,
+                summary: analysis.summary,
+                changes: analysis.changes
+            });
+            
+            const count = analysis.events.length;
+            const changeCount = analysis.changes.length;
+            
+            if (els.status) {
+                els.status.innerHTML = changeCount > 0 
+                    ? `<span class="status-dot" style="background:var(--warning-amber);"></span><span>Analyzed ${count} events, ${changeCount} change(s) detected</span>`
+                    : `<span class="status-dot" style="background:var(--success-green);"></span><span>Analyzed ${count} events</span>`;
+            }
+        } catch (e) {
+            // Better error handling without console.error in production
+            const errorMessage = e.message || "Unknown error occurred";
+            if (els.status) {
+                els.status.innerHTML = `<span class="status-dot" style="background:var(--error-red);"></span><span style="color:var(--error-red);">⚠️ Error: ${errorMessage}</span>`;
+            }
+            if (els.timeline) {
+                renderTimeline(els.timeline, []);
+                els.timeline.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon" style="color:var(--error-red);">⚠️</div>
+                        <h3>Parsing Error</h3>
+                        <p style="color:var(--text-muted); margin-top:10px;">${errorMessage}</p>
+                        <p style="color:var(--text-dim); font-size:12px; margin-top:8px;">Please check your input and try again.</p>
+                    </div>`;
+            }
         }
-    } catch (e) {
-        console.error(e);
-        if (els.status) els.status.textContent = "Error parsing log";
+    };
+
+    // Use requestIdleCallback if available, otherwise setTimeout
+    if (window.requestIdleCallback) {
+        requestIdleCallback(processHeavy, { timeout: 1000 });
+    } else {
+        setTimeout(processHeavy, 0);
     }
 };
 
@@ -90,14 +131,7 @@ if (els.tabDecoder && els.tabExcessBaggage) {
         e.stopPropagation();
         
         els.tabDecoder.classList.add("active");
-        els.tabDecoder.style.background = "rgba(59,130,246,0.2)";
-        els.tabDecoder.style.borderColor = "var(--primary-blue)";
-        els.tabDecoder.style.color = "var(--primary-blue)";
-        
         els.tabExcessBaggage.classList.remove("active");
-        els.tabExcessBaggage.style.background = "rgba(255,255,255,0.05)";
-        els.tabExcessBaggage.style.borderColor = "var(--glass-border)";
-        els.tabExcessBaggage.style.color = "var(--text-muted)";
         
         if (els.decoderSection) els.decoderSection.style.display = "block";
         if (els.decoderOutput) els.decoderOutput.style.display = "block";
@@ -109,29 +143,43 @@ if (els.tabDecoder && els.tabExcessBaggage) {
         e.stopPropagation();
         
         els.tabExcessBaggage.classList.add("active");
-        els.tabExcessBaggage.style.background = "rgba(59,130,246,0.2)";
-        els.tabExcessBaggage.style.borderColor = "var(--primary-blue)";
-        els.tabExcessBaggage.style.color = "var(--primary-blue)";
-        
         els.tabDecoder.classList.remove("active");
-        els.tabDecoder.style.background = "rgba(255,255,255,0.05)";
-        els.tabDecoder.style.borderColor = "var(--glass-border)";
-        els.tabDecoder.style.color = "var(--text-muted)";
         
         if (els.decoderSection) els.decoderSection.style.display = "none";
         if (els.decoderOutput) els.decoderOutput.style.display = "none";
         if (els.excessBaggageSection) els.excessBaggageSection.style.display = "block";
         
-        // Initialize excess baggage calculator if not already done
+        // Hide hero section when excess baggage is active
+        
+        // Lazy load excess baggage calculator
         if (els.excessBaggageContainer && els.excessBaggageContainer.children.length === 0) {
-            renderExcessBaggageCalculator(els.excessBaggageContainer);
+            // Show loading state
+            els.excessBaggageContainer.innerHTML = `
+                <div class="empty-state">
+                    <div class="loading-spinner"></div>
+                    <h3>Loading Calculator...</h3>
+                </div>`;
+            
+            // Load calculator asynchronously
+            if (window.requestIdleCallback) {
+                requestIdleCallback(() => {
+                    renderExcessBaggageCalculator(els.excessBaggageContainer);
+                }, { timeout: 500 });
+            } else {
+                setTimeout(() => {
+                    renderExcessBaggageCalculator(els.excessBaggageContainer);
+                }, 100);
+            }
         }
     });
 } else {
-    console.error("Tab elements not found:", { 
-        tabDecoder: !!els.tabDecoder, 
-        tabExcessBaggage: !!els.tabExcessBaggage 
-    });
+    // Silent error handling - tabs will work if elements exist
+    if (els.tabDecoder && !els.tabExcessBaggage) {
+        // Only show error if one tab exists but not the other (configuration issue)
+        if (els.status) {
+            els.status.textContent = "⚠️ Navigation configuration issue";
+        }
+    }
 }
 
 processInput();
