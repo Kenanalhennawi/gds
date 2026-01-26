@@ -1,4 +1,4 @@
-import { translateAirline, translateCity, translateStatus, translateEnvelope, translateHeaderType, translateOSI } from "./translator.js";
+import { translateAirline, translateCity, translateStatus, translateEnvelope, translateHeaderType, translateOSI, translateSSR } from "./translator.js";
 
 export const renderTimeline = (container, data) => {
     container.innerHTML = "";
@@ -297,24 +297,40 @@ export const renderTimeline = (container, data) => {
                     📋 Special Service Requests (SSR):
                 </div>`;
             evt.ssrs.forEach(ssr => {
-                const msg = evt.messages.find(m => m.ssrCode === ssr.code);
-                const explanation = msg ? msg.details || msg.msg : '';
-                const carrierName = translateAirline(ssr.carrier);
+                // Ensure we have required properties
+                if (!ssr || (!ssr.code && !ssr.raw)) return;
+                
+                const ssrCode = ssr.code || 'UNKNOWN';
+                const carrier = ssr.carrier || 'YY';
+                const msg = evt.messages ? evt.messages.find(m => m && m.ssrCode === ssrCode) : null;
+                const explanation = msg ? (msg.details || msg.msg || msg.title || '') : '';
+                const carrierName = translateAirline(carrier);
                 const statusInfo = ssr.status ? translateStatus(ssr.status) : null;
+                
+                // If no explanation from messages, try to get from SSR_EXPLANATIONS directly
+                let finalExplanation = explanation;
+                if (!finalExplanation && ssrCode !== 'UNKNOWN') {
+                    // Try to get explanation from translator
+                    const ssrInfo = translateSSR(ssr.raw || `SSR ${ssrCode} ${carrier}`);
+                    if (ssrInfo) {
+                        finalExplanation = ssrInfo.details || ssrInfo.msg || ssrInfo.title || '';
+                    }
+                }
                 
                 html += `
                     <div style="margin-bottom:8px; padding:10px; background:rgba(96,165,250,0.1); border-radius:6px; border-left:3px solid var(--info-blue); transition:all 0.3s ease;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                            <strong style="color:var(--info-blue); font-size:12px;">SSR ${ssr.code}</strong>
-                            <span style="font-size:11px; color:var(--text-muted);">${ssr.carrier} (${carrierName})</span>
+                            <strong style="color:var(--info-blue); font-size:12px;">SSR ${ssrCode}</strong>
+                            <span style="font-size:11px; color:var(--text-muted);">${carrier} (${carrierName})</span>
                         </div>
                         <div style="font-size:10px; color:var(--text-muted); margin-top:2px; line-height:1.4;">
-                            <div><strong>SSR Code:</strong> ${ssr.code}</div>
-                            <div><strong>Carrier:</strong> ${ssr.carrier} (${carrierName})</div>
+                            <div><strong>SSR Code:</strong> ${ssrCode}</div>
+                            <div><strong>Carrier:</strong> ${carrier} (${carrierName})</div>
                             ${ssr.status ? `<div><strong>Status:</strong> ${ssr.status} ${statusInfo ? `(${statusInfo.label})` : ''}</div>` : ''}
-                            ${explanation ? `<div style="margin-top:4px; color:var(--text-main); font-size:11px;"><strong>Explanation:</strong> ${explanation}</div>` : ''}
+                            ${finalExplanation ? `<div style="margin-top:4px; color:var(--text-main); font-size:11px;"><strong>Explanation:</strong> ${finalExplanation}</div>` : ''}
                         </div>
                         ${ssr.details ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.8; background:rgba(0,0,0,0.2); padding:4px; border-radius:3px;">${ssr.details}</div>` : ''}
+                        ${ssr.raw && !ssr.details ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.8; background:rgba(0,0,0,0.2); padding:4px; border-radius:3px;">${ssr.raw}</div>` : ''}
                     </div>
                 `;
             });
