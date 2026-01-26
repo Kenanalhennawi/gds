@@ -1282,10 +1282,18 @@ body {
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
+/* ========== FIXED SUMMARY CARD ========== */
 .summary-card {
     animation: slideIn 0.5s ease-out;
     box-shadow: var(--shadow-xl);
     border-radius: 20px;
+    /* FIX: Force height to auto so content isn't clipped by .glass-panel's 100% height rule */
+    height: auto !important; 
+    min-height: auto;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .summary-card h2 {
