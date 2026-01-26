@@ -460,8 +460,11 @@ body {
 
 .output-section { 
     height: 100%; 
-    overflow: hidden;
+    overflow-y: auto;
+    overflow-x: hidden;
     animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
 }
 
 @keyframes slideInRight {
@@ -557,9 +560,12 @@ body {
 
 /* ========== TIMELINE & CARDS ========== */
 .timeline-container {
-    height: 100%;
+    flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    padding: 24px;
     padding-right: 10px;
+    min-height: 0;
     display: flex;
     flex-direction: column;
     gap: 20px;
