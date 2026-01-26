@@ -64,8 +64,8 @@ export const renderTimeline = (container, data) => {
 
         // Get envelope explanation
         const envelopeInfo = translateEnvelope(evt.envelope);
-        let action = envelopeInfo.title;
-        let actionDesc = envelopeInfo.desc;
+        let action = envelopeInfo ? envelopeInfo.title : (evt.envelope || 'SYS');
+        let actionDesc = envelopeInfo ? envelopeInfo.desc : 'System message';
         
         // Parse header for additional context
         let headerInfo = "";
