@@ -41,7 +41,6 @@ export const renderTimeline = (container, data) => {
             <div class="empty-state modern-empty">
                 <div class="empty-icon-large">📊</div>
                 <h3>No Data Detected</h3>
-                <p>We take you beyond the ordinary, to places where data comes alive, insights leave you breathless, and every log becomes a story to tell.</p>
                 <p style="margin-top: 12px; font-size: 14px; color: var(--text-dim);">Paste a valid history log to begin analysis and unlock powerful insights.</p>
                 <div class="empty-actions">
                     <button class="btn-hero" onclick="document.getElementById('gdsInput')?.focus()">
