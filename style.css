@@ -176,12 +176,10 @@ body {
     background: var(--primary-blue);
 }
 
-/* Enhanced Styled Inputs and Selects - Optimized for Performance */
+/* Enhanced Styled Inputs and Selects */
 .styled-input,
 .styled-select {
-    /* Minimal transitions for better performance */
     transition: border-color 0.15s ease, background-color 0.15s ease !important;
-    /* Optimize rendering */
     contain: layout style paint;
     will-change: border-color;
 }
@@ -200,11 +198,9 @@ body {
     outline: none !important;
 }
 
-/* Optimize select for instant interaction */
+/* Optimize select */
 .styled-select {
-    /* Disable expensive operations during interaction */
     contain: strict;
-    /* Prevent reflow during dropdown open */
     backface-visibility: hidden;
     transform: translateZ(0);
 }
@@ -213,7 +209,6 @@ body {
     border-color: var(--primary-orange) !important;
 }
 
-/* Optimize select option rendering */
 .styled-select option {
     background: rgba(20, 25, 35, 0.95);
     color: var(--text-main);
@@ -229,13 +224,12 @@ body {
     color: var(--primary-orange-light);
 }
 
-/* Prevent layout thrashing on select open */
 select.styled-select {
     contain: strict;
     isolation: isolate;
 }
 
-/* Service Tabs Enhanced Styling */
+/* Service Tabs */
 .service-tab {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     position: relative;
@@ -275,7 +269,7 @@ select.styled-select {
     background: rgba(59, 130, 246, 0.3) !important;
 }
 
-/* Buttons Enhanced Styling */
+/* Buttons */
 .btn-primary,
 .btn-glass {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -329,7 +323,6 @@ select.styled-select {
     transform: translateY(0);
 }
 
-/* Autocomplete Dropdown Items */
 .autocomplete-dropdown > div {
     transition: all 0.2s ease !important;
 }
@@ -345,7 +338,6 @@ select.styled-select {
     transform: translateX(2px);
 }
 
-/* Labels Enhanced */
 label {
     transition: color 0.3s ease;
 }
@@ -355,18 +347,6 @@ label {
     color: var(--primary-blue);
 }
 
-/* Select Option Styling */
-.styled-select option {
-    background: rgba(20, 25, 35, 0.95);
-    color: var(--text-main);
-    padding: 8px;
-}
-
-.styled-select option:hover {
-    background: rgba(59, 130, 246, 0.2);
-}
-
-/* Glass Panel Hover Effect */
 .glass-panel {
     transition: all 0.3s ease;
 }
@@ -377,7 +357,6 @@ label {
         0 0 0 1px rgba(59, 130, 246, 0.1);
 }
 
-/* Result Display Animations */
 #rateResult {
     animation: slideInUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -393,7 +372,6 @@ label {
     }
 }
 
-/* Focus Ring Animation */
 @keyframes focusRing {
     0% {
         box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.4);
@@ -480,11 +458,26 @@ label {
     font-weight: 600;
 }
 
+/* --- FIXED SCROLLING CSS --- */
 .output-section { 
+    position: relative; 
     height: 100%; 
     overflow: hidden;
     animation: slideInRight 0.5s ease-out;
 }
+
+.timeline-container {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    padding-right: 10px;
+    padding-bottom: 60px; /* Prevents last card cut-off */
+    padding-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+/* --------------------------- */
 
 @keyframes slideInRight {
     from {
@@ -495,14 +488,6 @@ label {
         opacity: 1;
         transform: translateX(0);
     }
-}
-.timeline-container {
-    height: 100%;
-    overflow-y: auto;
-    padding-right: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
 }
 
 .timeline-card {
@@ -519,6 +504,7 @@ label {
         0 0 0 1px rgba(59, 130, 246, 0.05) inset;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
+    flex-shrink: 0; /* Ensures cards don't shrink in flex container */
 }
 
 .timeline-card::after {
@@ -739,13 +725,6 @@ label {
     border-left-color: var(--success-green);
     border: 1px solid rgba(74, 222, 128, 0.3); 
     color: #86efac; 
-}
-
-.alert-warning {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(251, 191, 36, 0.08));
-    border-left-color: var(--warning-amber);
-    border: 1px solid rgba(251, 191, 36, 0.3);
-    color: #fcd34d;
 }
 
 .alert-error {
