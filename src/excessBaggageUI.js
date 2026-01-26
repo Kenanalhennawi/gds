@@ -636,8 +636,9 @@ export function renderExcessBaggageCalculator(container) {
             
             displayResult(resultDiv, result, service);
         } catch (e) {
-            console.error(e);
-            showError(resultDiv, `Error: ${e.message}`);
+            // Better error handling without console.error
+            const errorMessage = e.message || "An error occurred while calculating rates";
+            showError(resultDiv, `Error: ${errorMessage}`);
         }
     });
 }
