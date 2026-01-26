@@ -964,3 +964,18 @@ label {
 ::-webkit-scrollbar-thumb:hover { 
     background: var(--accent-purple);
 }
+.summary-card {
+    animation: slideIn 0.4s ease-out;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+    /* Add these lines to ensure robustness */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100px;
+}
+
+.summary-card p {
+    margin-top: 5px;
+    line-height: 1.5;
+    opacity: 0.9;
+}
