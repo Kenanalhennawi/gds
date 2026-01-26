@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GDS Decoder | Enterprise</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-background"></div>
+    <div class="app-overlay"></div>
+
+    <div class="app-container">
+        <header class="app-header">
+            <div class="logo">
+                <div class="logo-icon">GDS</div>
+                <div class="logo-text">
+                    <h1>Decoder</h1>
+                    <span>Enterprise Edition</span>
+                </div>
+            </div>
+            <div class="header-tabs" style="display:flex; gap:10px; margin-left:30px; position:relative; z-index:10;">
+                <button id="tabDecoder" class="tab-btn active" style="padding:8px 16px; background:rgba(59,130,246,0.2); border:1px solid var(--primary-blue); border-radius:6px; color:var(--primary-blue); font-weight:600; cursor:pointer; transition:all 0.3s; position:relative; z-index:11; pointer-events:auto;">
+                    GDS Decoder
+                </button>
+                <button id="tabExcessBaggage" class="tab-btn" style="padding:8px 16px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:6px; color:var(--text-muted); font-weight:600; cursor:pointer; transition:all 0.3s; position:relative; z-index:11; pointer-events:auto;">
+                    Excess Baggage Policy
+                </button>
+            </div>
+            <div class="actions">
+                <button id="btnClear" class="btn-glass">Clear Console</button>
+            </div>
+        </header>
+
+        <main class="workspace">
+            <!-- GDS Decoder Section -->
+            <section id="decoderSection" class="input-section">
+                <div class="glass-panel">
+                    <textarea id="gdsInput" placeholder="Paste raw GDS history, PNR logs, or EDIFACT messages here... Auto-analysis starts automatically."></textarea>
+                    <div class="panel-footer">
+                        <div class="input-status" id="inputStatus">Ready - Auto-Analyzing</div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="decoderOutput" class="output-section">
+                <div id="timeline" class="timeline-container">
+                    <div class="empty-state">
+                        <div class="empty-icon">waiting</div>
+                        <h3>Awaiting Data</h3>
+                        <p>Paste history logs to begin automatic analysis.</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Excess Baggage Policy Section -->
+            <section id="excessBaggageSection" class="excess-baggage-section" style="display:none; grid-column:1/-1; padding:20px;">
+                <div id="excessBaggageContainer"></div>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="src/main.js"></script>
+</body>
+</html>
