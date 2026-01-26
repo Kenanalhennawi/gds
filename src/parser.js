@@ -132,7 +132,7 @@ export const parseLog = (input) => {
     const extractPassengers = (line) => {
         const paxes = [];
         const titles = ['MASTER', 'MSTR', 'MISS', 'MRS', 'MR', 'MS', 'DR', 'PROF', 'REV', 'HON'];
-        const regex = /^\d+([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?/g;
+        const regex = /\d+([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?/g;
         let match;
         while ((match = regex.exec(line)) !== null) {
             let surname = match[1].trim();
@@ -188,6 +188,10 @@ export const parseLog = (input) => {
         }
 
         if (line.startsWith("HDQ") || line.match(/^[.\s]*HDQ/)) {
+            // FIX: Finalize previous block if it has content, preventing lines from being eaten
+            if (currentBlock && (currentBlock.segments.length > 0 || currentBlock.passengers.length > 0)) {
+                finalizeBlock();
+            }
             if (!currentBlock) startNewBlock("SYS", "HDQ", line);
             parseContextFromHeader(currentBlock, null, line);
             return;
@@ -207,6 +211,21 @@ export const parseLog = (input) => {
         const foundPaxes = extractPassengers(line);
         if (foundPaxes.length > 0) {
             currentBlock.passengers.push(...foundPaxes);
+            return;
+        }
+
+        // --- ENHANCED SEGMENT PARSING (Fix for "HK1/0035" and similar formats) ---
+        const segSlashStatusMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4})([A-Z]?)\s*(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d{1,2})(?:\/|$|\s)/);
+        if (segSlashStatusMatch) {
+            currentBlock.segments.push({
+                carrier: segSlashStatusMatch[1],
+                flight: segSlashStatusMatch[2],
+                fareClass: segSlashStatusMatch[3] || '',
+                date: segSlashStatusMatch[4],
+                from: segSlashStatusMatch[5],
+                to: segSlashStatusMatch[6],
+                status: segSlashStatusMatch[7]
+            });
             return;
         }
 
@@ -255,9 +274,6 @@ export const parseLog = (input) => {
             return;
         }
 
-        // --- FIXED SSR LOGIC ---
-
-        // 1. Standard SSR line
         const ssrMatch = line.match(/^SSR\s+([A-Z]{4})\s+([A-Z0-9]{2})\s+([A-Z]{2}\d+)?/i);
         if (ssrMatch) {
             const ssrCode = ssrMatch[1];
@@ -278,20 +294,15 @@ export const parseLog = (input) => {
             return;
         }
 
-        // 2. SSR continuation lines (e.g. "HK1/P/AFG/...")
-        // If we have a previous SSR and this line looks like APIS data (HK1/...) or starts with slash
         const continuationMatch = line.match(/^(HK\d+|[A-Z]{2}\d+)\//) || line.startsWith('/');
         if (continuationMatch && currentBlock.ssrs.length > 0) {
             const lastSSR = currentBlock.ssrs[currentBlock.ssrs.length - 1];
-            // Only append if it looks like DOCS/DOCO/DOCA which use this format
             if (['DOCS', 'DOCO', 'DOCA'].includes(lastSSR.code)) {
                 lastSSR.details += (lastSSR.details ? ' ' : '') + line;
                 lastSSR.raw += '\n' + line;
                 
-                // Re-translate with full data to get correct explanation
                 const fullSSRInfo = translateSSR(lastSSR.code + ' ' + lastSSR.details);
                 if (fullSSRInfo) {
-                    // Update existing message if it exists
                     const existingMsgIndex = currentBlock.messages.findIndex(m => m.ssrCode === lastSSR.code);
                     if (existingMsgIndex >= 0) {
                         currentBlock.messages[existingMsgIndex] = fullSSRInfo;
@@ -303,7 +314,6 @@ export const parseLog = (input) => {
             }
         }
         
-        // 3. SSR without space (e.g. SSRTKNE)
         const ssrGluedMatch = line.match(/^SSR([A-Z]{4})([A-Z0-9]{2})([A-Z]{2}\d+)?/i);
         if (ssrGluedMatch) {
             const ssrCode = ssrGluedMatch[1];
@@ -324,7 +334,6 @@ export const parseLog = (input) => {
             return;
         }
         
-        // 4. SSR slash format
         const ssrSlashMatch = line.match(/^SSR([A-Z]{4})([A-Z0-9]{2})([A-Z]{2}\d+)?\/([^\s-]+)(?:-([^\s]+))?/i);
         if (ssrSlashMatch) {
             const ssrCode = ssrSlashMatch[1];
