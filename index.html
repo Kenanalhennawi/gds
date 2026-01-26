@@ -5,60 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GDS Decoder | Enterprise</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="app-background"></div>
     <div class="app-overlay"></div>
+    <div class="hero-particles"></div>
 
     <div class="app-container">
         <header class="app-header">
             <div class="logo">
-                <div class="logo-icon">GDS</div>
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
                 <div class="logo-text">
-                    <h1>Decoder</h1>
+                    <h1>GDS Decoder</h1>
                     <span>Enterprise Edition</span>
                 </div>
             </div>
-            <div class="header-tabs" style="display:flex; gap:10px; margin-left:30px; position:relative; z-index:10;">
-                <button id="tabDecoder" class="tab-btn active" style="padding:8px 16px; background:rgba(59,130,246,0.2); border:1px solid var(--primary-blue); border-radius:6px; color:var(--primary-blue); font-weight:600; cursor:pointer; transition:all 0.3s; position:relative; z-index:11; pointer-events:auto;">
-                    GDS Decoder
-                </button>
-                <button id="tabExcessBaggage" class="tab-btn" style="padding:8px 16px; background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); border-radius:6px; color:var(--text-muted); font-weight:600; cursor:pointer; transition:all 0.3s; position:relative; z-index:11; pointer-events:auto;">
-                    Excess Baggage Policy
-                </button>
-            </div>
+            <nav class="main-nav" role="navigation" aria-label="Main navigation">
+                <div class="header-tabs" role="tablist">
+                    <button id="tabDecoder" class="tab-btn active" role="tab" aria-selected="true" aria-controls="decoderSection decoderOutput" tabindex="0">
+                        <span class="tab-icon" aria-hidden="true">📊</span>
+                        <span>GDS Decoder</span>
+                    </button>
+                    <button id="tabExcessBaggage" class="tab-btn" role="tab" aria-selected="false" aria-controls="excessBaggageSection" tabindex="0">
+                        <span class="tab-icon" aria-hidden="true">✈️</span>
+                        <span>Excess Baggage</span>
+                    </button>
+                </div>
+            </nav>
             <div class="actions">
-                <button id="btnClear" class="btn-glass">Clear Console</button>
+                <button id="btnClear" class="btn-glass" aria-label="Clear console and reset input" title="Clear Console">
+                    <span>Clear Console</span>
+                </button>
             </div>
         </header>
 
         <main class="workspace">
             <!-- GDS Decoder Section -->
             <section id="decoderSection" class="input-section">
-                <div class="glass-panel">
-                    <textarea id="gdsInput" placeholder="Paste raw GDS history, PNR logs, or EDIFACT messages here... Auto-analysis starts automatically."></textarea>
+                <div class="glass-panel modern-panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">
+                            <span class="title-icon">📝</span>
+                            Input Console
+                        </h3>
+                    </div>
+                    <textarea id="gdsInput" 
+                        placeholder="Paste raw GDS history, PNR logs, or EDIFACT messages here...&#10;&#10;Auto-analysis starts automatically as you type."
+                        aria-label="GDS log input area"
+                        aria-describedby="inputStatus"></textarea>
                     <div class="panel-footer">
-                        <div class="input-status" id="inputStatus">Ready - Auto-Analyzing</div>
+                        <div class="input-status" id="inputStatus" role="status" aria-live="polite" aria-atomic="true">
+                            <span class="status-dot" aria-hidden="true"></span>
+                            <span>Ready - Auto-Analyzing</span>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section id="decoderOutput" class="output-section">
-                <div id="timeline" class="timeline-container">
-                    <div class="empty-state">
-                        <div class="empty-icon">waiting</div>
-                        <h3>Awaiting Data</h3>
-                        <p>Paste history logs to begin automatic analysis.</p>
+            <section id="decoderOutput" class="output-section" role="region" aria-label="GDS analysis results">
+                <div id="timeline" class="timeline-container" role="log" aria-live="polite" aria-atomic="false">
+                    <div class="empty-state modern-empty">
+                        <div class="empty-icon-large">📊</div>
+                        <h3>No Data Detected</h3>
+                        <p style="margin-top: 12px; font-size: 14px; color: var(--text-dim);">Paste a valid history log to begin analysis and unlock powerful insights.</p>
+                        <div class="empty-actions">
+                            <button class="btn-hero" onclick="document.getElementById('gdsInput')?.focus()" aria-label="Focus on input area to start analysis">
+                                Start Analysis
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
             
             <!-- Excess Baggage Policy Section -->
-            <section id="excessBaggageSection" class="excess-baggage-section" style="display:none; grid-column:1/-1; padding:20px;">
-                <div id="excessBaggageContainer"></div>
+            <section id="excessBaggageSection" class="excess-baggage-section" style="display:none; grid-column:1/-1; padding:20px;" role="region" aria-label="Excess baggage calculator">
+                <div id="excessBaggageContainer" aria-live="polite"></div>
             </section>
         </main>
+        
+        <footer class="app-footer">
+            <p>© Created by <strong>Kenan Alhennawi</strong> 2026</p>
+        </footer>
     </div>
 
     <script type="module" src="src/main.js"></script>
