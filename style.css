@@ -513,14 +513,35 @@ body {
     }
 }
 
+/* ========== TIMELINE & CARDS (FIXED SCROLLING) ========== */
+
 .output-section { 
-    height: 100%;
-    min-height: 0;
-    overflow: hidden;
+    /* The parent must be relative so the child can anchor to it */
+    position: relative; 
+    height: 100%; 
+    width: 100%;
+    overflow: hidden; /* Hide anything that spills out */
     animation: slideInRight 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.timeline-container {
+    /* Absolute positioning forces it to fill the exact size of the parent */
+    position: absolute;
+    inset: 0; /* Equivalent to top:0; right:0; bottom:0; left:0; */
+    
+    /* This enables the scrolling */
+    overflow-y: auto !important; 
+    overflow-x: hidden;
+    
+    /* Spacing */
+    padding: 24px;
+    padding-right: 12px; /* Slight adjustment for scrollbar space */
+    padding-bottom: 80px; /* Extra padding at bottom so last card isn't cut off */
+    
+    /* Internal layout for the cards */
     display: flex;
     flex-direction: column;
-    position: relative;
+    gap: 20px;
 }
 
 @keyframes slideInRight {
@@ -532,6 +553,26 @@ body {
         opacity: 1;
         transform: translateX(0);
     }
+}
+
+/* Custom scrollbar for timeline */
+.timeline-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.timeline-container::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.timeline-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--primary-blue), var(--primary-orange));
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.timeline-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--primary-blue-light), var(--primary-orange-light));
 }
 
 #gdsInput {
@@ -612,42 +653,6 @@ body {
         transform: scale(1.2);
         opacity: 0.7;
     }
-}
-
-/* ========== TIMELINE & CARDS ========== */
-.timeline-container {
-    flex: 1;
-    overflow-y: auto !important;
-    overflow-x: hidden;
-    padding: 24px;
-    padding-right: 10px;
-    padding-bottom: 40px;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    position: relative;
-    height: 0; /* Force flex child to respect parent constraints */
-}
-
-/* Custom scrollbar for timeline */
-.timeline-container::-webkit-scrollbar {
-    width: 8px;
-}
-
-.timeline-container::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-}
-
-.timeline-container::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
-    border-radius: 4px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.timeline-container::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, var(--primary-blue-light), var(--primary-orange-light));
 }
 
 .timeline-card {
