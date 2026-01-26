@@ -588,9 +588,11 @@ export const translateEnvelope = (code) => {
         'QW': { title: 'Query Wait', desc: 'Query wait message indicating system is processing.' },
         'QX': { title: 'Query Cancel', desc: 'Query cancel message to cancel a pending query.' },
         'QY': { title: 'Query Yes', desc: 'Query yes response confirming an action.' },
-        'QZ': { title: 'Query No', desc: 'Query no response denying an action.' }
+        'QZ': { title: 'Query No', desc: 'Query no response denying an action.' },
+        'SYS': { title: 'SYS', desc: 'System message from the GDS host. This is a system-generated message or notification.' },
+        'UNK': { title: 'Unknown', desc: 'Unknown or unrecognized message format.' }
     };
-    return map[code] || { title: code, desc: 'Unknown message envelope type.' };
+    return map[code] || { title: code || 'Unknown', desc: 'Unknown message envelope type.' };
 };
 
 // Comprehensive Header Type explanations - Actual GDS header types used in practice
