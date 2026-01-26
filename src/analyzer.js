@@ -16,7 +16,8 @@ const segmentKey = (seg) => {
 // Check if status indicates confirmed
 const isConfirmed = (status) => {
     const s = (status || "").substring(0, 2).toUpperCase();
-    return ['HK', 'KK', 'KL', 'SS'].includes(s);
+    // FIXED: Added 'LK', 'PK', 'RR' to the list so your segments are seen as Active
+    return ['HK', 'KK', 'KL', 'SS', 'LK', 'PK', 'RR'].includes(s);
 };
 
 // Check if status indicates cancelled
@@ -60,6 +61,7 @@ export const analyzeBookingChanges = (events) => {
     const segmentHistory = new Map(); // Track segments across events: key -> {firstSeen, lastSeen, statusHistory}
     
     // First pass: build segment history
+    // (This logic is preserved as requested to track the full lifecycle of segments)
     events.forEach((event, eventIndex) => {
         event.segments.forEach(seg => {
             const key = segmentKey(seg);
@@ -183,7 +185,6 @@ export const analyzeBookingChanges = (events) => {
         // 4. Check for booking-level cancellations (all segments cancelled)
         if (currEvent.segments.length > 0) {
             const allCancelled = currEvent.segments.every(s => isCancelled(s.status));
-            const allConfirmed = currEvent.segments.every(s => isConfirmed(s.status));
             const hasFDIS = currEvent.segments.some(s => isScheduleChange(s.status));
             const hasChangeStatus = currEvent.segments.some(s => isChangeStatus(s.status));
             
@@ -259,7 +260,7 @@ const generateSummary = (events, changes, segmentHistory) => {
             
             if (hasChangeStatus) {
                 return {
-                    status: "Booking Changes Detected",
+                    status: "Booking Changes Pending",
                     description: "One or more segments have change/hold status, indicating modifications to the booking.",
                     alertLevel: "warning"
                 };
@@ -284,6 +285,7 @@ const generateSummary = (events, changes, segmentHistory) => {
             }
         }
         
+        // This handles cases where the parser found events but no segments (e.g., just remarks)
         return {
             status: "No Changes Detected",
             description: "No significant booking changes were detected in the history.",
