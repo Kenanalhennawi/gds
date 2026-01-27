@@ -162,12 +162,25 @@ export const parseLog = (input) => {
         // Also handle: 1AL FAHD/SHAMSA MUJALLI F A MS (with spaces in name)
         // Pattern must start with single digit (1-9) followed by letters, not numbers
         // This avoids matching things like "BAB9HM/67599313" or "OUL42M"
-        const regex = /(?:^|\s)([1-9])([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?(?:\s|$)/g;
+        // Updated to handle names like "1HOTAKI/LEEMAMS" where MS is title attached to name
+        // Must be followed by space, end of line, or airline code pattern (2 letters + number)
+        const regex = /(?:^|\s)([1-9])([A-Z]+)\/([A-Z]+)(?=\s|$|[A-Z]{2}\d)/g;
         let match;
         while ((match = regex.exec(line)) !== null) {
-            let surname = match[2].trim();
-            let given = match[3].trim();
-            let title = match[4] ? match[4].trim() : "";
+            let surname = match[2];
+            let given = match[3];
+            let title = "";
+            
+            // Check if title is at the end of given name (e.g., LEEMAMS -> LEEMA + MS)
+            // Check longest titles first to avoid partial matches
+            for (const t of titles) {
+                const upperGiven = given.toUpperCase();
+                if (upperGiven.endsWith(t)) {
+                    title = t;
+                    given = given.substring(0, given.length - t.length);
+                    break;
+                }
+            }
             
             // Skip if surname or given name contains invalid keywords
             const fullNameUpper = (surname + ' ' + given).toUpperCase();
@@ -180,34 +193,17 @@ export const parseLog = (input) => {
                 continue;
             }
             
-            // Check if title is at the end of given name (e.g., SAUDMR -> SAUD + MR)
-            // Check longest titles first to avoid partial matches
-            if (!title) {
-                for (const t of titles) {
-                    const upperGiven = given.toUpperCase();
-                    if (upperGiven.endsWith(t)) {
-                        title = t;
-                        given = given.substring(0, given.length - t.length).trim();
-                        break;
-                    }
-                }
-            }
-            
             // Also check surname for titles (less common but possible)
             if (!title) {
                 for (const t of titles) {
                     const upperSurname = surname.toUpperCase();
                     if (upperSurname.endsWith(t)) {
                         title = t;
-                        surname = surname.substring(0, surname.length - t.length).trim();
+                        surname = surname.substring(0, surname.length - t.length);
                         break;
                     }
                 }
             }
-            
-            // Clean up any extra spaces
-            surname = surname.replace(/\s+/g, ' ');
-            given = given.replace(/\s+/g, ' ');
             
             paxes.push({
                 raw: match[0].trim(),
