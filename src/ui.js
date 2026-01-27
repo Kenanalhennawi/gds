@@ -168,12 +168,12 @@ export const renderTimeline = (container, data) => {
             }
             
             if (evt.timestamp) {
-                // Format timestamp: 050437 -> 05:04:37 or date format
+                // Format timestamp: 050437 -> 05:04:37 or 022222 -> 02:22:22
                 const ts = evt.timestamp;
                 const formattedTime = ts.length === 6 ? `${ts.substring(0,2)}:${ts.substring(2,4)}:${ts.substring(4,6)}` : ts;
                 contextHtml += `<div class="context-row">
                     <span class="ctx-label">Timestamp:</span> 
-                    <span class="ctx-val">${formattedTime}</span>
+                    <span class="ctx-val" title="Time in HH:MM:SS format (24-hour)">${formattedTime}</span>
                 </div>`;
             }
             
