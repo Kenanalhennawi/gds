@@ -154,14 +154,29 @@ export const parseLog = (input) => {
         // Common titles that might appear at the end of names (sorted by length, longest first)
         const titles = ['MASTER', 'MSTR', 'MISS', 'MRS', 'MR', 'MS', 'DR', 'PROF', 'REV', 'HON'];
         
+        // Keywords that indicate this is NOT a passenger name (SSR/OSI content)
+        const invalidKeywords = ['PAX', 'YRS', 'VISA', 'PASSPORT', 'CITIZENS', 'SHOULD', 'MUST', 'TRVL', 'REFER', 'EMBASSY', 'DETAILS', 'TKTD', 'XLD', 'DUE', 'NOT', 'BELOW', 'TOURIST', 'VISIT', 'PARENT', 'AUTHORISED', 'GUARDIAN'];
+        
         // Pattern: 1SURNAME/GIVEN or 1SURNAME/GIVENTITLE or 1SURNAME/GIVEN TITLE
         // Also handle: 1AL FAHD/SHAMSA MUJALLI F A MS (with spaces in name)
-        const regex = /\d+([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?/g;
+        // More strict: require name to start at beginning of line or after space, and not be part of SSR/OSI
+        const regex = /(?:^|\s)(\d+)([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?(?:\s|$)/g;
         let match;
         while ((match = regex.exec(line)) !== null) {
-            let surname = match[1].trim();
-            let given = match[2].trim();
-            let title = match[3] ? match[3].trim() : "";
+            let surname = match[2].trim();
+            let given = match[3].trim();
+            let title = match[4] ? match[4].trim() : "";
+            
+            // Skip if surname or given name contains invalid keywords
+            const fullNameUpper = (surname + ' ' + given).toUpperCase();
+            if (invalidKeywords.some(keyword => fullNameUpper.includes(keyword))) {
+                continue;
+            }
+            
+            // Skip if surname or given name is too long (likely not a name)
+            if (surname.length > 30 || given.length > 30) {
+                continue;
+            }
             
             // Check if title is at the end of given name (e.g., SAUDMR -> SAUD + MR)
             // Check longest titles first to avoid partial matches
@@ -193,7 +208,7 @@ export const parseLog = (input) => {
             given = given.replace(/\s+/g, ' ');
             
             paxes.push({
-                raw: match[0],
+                raw: match[0].trim(),
                 surname: surname,
                 given: given,
                 title: title
@@ -232,14 +247,28 @@ export const parseLog = (input) => {
         }
 
         // Detect header types (must be at start of line or after certain patterns)
-        const headerTypeMatch = line.match(/^(TRL|AKA|ASC|NAR|DVD|NCO)\s*/);
+        // Also handle format like "DXBRMEK .HDQRMFZ 161248 ASC" where ASC comes after timestamp
+        const headerTypeMatch = line.match(/^(TRL|AKA|ASC|NAR|DVD|NCO)\s*/) || line.match(/\s+(TRL|AKA|ASC|NAR|DVD|NCO)\s*$/);
         if (headerTypeMatch && currentBlock) {
             currentBlock.headerType = headerTypeMatch[1];
         }
 
         // Handle lines starting with HDQ (including HDQKQ, HDQRMFZ, etc.)
-        if (line.startsWith("HDQ") || line.match(/^[.\s]*HDQ/)) {
-            if (!currentBlock) startNewBlock("SYS", "HDQ", line);
+        // Also handle format like "DXBRMEK .HDQRMFZ" or ".HDQRMFZ"
+        if (line.startsWith("HDQ") || line.match(/^[.\s]*HDQ/) || line.match(/^[A-Z]{3}[A-Z0-9]{2}\s+\.HDQ/)) {
+            if (!currentBlock) {
+                // Check if line has format like "DXBRMEK .HDQRMFZ" - extract office and airline
+                const officeHdqMatch = line.match(/^([A-Z]{3})([A-Z0-9]{2})\s+\.HDQ/);
+                if (officeHdqMatch) {
+                    startNewBlock("SYS", "HDQ", line);
+                    if (currentBlock) {
+                        currentBlock.context.office = officeHdqMatch[1];
+                        currentBlock.context.airline = officeHdqMatch[2];
+                    }
+                } else {
+                    startNewBlock("SYS", "HDQ", line);
+                }
+            }
             parseContextFromHeader(currentBlock, null, line);
             return;
         }
@@ -255,10 +284,26 @@ export const parseLog = (input) => {
             else return; 
         }
 
-        const foundPaxes = extractPassengers(line);
-        if (foundPaxes.length > 0) {
-            currentBlock.passengers.push(...foundPaxes);
-            return;
+        // Skip passenger extraction from SSR/OSI lines to avoid false matches
+        // Check if line is SSR or OSI before extracting passengers
+        const isSSROrOSI = line.match(/^(SSR|OSI)\s+/i);
+        
+        // Only extract passengers if line is not SSR/OSI and matches passenger pattern
+        if (!isSSROrOSI) {
+            const foundPaxes = extractPassengers(line);
+            if (foundPaxes.length > 0) {
+                // Additional validation: passenger names should not contain common SSR/OSI keywords
+                const ssrKeywords = ['PAX', 'YRS', 'VISA', 'PASSPORT', 'CITIZENS', 'SHOULD', 'MUST', 'TRVL', 'REFER', 'EMBASSY', 'DETAILS', 'TKTD', 'XLD', 'DUE', 'NOT'];
+                const validPaxes = foundPaxes.filter(p => {
+                    const fullName = (p.surname + ' ' + p.given).toUpperCase();
+                    return !ssrKeywords.some(keyword => fullName.includes(keyword));
+                });
+                
+                if (validPaxes.length > 0) {
+                    currentBlock.passengers.push(...validPaxes);
+                    return;
+                }
+            }
         }
 
         // Try standard segment format: FZ123 24JAN DXBADD HK1
