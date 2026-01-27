@@ -44,7 +44,7 @@ export const parseLog = (input) => {
             rawHeader: rawLine,
             headerType: null,
             timestamp: null,
-            context: { airline: null, recordLocator: null, office: null, gdsSystem: null },
+            context: { airline: null, recordLocator: null, office: null },
             segments: [],
             messages: [],
             ssrs: [],
@@ -54,8 +54,7 @@ export const parseLog = (input) => {
         };
         parseContextFromHeader(currentBlock, header, rawLine);
         
-        // Extract timestamp from header line (can be at end or in middle)
-        const timeMatch = rawLine.match(/\s+(\d{6})(?:\s|$)/) || rawLine.match(/(\d{6})\s*$/);
+        const timeMatch = rawLine.match(/\s+(\d{6})\s*$/);
         if (timeMatch) {
             currentBlock.timestamp = timeMatch[1];
         }
@@ -175,14 +174,6 @@ export const parseLog = (input) => {
     lines.forEach(line => {
         if (currentBlock) {
             currentBlock.rawLines.push(line);
-        }
-        
-        // Detect GDS System type (1A=Amadeus, 1G=Galileo, 1S=Sabre, etc.)
-        const gdsSystemMatch = line.match(/\b(1[ABFGPS])\b/);
-        if (gdsSystemMatch && currentBlock) {
-            if (!currentBlock.context.gdsSystem) {
-                currentBlock.context.gdsSystem = gdsSystemMatch[1];
-            }
         }
         
         const envMatch = line.match(/^(QP|QK|QD)\s+(\S+)/);
