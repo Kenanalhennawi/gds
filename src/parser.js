@@ -54,8 +54,9 @@ export const parseLog = (input) => {
         };
         parseContextFromHeader(currentBlock, header, rawLine);
         
-        // Extract timestamp from header line (e.g., "050437" or "161459")
-        const timeMatch = rawLine.match(/\s+(\d{6})\s*$/);
+        // Extract timestamp from header line (e.g., "050437", "161459", or "022222")
+        // Can be at end of line or in middle (e.g., "QP MUCRM1A .HDQRMFZ 022222 AKA")
+        const timeMatch = rawLine.match(/\s+(\d{6})(?:\s|$)/) || rawLine.match(/(\d{6})\s*$/);
         if (timeMatch) {
             currentBlock.timestamp = timeMatch[1];
         }
@@ -159,8 +160,9 @@ export const parseLog = (input) => {
         
         // Pattern: 1SURNAME/GIVEN or 1SURNAME/GIVENTITLE or 1SURNAME/GIVEN TITLE
         // Also handle: 1AL FAHD/SHAMSA MUJALLI F A MS (with spaces in name)
-        // More strict: require name to start at beginning of line or after space, and not be part of SSR/OSI
-        const regex = /(?:^|\s)(\d+)([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?(?:\s|$)/g;
+        // Pattern must start with single digit (1-9) followed by letters, not numbers
+        // This avoids matching things like "BAB9HM/67599313" or "OUL42M"
+        const regex = /(?:^|\s)([1-9])([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?(?:\s|$)/g;
         let match;
         while ((match = regex.exec(line)) !== null) {
             let surname = match[2].trim();
