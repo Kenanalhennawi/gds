@@ -156,9 +156,14 @@ export const renderTimeline = (container, data) => {
                     }
                 }
                 
+                // Clean header - remove timestamp if present (6 digits like 022222)
+                let cleanHeader = evt.rawHeader;
+                // Remove timestamp pattern (6 digits) from header display
+                cleanHeader = cleanHeader.replace(/\s+\d{6}(?:\s|$)/g, ' ').trim();
+                
                 contextHtml += `<div class="context-row">
                     <span class="ctx-label">Header:</span> 
-                    <span class="ctx-val" style="font-family:var(--font-code);">${evt.rawHeader}</span>
+                    <span class="ctx-val" style="font-family:var(--font-code);">${cleanHeader}</span>
                 </div>`;
                 if (headerParts.length > 0) {
                     contextHtml += `<div class="context-row" style="font-size:11px; color:var(--text-muted); margin-top:4px;">
