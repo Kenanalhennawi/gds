@@ -256,7 +256,8 @@ export const parseLog = (input) => {
         }
 
         // --- ENHANCED SEGMENT PARSING (Fix for "HK1/0035" and similar formats) ---
-        const segSlashStatusMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4})([A-Z]?)\s*(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d{1,2})(?:\/|$|\s)/);
+        // Updated to handle NN status (with or without numbers)
+        const segSlashStatusMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4})([A-Z]?)\s*(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d{0,2})(?:\/|$|\s)/);
         if (segSlashStatusMatch) {
             currentBlock.segments.push({
                 carrier: segSlashStatusMatch[1],
@@ -270,7 +271,7 @@ export const parseLog = (input) => {
             return;
         }
 
-        const segMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4})([A-Z]?)\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)/);
+        const segMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4})([A-Z]?)\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d*)/);
         if (segMatch) {
             currentBlock.segments.push({
                 carrier: segMatch[1],
@@ -284,7 +285,7 @@ export const parseLog = (input) => {
             return;
         }
         
-        const segSlashMatch = line.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{6})\s+([A-Z]{2}\d+)$/);
+        const segSlashMatch = line.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{6})\s+([A-Z]{2}\d*)$/);
         if (segSlashMatch) {
             const route = segSlashMatch[7];
             currentBlock.segments.push({
@@ -302,7 +303,7 @@ export const parseLog = (input) => {
             return;
         }
         
-        const segSlashSeparatedMatch = line.match(/^([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{2}\d+)$/);
+        const segSlashSeparatedMatch = line.match(/^([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{2}\d*)$/);
         if (segSlashSeparatedMatch) {
             currentBlock.segments.push({
                 carrier: segSlashSeparatedMatch[1],
@@ -316,7 +317,8 @@ export const parseLog = (input) => {
         }
 
         // NEW: Handle segments with day-of-week prefix and dots: "FZ010W24JAN DOHDXB HK2 .3."
-        const segWithDayPrefixMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)([MTWFS][0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)(?:\s*\.\d+\.)?/);
+        // Updated to handle NN status (with or without numbers)
+        const segWithDayPrefixMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)([MTWFS][0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d*)(?:\s*\.\d+\.)?/);
         if (segWithDayPrefixMatch) {
             currentBlock.segments.push({
                 carrier: segWithDayPrefixMatch[1],
@@ -359,7 +361,8 @@ export const parseLog = (input) => {
         }
 
         // NEW: Handle segments without day prefix but with dots: "FZ010 24JAN DOHDXB HK2 .3."
-        const segWithDotsMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)\s+(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)(?:\s*\.\d+\.)?/);
+        // Updated to handle NN status (with or without numbers)
+        const segWithDotsMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)\s+(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d*)(?:\s*\.\d+\.)?/);
         if (segWithDotsMatch) {
             currentBlock.segments.push({
                 carrier: segWithDotsMatch[1],
