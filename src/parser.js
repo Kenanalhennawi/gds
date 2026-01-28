@@ -27,6 +27,12 @@ const cleanText = (text) => {
     // Pattern: Carrier + Flight + Date + Route + Status + dots, repeated
     clean = clean.replace(/([A-Z]{2}\d{1,4}[A-Z]?[MTWFS]?\d{2}[A-Z]{3}\s+[A-Z]{3}[A-Z]{3}\s+[A-Z]{2}\d+\s*\.\d+\.)\s+(?=[A-Z]{2}\d)/g, "$1\n");
     
+    // NEW: Also split segments with DK format: "FZ010C24JAN DOHDXB DK1/19002110 .4. FZ777C24JAN..."
+    clean = clean.replace(/([A-Z]{2}\d{1,4}[A-Z]?[MTWFS]?\d{2}[A-Z]{3}\s+[A-Z]{3}[A-Z]{3}\s+DK\d+\/\d+(?:\/\d+)?\s*\.\d+\.)\s+(?=[A-Z]{2}\d)/g, "$1\n");
+    
+    // NEW: Split segments without dots but with space: "FZ010W24JAN DOHDXB XX1 FZ777W24JAN..."
+    clean = clean.replace(/([A-Z]{2}\d{1,4}[A-Z]?[MTWFS]?\d{2}[A-Z]{3}\s+[A-Z]{3}[A-Z]{3}\s+[A-Z]{2}\d+)\s+(?=[A-Z]{2}\d{1,4}[A-Z]?[MTWFS]?\d{2}[A-Z]{3})/g, "$1\n");
+    
     // NEW: Split glued SSRs when they start with SSR (e.g. "SSRTKNEFZ... SSRTKNEFZ...")
     clean = clean.replace(/(SSR[A-Z]{4}[A-Z0-9]{2}[A-Z]{2}\d+[A-Z0-9]+)\s+(?=SSR[A-Z]{4})/g, "$1\n");
     
@@ -327,7 +333,8 @@ export const parseLog = (input) => {
         // NEW: Handle segments with DK status and ticket numbers: "FZ010C24JAN DOHDXB DK1/19002110 .4."
         const segWithDKTicketMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)([MTWFS]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+DK(\d+)\/(\d+)(?:\/(\d+))?(?:\s*\.\d+\.)?/);
         if (segWithDKTicketMatch) {
-            const date = segWithDKTicketMatch[4] ? segWithDKTicketMatch[5] : segWithDKTicketMatch[5];
+            // Date is always in group 5 (group 4 is optional day prefix)
+            const date = segWithDKTicketMatch[5];
             const ticketNum = segWithDKTicketMatch[9];
             const ticketSuffix = segWithDKTicketMatch[10] || '';
             const fullTicketNum = ticketSuffix ? `${ticketNum}/${ticketSuffix}` : ticketNum;
