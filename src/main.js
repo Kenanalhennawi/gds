@@ -2,6 +2,7 @@ import { parseLog } from "./parser.js";
 import { renderTimeline } from "./ui.js";
 import { analyzeBookingChanges } from "./analyzer.js";
 import { renderExcessBaggageCalculator } from "./excessBaggageUI.js";
+import { detectSystem, getKnownSystems } from "./systemDetector.js";
 
 const els = {
     input: document.getElementById("gdsInput"),
@@ -10,6 +11,9 @@ const els = {
     clear: document.getElementById("btnClear"),
     outputHint: document.getElementById("outputHint"),
     loadingBar: document.getElementById("loadingBar"),
+    detectedSystemPill: document.getElementById("detectedSystemPill"),
+    detectedConfidencePill: document.getElementById("detectedConfidencePill"),
+    systemsList: document.getElementById("systemsList"),
     tabDecoder: document.getElementById("tabDecoder"),
     tabExcessBaggage: document.getElementById("tabExcessBaggage"),
     decoderSection: document.getElementById("decoderSection"),
@@ -54,6 +58,15 @@ const processInput = () => {
         // Show hint and hide loading bar when input is empty
         if (els.outputHint) els.outputHint.style.display = "flex";
         if (els.loadingBar) els.loadingBar.style.display = "none";
+        // Reset system detection
+        if (els.detectedSystemPill) {
+            els.detectedSystemPill.textContent = "Unknown / Generic";
+            els.detectedSystemPill.className = "system-pill system-unknown";
+        }
+        if (els.detectedConfidencePill) {
+            els.detectedConfidencePill.textContent = "low confidence";
+            els.detectedConfidencePill.className = "confidence-pill confidence-low";
+        }
         return;
     }
 
@@ -63,6 +76,17 @@ const processInput = () => {
     // Use requestIdleCallback for better performance on heavy operations
     const processHeavy = () => {
         try {
+            // Detect GDS system
+            const systemDetection = detectSystem(raw);
+            if (els.detectedSystemPill) {
+                els.detectedSystemPill.textContent = systemDetection.label;
+                els.detectedSystemPill.className = `system-pill system-${systemDetection.id}`;
+            }
+            if (els.detectedConfidencePill) {
+                els.detectedConfidencePill.textContent = `${systemDetection.confidence} confidence`;
+                els.detectedConfidencePill.className = `confidence-pill confidence-${systemDetection.confidence}`;
+            }
+            
             const events = parseLog(raw);
             
             // Analyze booking changes
@@ -217,6 +241,13 @@ if (els.tabDecoder && els.tabExcessBaggage) {
             els.status.textContent = "⚠️ Navigation configuration issue";
         }
     }
+}
+
+// Populate supported systems list
+if (els.systemsList) {
+    const systems = getKnownSystems();
+    const systemsText = systems.map(s => s.label).join(", ");
+    els.systemsList.textContent = systemsText;
 }
 
 processInput();
