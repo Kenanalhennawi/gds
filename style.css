@@ -590,6 +590,121 @@ body {
     letter-spacing: 0.3px;
 }
 
+/* System Detection Styles */
+.system-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(100, 120, 150, 0.15);
+    flex-wrap: wrap;
+}
+
+.system-label {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.system-pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    background: rgba(100, 120, 150, 0.2);
+    border: 1px solid rgba(100, 120, 150, 0.3);
+    color: var(--text-main);
+    transition: all 0.3s ease;
+}
+
+.system-pill.system-amadeus {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(59, 130, 246, 0.15));
+    border-color: rgba(59, 130, 246, 0.4);
+    color: var(--primary-blue-light);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+}
+
+.system-pill.system-sabre {
+    background: linear-gradient(135deg, rgba(249, 115, 22, 0.25), rgba(249, 115, 22, 0.15));
+    border-color: rgba(249, 115, 22, 0.4);
+    color: var(--primary-orange-light);
+    box-shadow: 0 0 12px rgba(249, 115, 22, 0.2);
+}
+
+.system-pill.system-galileo,
+.system-pill.system-travelport {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(16, 185, 129, 0.15));
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #86efac;
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+.system-pill.system-worldspan {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.25), rgba(139, 92, 246, 0.15));
+    border-color: rgba(139, 92, 246, 0.4);
+    color: #c4b5fd;
+    box-shadow: 0 0 12px rgba(139, 92, 246, 0.2);
+}
+
+.system-pill.system-ndc {
+    background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(236, 72, 153, 0.15));
+    border-color: rgba(236, 72, 153, 0.4);
+    color: #f9a8d4;
+    box-shadow: 0 0 12px rgba(236, 72, 153, 0.2);
+}
+
+.confidence-pill {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(100, 120, 150, 0.2);
+    color: var(--text-muted);
+}
+
+.confidence-pill.confidence-high {
+    background: rgba(16, 185, 129, 0.2);
+    border-color: rgba(16, 185, 129, 0.4);
+    color: #86efac;
+}
+
+.confidence-pill.confidence-medium {
+    background: rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.4);
+    color: #fcd34d;
+}
+
+.confidence-pill.confidence-low {
+    background: rgba(100, 120, 150, 0.2);
+    border-color: rgba(100, 120, 150, 0.3);
+    color: var(--text-dim);
+}
+
+.systems-list {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(100, 120, 150, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: 10px;
+    color: var(--text-dim);
+}
+
+.systems-list::before {
+    content: "Supported systems: ";
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-right: 4px;
+}
+
 /* Loading Bar Styles */
 .loading-bar-container {
     position: absolute;
