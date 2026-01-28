@@ -198,6 +198,19 @@ export const parseLog = (input) => {
             currentBlock.rawLines.push(line);
         }
         
+        // NEW: Early extraction of 13-digit ticket numbers from any line
+        // This ensures we catch ticket numbers even if other parsing fails
+        if (line.includes('TKNE') || (line.includes('SSR') && line.match(/\d{13}/))) {
+            const ticketMatches = line.match(/(\d{13})/g);
+            if (ticketMatches && currentBlock) {
+                ticketMatches.forEach(ticketNum => {
+                    if (!currentBlock.ticketNumbers.includes(ticketNum)) {
+                        currentBlock.ticketNumbers.push(ticketNum);
+                    }
+                });
+            }
+        }
+        
         const envMatch = line.match(/^(QP|QK|QD)\s+(\S+)/);
         if (envMatch) {
             startNewBlock(envMatch[1], envMatch[2], line);
@@ -435,11 +448,10 @@ export const parseLog = (input) => {
         }
 
         // NEW: Handle glued SSR with ticket numbers: "SSRTKNEFZHK1DOHDXB0010W24JAN-1SAAD/ALI MR.1412998508237C1"
-        // Enhanced to capture 13-digit e-ticket numbers (like 1412998508237)
-        // Also handles cases where SSR is glued: "SSRTKNEFZHK1..." or "SSR TKNE FZHK1..."
-        // Pattern: SSR [optional space] TKNE [carrier]HK[status][from][to][flight][date]-[passenger].[13-digit-ticket][suffix]
-        // More flexible pattern to handle various spacing
-        const ssrTicketGluedMatch = line.match(/SSR\s*TKNE\s*([A-Z0-9]{2})([A-Z]{2}\d+)([A-Z]{3})([A-Z]{3})(\d{4})([MTWFS]?\d{2}[A-Z]{3})-(\d+[A-Z\s]+\/[A-Z\s]+[A-Z]{0,6}\s*[A-Z]{0,2})\.(\d{13})([A-Z]\d+)?/i);
+        // After cleanText becomes: "SSR TKNE FZHK1DOHDXB0010W24JAN-1SAAD/ALI MR.1412998508237C1"
+        // Pattern: SSR TKNE [carrier]HK[status][from][to][flight][date]-[passenger].[13-digit-ticket][suffix]
+        // The carrier/flight/route are all glued together, so we need to match them without spaces
+        const ssrTicketGluedMatch = line.match(/SSR\s+TKNE\s+([A-Z0-9]{2})([A-Z]{2}\d+)([A-Z]{3})([A-Z]{3})(\d{4})([MTWFS]?\d{2}[A-Z]{3})-(\d+[A-Z\s]+\/[A-Z\s]+[A-Z]{0,6}\s*[A-Z]{0,2})\.(\d{13})([A-Z]\d+)?/i);
         if (ssrTicketGluedMatch) {
             const ssrCode = 'TKNE';
             const carrier = ssrTicketGluedMatch[1];
@@ -500,29 +512,30 @@ export const parseLog = (input) => {
 
         // NEW: Extract 13-digit ticket numbers from any line (standalone pattern)
         // This is a fallback to catch ticket numbers even if the main regex doesn't match
-        const standaloneTicketMatch = line.match(/(\d{13})/);
-        if (standaloneTicketMatch && !ssrTicketGluedMatch && !ssrTicketNumberMatch) {
-            const ticketNum = standaloneTicketMatch[1];
-            // Only add if it's in a context that suggests it's a ticket number (near SSR, TKNE, etc.)
-            if (line.match(/SSR|TKNE|TICKET|TKT/i)) {
-                if (!currentBlock.ticketNumbers.includes(ticketNum)) {
-                    currentBlock.ticketNumbers.push(ticketNum);
-                }
-                // Also create an SSR entry if we found TKNE
-                if (line.match(/TKNE/i) && !currentBlock.ssrs.some(s => s.ticketNumber === ticketNum)) {
-                    const carrierMatch = line.match(/TKNE\s*([A-Z0-9]{2})/i);
-                    const passengerMatch = line.match(/(\d+[A-Z\s]+\/[A-Z\s]+[A-Z]{0,6})/i);
-                    const passenger = passengerMatch ? passengerMatch[1].replace(/^\d+/, '').trim() : '';
-                    
-                    currentBlock.ssrs.push({
-                        code: 'TKNE',
-                        carrier: carrierMatch ? carrierMatch[1] : '',
-                        status: '',
-                        raw: line,
-                        ticketNumber: ticketNum,
-                        details: passenger ? `Passenger: ${passenger}, E-Ticket: ${ticketNum}` : `E-Ticket Number: ${ticketNum}`
-                    });
-                }
+        // Check for 13-digit numbers in lines containing TKNE
+        if (line.includes('TKNE') || line.includes('SSR')) {
+            const ticketMatches = line.match(/(\d{13})/g);
+            if (ticketMatches && !ssrTicketGluedMatch && !ssrTicketNumberMatch) {
+                ticketMatches.forEach(ticketNum => {
+                    if (!currentBlock.ticketNumbers.includes(ticketNum)) {
+                        currentBlock.ticketNumbers.push(ticketNum);
+                    }
+                    // Also create an SSR entry if we found TKNE and don't already have this ticket
+                    if (line.match(/TKNE/i) && !currentBlock.ssrs.some(s => s.ticketNumber === ticketNum)) {
+                        const carrierMatch = line.match(/TKNE\s+([A-Z0-9]{2})/i);
+                        const passengerMatch = line.match(/(\d+[A-Z\s]+\/[A-Z\s]+[A-Z]{0,6})/i);
+                        const passenger = passengerMatch ? passengerMatch[1].replace(/^\d+/, '').trim() : '';
+                        
+                        currentBlock.ssrs.push({
+                            code: 'TKNE',
+                            carrier: carrierMatch ? carrierMatch[1] : '',
+                            status: '',
+                            raw: line,
+                            ticketNumber: ticketNum,
+                            details: passenger ? `Passenger: ${passenger}, E-Ticket: ${ticketNum}` : `E-Ticket Number: ${ticketNum}`
+                        });
+                    }
+                });
             }
         }
 
