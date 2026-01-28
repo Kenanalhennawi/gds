@@ -17,7 +17,8 @@ const cleanText = (text) => {
     // NEW: Split glued SSR TKNE lines that contain ticket numbers
     // Pattern: SSRTKNEFZHK1... followed by 13-digit number, then another SSRTKNE
     // This handles cases like: "SSRTKNEFZHK1...1412998508237C1 SSRTKNEFZHK1..."
-    clean = clean.replace(/(SSR\s*TKNE[^S]*\.\d{13}[A-Z]\d+)\s+(?=SSR)/gi, "$1\n");
+    // First, ensure SSR TKNE is separated, then split on the pattern
+    clean = clean.replace(/(SSR\s+TKNE[^S]*\.\d{13}[A-Z]\d+)\s+(?=SSR)/gi, "$1\n");
     
     // Fix glued headers (e.g. TRLHDQ)
     clean = clean.replace(/([A-Z0-9])(QP|QK|QD|HDQ|SWI|TRL|AKA|NAR|DVD)/g, "$1\n$2");
@@ -437,18 +438,19 @@ export const parseLog = (input) => {
         // Enhanced to capture 13-digit e-ticket numbers (like 1412998508237)
         // Also handles cases where SSR is glued: "SSRTKNEFZHK1..." or "SSR TKNE FZHK1..."
         // Pattern: SSR [optional space] TKNE [carrier]HK[status][from][to][flight][date]-[passenger].[13-digit-ticket][suffix]
-        const ssrTicketGluedMatch = line.match(/SSR\s*([A-Z]{4})([A-Z0-9]{2})([A-Z]{2}\d+)([A-Z]{3})([A-Z]{3})(\d{4})([MTWFS]?\d{2}[A-Z]{3})-(\d+[A-Z\s]+\/[A-Z\s]+[A-Z]{0,6}\s*[A-Z]{0,2})\.(\d{13})([A-Z]\d+)?/i);
+        // More flexible pattern to handle various spacing
+        const ssrTicketGluedMatch = line.match(/SSR\s*TKNE\s*([A-Z0-9]{2})([A-Z]{2}\d+)([A-Z]{3})([A-Z]{3})(\d{4})([MTWFS]?\d{2}[A-Z]{3})-(\d+[A-Z\s]+\/[A-Z\s]+[A-Z]{0,6}\s*[A-Z]{0,2})\.(\d{13})([A-Z]\d+)?/i);
         if (ssrTicketGluedMatch) {
-            const ssrCode = ssrTicketGluedMatch[1];
-            const carrier = ssrTicketGluedMatch[2];
-            const status = ssrTicketGluedMatch[3];
-            const from = ssrTicketGluedMatch[4];
-            const to = ssrTicketGluedMatch[5];
-            const flight = ssrTicketGluedMatch[6];
-            const date = ssrTicketGluedMatch[7].replace(/^[MTWFS]/, ''); // Remove day prefix if present
-            const passenger = ssrTicketGluedMatch[8].replace(/^\d+/, ''); // Remove leading number
-            const ticketNum = ssrTicketGluedMatch[9]; // 13-digit e-ticket number
-            const ticketSuffix = ssrTicketGluedMatch[10] || ''; // Optional suffix like C1, C2, etc.
+            const ssrCode = 'TKNE';
+            const carrier = ssrTicketGluedMatch[1];
+            const status = ssrTicketGluedMatch[2];
+            const from = ssrTicketGluedMatch[3];
+            const to = ssrTicketGluedMatch[4];
+            const flight = ssrTicketGluedMatch[5];
+            const date = ssrTicketGluedMatch[6].replace(/^[MTWFS]/, ''); // Remove day prefix if present
+            const passenger = ssrTicketGluedMatch[7].replace(/^\d+/, '').trim(); // Remove leading number
+            const ticketNum = ssrTicketGluedMatch[8]; // 13-digit e-ticket number
+            const ticketSuffix = ssrTicketGluedMatch[9] || ''; // Optional suffix like C1, C2, etc.
             
             currentBlock.ssrs.push({
                 code: ssrCode,
@@ -497,6 +499,7 @@ export const parseLog = (input) => {
         }
 
         // NEW: Extract 13-digit ticket numbers from any line (standalone pattern)
+        // This is a fallback to catch ticket numbers even if the main regex doesn't match
         const standaloneTicketMatch = line.match(/(\d{13})/);
         if (standaloneTicketMatch && !ssrTicketGluedMatch && !ssrTicketNumberMatch) {
             const ticketNum = standaloneTicketMatch[1];
@@ -506,15 +509,18 @@ export const parseLog = (input) => {
                     currentBlock.ticketNumbers.push(ticketNum);
                 }
                 // Also create an SSR entry if we found TKNE
-                if (line.match(/TKNE/i)) {
+                if (line.match(/TKNE/i) && !currentBlock.ssrs.some(s => s.ticketNumber === ticketNum)) {
                     const carrierMatch = line.match(/TKNE\s*([A-Z0-9]{2})/i);
+                    const passengerMatch = line.match(/(\d+[A-Z\s]+\/[A-Z\s]+[A-Z]{0,6})/i);
+                    const passenger = passengerMatch ? passengerMatch[1].replace(/^\d+/, '').trim() : '';
+                    
                     currentBlock.ssrs.push({
                         code: 'TKNE',
                         carrier: carrierMatch ? carrierMatch[1] : '',
                         status: '',
                         raw: line,
                         ticketNumber: ticketNum,
-                        details: `E-Ticket Number: ${ticketNum}`
+                        details: passenger ? `Passenger: ${passenger}, E-Ticket: ${ticketNum}` : `E-Ticket Number: ${ticketNum}`
                     });
                 }
             }
