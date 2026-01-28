@@ -8,6 +8,8 @@ const els = {
     timeline: document.getElementById("timeline"),
     status: document.getElementById("inputStatus"),
     clear: document.getElementById("btnClear"),
+    outputHint: document.getElementById("outputHint"),
+    loadingBar: document.getElementById("loadingBar"),
     tabDecoder: document.getElementById("tabDecoder"),
     tabExcessBaggage: document.getElementById("tabExcessBaggage"),
     decoderSection: document.getElementById("decoderSection"),
@@ -21,6 +23,25 @@ const showLoading = () => {
     if (els.status) {
         els.status.innerHTML = `<span class="status-dot" style="animation:pulse 1.5s infinite;"></span><span>Analyzing...</span>`;
     }
+    // Hide hint and show loading bar
+    if (els.outputHint) els.outputHint.style.display = "none";
+    if (els.loadingBar) {
+        els.loadingBar.style.display = "block";
+        // Animate progress bar
+        const fill = els.loadingBar.querySelector(".loading-bar-fill");
+        if (fill) {
+            fill.style.width = "0%";
+            setTimeout(() => {
+                fill.style.width = "30%";
+            }, 100);
+            setTimeout(() => {
+                fill.style.width = "60%";
+            }, 300);
+            setTimeout(() => {
+                fill.style.width = "90%";
+            }, 600);
+        }
+    }
 };
 
 const processInput = () => {
@@ -30,6 +51,9 @@ const processInput = () => {
     if (!raw || !raw.trim()) {
         renderTimeline(els.timeline, []);
         if (els.status) els.status.innerHTML = `<span class="status-dot"></span><span>Ready - Auto-Analyzing</span>`;
+        // Show hint and hide loading bar when input is empty
+        if (els.outputHint) els.outputHint.style.display = "flex";
+        if (els.loadingBar) els.loadingBar.style.display = "none";
         return;
     }
 
@@ -44,6 +68,14 @@ const processInput = () => {
             // Analyze booking changes
             const analysis = analyzeBookingChanges(events);
             
+            // Complete loading bar
+            if (els.loadingBar) {
+                const fill = els.loadingBar.querySelector(".loading-bar-fill");
+                if (fill) {
+                    fill.style.width = "100%";
+                }
+            }
+            
             // Render with summary and change details
             renderTimeline(els.timeline, {
                 events: analysis.events,
@@ -53,6 +85,16 @@ const processInput = () => {
             
             const count = analysis.events.length;
             const changeCount = analysis.changes.length;
+            
+            // Hide loading bar and show hint if no events
+            setTimeout(() => {
+                if (els.loadingBar) els.loadingBar.style.display = "none";
+                if (els.outputHint && count === 0) {
+                    els.outputHint.style.display = "flex";
+                } else if (els.outputHint && count > 0) {
+                    els.outputHint.style.display = "none";
+                }
+            }, 200);
             
             if (els.status) {
                 els.status.innerHTML = changeCount > 0 
@@ -65,6 +107,9 @@ const processInput = () => {
             if (els.status) {
                 els.status.innerHTML = `<span class="status-dot" style="background:var(--error-red);"></span><span style="color:var(--error-red);">⚠️ Error: ${errorMessage}</span>`;
             }
+            // Hide loading bar on error
+            if (els.loadingBar) els.loadingBar.style.display = "none";
+            if (els.outputHint) els.outputHint.style.display = "flex";
             if (els.timeline) {
                 renderTimeline(els.timeline, []);
                 els.timeline.innerHTML = `
