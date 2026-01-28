@@ -35,13 +35,8 @@ export const renderTimeline = (container, data) => {
         container.appendChild(summaryCard);
     }
 
-    // 2. Empty State
+    // 2. No events: render nothing (no placeholder)
     if (!events || events.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <h3>No Data Detected</h3>
-                <p>Paste a valid history log to begin analysis.</p>
-            </div>`;
         return;
     }
     
