@@ -70,8 +70,18 @@
             </section>
 
             <section id="decoderOutput" class="output-section" role="region" aria-label="GDS analysis results">
-                <div class="output-hint" aria-hidden="true">
-                    Paste your GDS history log on the left — decoded events will appear here automatically.
+                <div class="output-hint" id="outputHint">
+                    <div class="hint-icon">📋</div>
+                    <div class="hint-content">
+                        <strong>Ready to Analyze</strong>
+                        <span>Paste your GDS history log on the left — decoded events will appear here automatically.</span>
+                    </div>
+                </div>
+                <div id="loadingBar" class="loading-bar-container" style="display: none;">
+                    <div class="loading-bar">
+                        <div class="loading-bar-fill"></div>
+                    </div>
+                    <div class="loading-text">Analyzing GDS log data...</div>
                 </div>
                 <div id="timeline" class="timeline-container" role="log" aria-live="polite" aria-atomic="false"></div>
             </section>
