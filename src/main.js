@@ -21,14 +21,6 @@ const showLoading = () => {
     if (els.status) {
         els.status.innerHTML = `<span class="status-dot" style="animation:pulse 1.5s infinite;"></span><span>Analyzing...</span>`;
     }
-    if (els.timeline) {
-        els.timeline.innerHTML = `
-            <div class="empty-state">
-                <div class="loading-spinner"></div>
-                <h3>Processing...</h3>
-                <p style="color:var(--text-muted); margin-top:10px;">Analyzing GDS log data</p>
-            </div>`;
-    }
 };
 
 const processInput = () => {
