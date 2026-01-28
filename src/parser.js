@@ -16,6 +16,16 @@ const cleanText = (text) => {
     
     // Fix glued headers (e.g. TRLHDQ)
     clean = clean.replace(/([A-Z0-9])(QP|QK|QD|HDQ|SWI|TRL|AKA|NAR|DVD)/g, "$1\n$2");
+    
+    // NEW: Split glued segments (e.g. "FZ010W24JAN DOHDXB HK2 .3. FZ777W24JAN..." -> separate lines)
+    // Pattern: Carrier + Flight + Date + Route + Status + dots, repeated
+    clean = clean.replace(/([A-Z]{2}\d{1,4}[A-Z]?[MTWFS]?\d{2}[A-Z]{3}\s+[A-Z]{3}[A-Z]{3}\s+[A-Z]{2}\d+\s*\.\d+\.)\s+(?=[A-Z]{2}\d)/g, "$1\n");
+    
+    // NEW: Split glued SSRs when they start with SSR (e.g. "SSRTKNEFZ... SSRTKNEFZ...")
+    clean = clean.replace(/(SSR[A-Z]{4}[A-Z0-9]{2}[A-Z]{2}\d+[A-Z0-9]+)\s+(?=SSR[A-Z]{4})/g, "$1\n");
+    
+    // NEW: Split passenger lines that are glued (e.g. "1SAAD/ALI MR 1AARIF/MARYAM MS")
+    clean = clean.replace(/(\d+[A-Z]+\/[A-Z\s]+[A-Z]{0,6})\s+(?=\d+[A-Z]+\/)/g, "$1\n");
 
     return clean
         .split(/\r\n|\r|\n/)
@@ -132,12 +142,17 @@ export const parseLog = (input) => {
     const extractPassengers = (line) => {
         const paxes = [];
         const titles = ['MASTER', 'MSTR', 'MISS', 'MRS', 'MR', 'MS', 'DR', 'PROF', 'REV', 'HON'];
-        const regex = /\d+([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?/g;
+        // Enhanced regex to handle leading numbers like "1SAAD/ALI MR" or "SAAD/ALI MR"
+        // Also handles cases where title might be before the slash
+        const regex = /(\d+)?([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?/g;
         let match;
         while ((match = regex.exec(line)) !== null) {
-            let surname = match[1].trim();
-            let given = match[2].trim();
-            let title = match[3] ? match[3].trim() : "";
+            // Skip if this looks like a flight segment (has 3-letter codes that look like airports)
+            if (match[0].match(/[A-Z]{3}[A-Z]{3}/)) continue;
+            
+            let surname = match[2].trim();
+            let given = match[3].trim();
+            let title = match[4] ? match[4].trim() : "";
             
             if (!title) {
                 for (const t of titles) {
@@ -274,6 +289,36 @@ export const parseLog = (input) => {
             return;
         }
 
+        // NEW: Handle segments with day-of-week prefix and dots: "FZ010W24JAN DOHDXB HK2 .3."
+        const segWithDayPrefixMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)([MTWFS][0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)(?:\s*\.\d+\.)?/);
+        if (segWithDayPrefixMatch) {
+            currentBlock.segments.push({
+                carrier: segWithDayPrefixMatch[1],
+                flight: segWithDayPrefixMatch[2],
+                fareClass: segWithDayPrefixMatch[3] || '',
+                date: segWithDayPrefixMatch[4].substring(1), // Remove day prefix (W, M, T, etc.)
+                from: segWithDayPrefixMatch[5],
+                to: segWithDayPrefixMatch[6],
+                status: segWithDayPrefixMatch[7]
+            });
+            return;
+        }
+
+        // NEW: Handle segments without day prefix but with dots: "FZ010 24JAN DOHDXB HK2 .3."
+        const segWithDotsMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)\s+(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d+)(?:\s*\.\d+\.)?/);
+        if (segWithDotsMatch) {
+            currentBlock.segments.push({
+                carrier: segWithDotsMatch[1],
+                flight: segWithDotsMatch[2],
+                fareClass: segWithDotsMatch[3] || '',
+                date: segWithDotsMatch[4],
+                from: segWithDotsMatch[5],
+                to: segWithDotsMatch[6],
+                status: segWithDotsMatch[7]
+            });
+            return;
+        }
+
         const ssrMatch = line.match(/^SSR\s+([A-Z]{4})\s+([A-Z0-9]{2})\s+([A-Z]{2}\d+)?/i);
         if (ssrMatch) {
             const ssrCode = ssrMatch[1];
@@ -348,6 +393,53 @@ export const parseLog = (input) => {
                 status: status,
                 raw: line,
                 details: `${value}${passenger ? ' - ' + passenger : ''}`
+            });
+            
+            const ssrInfo = translateSSR(line);
+            if (ssrInfo) currentBlock.messages.push(ssrInfo);
+            return;
+        }
+
+        // NEW: Handle glued SSR with ticket numbers: "SSRTKNEFZHK1DOHDXB0010W24JAN-1SAAD/ALI MR.1412998508237C1"
+        const ssrTicketGluedMatch = line.match(/SSR([A-Z]{4})([A-Z0-9]{2})([A-Z]{2}\d+)([A-Z]{3})([A-Z]{3})(\d{4})([MTWFS]?\d{2}[A-Z]{3})-(\d+[A-Z\s]+\/[A-Z\s]+[A-Z]{0,6})\.(\d+[A-Z]\d+)/i);
+        if (ssrTicketGluedMatch) {
+            const ssrCode = ssrTicketGluedMatch[1];
+            const carrier = ssrTicketGluedMatch[2];
+            const status = ssrTicketGluedMatch[3];
+            const from = ssrTicketGluedMatch[4];
+            const to = ssrTicketGluedMatch[5];
+            const flight = ssrTicketGluedMatch[6];
+            const date = ssrTicketGluedMatch[7].replace(/^[MTWFS]/, ''); // Remove day prefix if present
+            const passenger = ssrTicketGluedMatch[8].replace(/^\d+/, ''); // Remove leading number
+            const ticketNum = ssrTicketGluedMatch[9];
+            
+            currentBlock.ssrs.push({
+                code: ssrCode,
+                carrier: carrier,
+                status: status,
+                raw: line,
+                details: `Flight ${carrier}${flight} ${from}-${to} ${date}, Passenger: ${passenger}, Ticket: ${ticketNum}`
+            });
+            
+            const ssrInfo = translateSSR(line);
+            if (ssrInfo) currentBlock.messages.push(ssrInfo);
+            return;
+        }
+
+        // NEW: Handle simpler glued SSR format: "SSRTKNEFZHK1..."
+        const ssrSimpleGluedMatch = line.match(/SSR([A-Z]{4})([A-Z0-9]{2})([A-Z]{2}\d+)([A-Z0-9]+)/i);
+        if (ssrSimpleGluedMatch && !ssrTicketGluedMatch) {
+            const ssrCode = ssrSimpleGluedMatch[1];
+            const carrier = ssrSimpleGluedMatch[2];
+            const status = ssrSimpleGluedMatch[3];
+            const details = ssrSimpleGluedMatch[4];
+            
+            currentBlock.ssrs.push({
+                code: ssrCode,
+                carrier: carrier,
+                status: status,
+                raw: line,
+                details: details
             });
             
             const ssrInfo = translateSSR(line);
