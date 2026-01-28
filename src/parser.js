@@ -60,6 +60,7 @@ export const parseLog = (input) => {
             ssrs: [],
             osis: [],
             passengers: [],
+            ticketNumbers: [], // NEW: Store all e-ticket numbers found
             rawLines: []
         };
         parseContextFromHeader(currentBlock, header, rawLine);
@@ -401,7 +402,8 @@ export const parseLog = (input) => {
         }
 
         // NEW: Handle glued SSR with ticket numbers: "SSRTKNEFZHK1DOHDXB0010W24JAN-1SAAD/ALI MR.1412998508237C1"
-        const ssrTicketGluedMatch = line.match(/SSR([A-Z]{4})([A-Z0-9]{2})([A-Z]{2}\d+)([A-Z]{3})([A-Z]{3})(\d{4})([MTWFS]?\d{2}[A-Z]{3})-(\d+[A-Z\s]+\/[A-Z\s]+[A-Z]{0,6})\.(\d+[A-Z]\d+)/i);
+        // Enhanced to capture 13-digit e-ticket numbers (like 1412998508237)
+        const ssrTicketGluedMatch = line.match(/SSR([A-Z]{4})([A-Z0-9]{2})([A-Z]{2}\d+)([A-Z]{3})([A-Z]{3})(\d{4})([MTWFS]?\d{2}[A-Z]{3})-(\d+[A-Z\s]+\/[A-Z\s]+[A-Z]{0,6})\.(\d{13})([A-Z]\d+)?/i);
         if (ssrTicketGluedMatch) {
             const ssrCode = ssrTicketGluedMatch[1];
             const carrier = ssrTicketGluedMatch[2];
@@ -411,36 +413,103 @@ export const parseLog = (input) => {
             const flight = ssrTicketGluedMatch[6];
             const date = ssrTicketGluedMatch[7].replace(/^[MTWFS]/, ''); // Remove day prefix if present
             const passenger = ssrTicketGluedMatch[8].replace(/^\d+/, ''); // Remove leading number
-            const ticketNum = ssrTicketGluedMatch[9];
+            const ticketNum = ssrTicketGluedMatch[9]; // 13-digit e-ticket number
+            const ticketSuffix = ssrTicketGluedMatch[10] || ''; // Optional suffix like C1, C2, etc.
             
             currentBlock.ssrs.push({
                 code: ssrCode,
                 carrier: carrier,
                 status: status,
                 raw: line,
-                details: `Flight ${carrier}${flight} ${from}-${to} ${date}, Passenger: ${passenger}, Ticket: ${ticketNum}`
+                ticketNumber: ticketNum, // Store ticket number separately for easy access
+                details: `Flight ${carrier}${flight} ${from}-${to} ${date}, Passenger: ${passenger}, E-Ticket: ${ticketNum}${ticketSuffix ? ' (' + ticketSuffix + ')' : ''}`
             });
+            
+            // Add ticket number to the block's ticketNumbers array
+            if (ticketNum && !currentBlock.ticketNumbers.includes(ticketNum)) {
+                currentBlock.ticketNumbers.push(ticketNum);
+            }
             
             const ssrInfo = translateSSR(line);
             if (ssrInfo) currentBlock.messages.push(ssrInfo);
             return;
         }
 
+        // NEW: Handle SSR TKNE with 13-digit ticket numbers in various formats
+        // Pattern: SSRTKNE... followed by 13-digit number
+        const ssrTicketNumberMatch = line.match(/SSR\s*TKNE[^0-9]*(\d{13})/i);
+        if (ssrTicketNumberMatch && !ssrTicketGluedMatch) {
+            const ticketNum = ssrTicketNumberMatch[1];
+            const carrierMatch = line.match(/SSR\s*TKNE\s*([A-Z0-9]{2})/i);
+            const carrier = carrierMatch ? carrierMatch[1] : '';
+            
+            currentBlock.ssrs.push({
+                code: 'TKNE',
+                carrier: carrier,
+                status: '',
+                raw: line,
+                ticketNumber: ticketNum,
+                details: `E-Ticket Number: ${ticketNum}`
+            });
+            
+            // Add ticket number to the block's ticketNumbers array
+            if (ticketNum && !currentBlock.ticketNumbers.includes(ticketNum)) {
+                currentBlock.ticketNumbers.push(ticketNum);
+            }
+            
+            const ssrInfo = translateSSR(line);
+            if (ssrInfo) currentBlock.messages.push(ssrInfo);
+            return;
+        }
+
+        // NEW: Extract 13-digit ticket numbers from any line (standalone pattern)
+        const standaloneTicketMatch = line.match(/(\d{13})/);
+        if (standaloneTicketMatch && !ssrTicketGluedMatch && !ssrTicketNumberMatch) {
+            const ticketNum = standaloneTicketMatch[1];
+            // Only add if it's in a context that suggests it's a ticket number (near SSR, TKNE, etc.)
+            if (line.match(/SSR|TKNE|TICKET|TKT/i)) {
+                if (!currentBlock.ticketNumbers.includes(ticketNum)) {
+                    currentBlock.ticketNumbers.push(ticketNum);
+                }
+                // Also create an SSR entry if we found TKNE
+                if (line.match(/TKNE/i)) {
+                    const carrierMatch = line.match(/TKNE\s*([A-Z0-9]{2})/i);
+                    currentBlock.ssrs.push({
+                        code: 'TKNE',
+                        carrier: carrierMatch ? carrierMatch[1] : '',
+                        status: '',
+                        raw: line,
+                        ticketNumber: ticketNum,
+                        details: `E-Ticket Number: ${ticketNum}`
+                    });
+                }
+            }
+        }
+
         // NEW: Handle simpler glued SSR format: "SSRTKNEFZHK1..."
         const ssrSimpleGluedMatch = line.match(/SSR([A-Z]{4})([A-Z0-9]{2})([A-Z]{2}\d+)([A-Z0-9]+)/i);
-        if (ssrSimpleGluedMatch && !ssrTicketGluedMatch) {
+        if (ssrSimpleGluedMatch && !ssrTicketGluedMatch && !ssrTicketNumberMatch) {
             const ssrCode = ssrSimpleGluedMatch[1];
             const carrier = ssrSimpleGluedMatch[2];
             const status = ssrSimpleGluedMatch[3];
             const details = ssrSimpleGluedMatch[4];
+            
+            // Check if there's a 13-digit number in the details
+            const ticketInDetails = details.match(/(\d{13})/);
+            const ticketNum = ticketInDetails ? ticketInDetails[1] : null;
             
             currentBlock.ssrs.push({
                 code: ssrCode,
                 carrier: carrier,
                 status: status,
                 raw: line,
+                ticketNumber: ticketNum,
                 details: details
             });
+            
+            if (ticketNum && !currentBlock.ticketNumbers.includes(ticketNum)) {
+                currentBlock.ticketNumbers.push(ticketNum);
+            }
             
             const ssrInfo = translateSSR(line);
             if (ssrInfo) currentBlock.messages.push(ssrInfo);
