@@ -288,7 +288,11 @@ export const renderTimeline = (container, data) => {
         // Display E-Ticket Numbers prominently (NEW)
         const ticketNumbers = evt.ticketNumbers || [];
         const ssrTicketNumbers = evt.ssrs.filter(ssr => ssr.ticketNumber).map(ssr => ssr.ticketNumber);
-        const allTicketNumbers = [...new Set([...ticketNumbers, ...ssrTicketNumbers])];
+        // Also extract ticket numbers from segments (DK format: DK1/19002110)
+        const segmentTicketNumbers = (evt.segments || [])
+            .filter(seg => seg.ticketNumber)
+            .map(seg => seg.ticketNumber);
+        const allTicketNumbers = [...new Set([...ticketNumbers, ...ssrTicketNumbers, ...segmentTicketNumbers])];
         
         if (allTicketNumbers.length > 0) {
             html += `<div class="ticket-numbers-container" style="margin-top:15px; padding:15px; background:linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.08)); border-radius:8px; border-left:4px solid var(--success-green);">
