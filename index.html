@@ -75,6 +75,12 @@
                     <div class="hint-content">
                         <strong>Ready to Analyze</strong>
                         <span>Paste your GDS history log on the left — decoded events will appear here automatically.</span>
+                        <div class="system-row" id="systemRow">
+                            <span class="system-label">Detected system:</span>
+                            <span class="system-pill" id="detectedSystemPill">Unknown / Generic</span>
+                            <span class="confidence-pill" id="detectedConfidencePill">low confidence</span>
+                        </div>
+                        <div class="systems-list" id="systemsList" aria-hidden="true"></div>
                     </div>
                 </div>
                 <div id="loadingBar" class="loading-bar-container" style="display: none;">
