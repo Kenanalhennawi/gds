@@ -284,6 +284,32 @@ export const renderTimeline = (container, data) => {
             html += `</div>`;
         }
 
+        // Display E-Ticket Numbers prominently (NEW)
+        const ticketNumbers = evt.ticketNumbers || [];
+        const ssrTicketNumbers = evt.ssrs.filter(ssr => ssr.ticketNumber).map(ssr => ssr.ticketNumber);
+        const allTicketNumbers = [...new Set([...ticketNumbers, ...ssrTicketNumbers])];
+        
+        if (allTicketNumbers.length > 0) {
+            html += `<div class="ticket-numbers-container" style="margin-top:15px; padding:15px; background:linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.08)); border-radius:8px; border-left:4px solid var(--success-green);">
+                <div style="font-weight:700; color:var(--success-green); margin-bottom:12px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
+                    ✈️ E-Ticket Numbers:
+                </div>`;
+            allTicketNumbers.forEach((ticketNum, idx) => {
+                html += `
+                    <div style="margin-bottom:8px; padding:10px; background:rgba(0,0,0,0.2); border-radius:6px; border:1px solid rgba(16, 185, 129, 0.3);">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="font-size:18px;">🎫</span>
+                            <div style="flex:1;">
+                                <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">E-Ticket #${idx + 1}</div>
+                                <div style="font-family:var(--font-code); font-size:16px; font-weight:700; color:var(--success-green); letter-spacing:2px;">${ticketNum}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            html += `</div>`;
+        }
+
         // Display SSR codes with explanations
         if (evt.ssrs && evt.ssrs.length > 0) {
             html += `<div class="ssr-container" style="margin-top:15px; padding-left:15px;">
@@ -306,6 +332,7 @@ export const renderTimeline = (container, data) => {
                             <div><strong>SSR Code:</strong> ${ssr.code}</div>
                             <div><strong>Carrier:</strong> ${ssr.carrier} (${carrierName})</div>
                             ${ssr.status ? `<div><strong>Status:</strong> ${ssr.status} ${statusInfo ? `(${statusInfo.label})` : ''}</div>` : ''}
+                            ${ssr.ticketNumber ? `<div style="margin-top:4px;"><strong style="color:var(--success-green);">E-Ticket Number:</strong> <span style="font-family:var(--font-code); font-weight:700; color:var(--success-green);">${ssr.ticketNumber}</span></div>` : ''}
                             ${explanation ? `<div style="margin-top:4px; color:var(--text-main); font-size:11px;"><strong>Explanation:</strong> ${explanation}</div>` : ''}
                         </div>
                         ${ssr.details ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.8; background:rgba(0,0,0,0.2); padding:4px; border-radius:3px;">${ssr.details}</div>` : ''}
