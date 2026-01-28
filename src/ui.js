@@ -256,6 +256,7 @@ export const renderTimeline = (container, data) => {
                     <div><strong>Route:</strong> ${seg.from} (${from}) → ${seg.to} (${to})</div>
                     <div><strong>Date:</strong> ${seg.date}</div>
                     <div><strong>Status:</strong> ${seg.status} (${st.label})</div>
+                    ${seg.ticketNumber ? `<div style="margin-top:4px;"><strong style="color:var(--success-green);">Ticket Number:</strong> <span style="font-family:var(--font-code); font-weight:700; color:var(--success-green);">${seg.ticketNumber}</span></div>` : ''}
                 `;
                 
                 // Add codeshare info if available
