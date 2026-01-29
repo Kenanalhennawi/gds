@@ -840,7 +840,9 @@ function displayExtraLegroomResult(result) {
 
 function displayUpgradeResult(result) {
     const originCity = translateCity(result.origin);
-    
+    const exceptionBadge = result.isException && result.exceptionFrom
+        ? `<div style="font-size:11px; color:var(--warning-amber); margin-bottom:8px; font-weight:600;">Exception rate: ${result.exceptionFrom}</div>`
+        : '';
     return `
         <div style="font-weight:700; font-size:18px; margin-bottom:15px; color:var(--info-blue);">
             ✓ Upgrade to Business Class
@@ -857,6 +859,7 @@ function displayUpgradeResult(result) {
         </div>
         
         <div style="background:rgba(96,165,250,0.1); padding:15px; border-radius:8px; border-left:3px solid var(--info-blue);">
+            ${exceptionBadge}
             <div style="font-weight:700; margin-bottom:10px; color:var(--info-blue);">Upgrade Rate (at airport)</div>
             <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-bottom:5px;">
                 ${result.rate.toLocaleString()} ${result.currency}
