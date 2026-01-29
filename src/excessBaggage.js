@@ -446,12 +446,62 @@ function getUpgradeZone(airport) {
     return null;
 }
 
-// Get Upgrade to Business rate (adult/child)
+// Get Upgrade to Business rate (adult/child) – applies UPGRADE_EXCEPTIONS when applicable
 export function getUpgradeRate(origin, currency) {
+    const code = origin.toUpperCase();
     const zone = getUpgradeZone(origin);
     if (!zone) {
         return {
             error: `Upgrade rate not available for ${origin}`
+        };
+    }
+    
+    // Check airport-specific exception (KWI, BAH, MCT, BGW, TLV, KTM)
+    const airportEx = UPGRADE_EXCEPTIONS[code];
+    if (airportEx && airportEx[currency] != null) {
+        const infantRates = UPGRADE_INFANT_RATES[`ZONE${zone}`];
+        const infantRate = infantRates && infantRates[currency];
+        return {
+            origin: code,
+            zone: parseInt(zone),
+            currency,
+            rate: airportEx[currency],
+            infantRate: infantRate != null ? infantRate : null,
+            description: `Upgrade to Business Class from Zone ${zone}`,
+            isException: true,
+            exceptionFrom: airportEx.from
+        };
+    }
+    // Check Saudi (all KSA points)
+    if (KSA_AIRPORT_CODES.includes(code) && UPGRADE_EXCEPTIONS.SAUDI && UPGRADE_EXCEPTIONS.SAUDI[currency] != null) {
+        const zoneKey = `ZONE${zone}`;
+        const infantRates = UPGRADE_INFANT_RATES[zoneKey];
+        const infantRate = infantRates && infantRates[currency];
+        return {
+            origin: code,
+            zone: parseInt(zone),
+            currency,
+            rate: UPGRADE_EXCEPTIONS.SAUDI[currency],
+            infantRate: infantRate != null ? infantRate : null,
+            description: `Upgrade to Business Class from Zone ${zone}`,
+            isException: true,
+            exceptionFrom: UPGRADE_EXCEPTIONS.SAUDI.from
+        };
+    }
+    // Check India (all India points)
+    if (INDIA_AIRPORT_CODES.includes(code) && UPGRADE_EXCEPTIONS.INDIA && UPGRADE_EXCEPTIONS.INDIA[currency] != null) {
+        const zoneKey = `ZONE${zone}`;
+        const infantRates = UPGRADE_INFANT_RATES[zoneKey];
+        const infantRate = infantRates && infantRates[currency];
+        return {
+            origin: code,
+            zone: parseInt(zone),
+            currency,
+            rate: UPGRADE_EXCEPTIONS.INDIA[currency],
+            infantRate: infantRate != null ? infantRate : null,
+            description: `Upgrade to Business Class from Zone ${zone}`,
+            isException: true,
+            exceptionFrom: UPGRADE_EXCEPTIONS.INDIA.from
         };
     }
     
@@ -468,7 +518,7 @@ export function getUpgradeRate(origin, currency) {
     const infantRate = infantRates && infantRates[currency];
     
     return {
-        origin: origin.toUpperCase(),
+        origin: code,
         zone: parseInt(zone),
         currency,
         rate,
@@ -1468,8 +1518,11 @@ const EK_OAL_EXCESS_RATES_PER_KG = {
 // Canadian airport codes – for EK/OAL per-piece (CAD)
 const CANADA_AIRPORT_CODES = ['YYZ', 'YVR', 'YUL', 'YYC', 'YOW', 'YHZ', 'YEG'];
 
-// India airport codes (FZ zone 6) – for India excess baggage note
+// India airport codes (FZ zone 6) – for India excess baggage note and upgrade exception
 const INDIA_AIRPORT_CODES = ['AMD', 'BOM', 'BLR', 'CCJ', 'CCU', 'COK', 'DEL', 'HYD', 'LKO', 'MAA', 'TRV', 'GOI'];
+
+// KSA (Saudi Arabia) airport codes – for upgrade exception "All KSA points"
+const KSA_AIRPORT_CODES = ['AHB', 'AQI', 'AJF', 'DMM', 'ELQ', 'EAM', 'GIZ', 'HAS', 'HOF', 'JED', 'NUM', 'MED', 'RUH', 'RSI', 'TUU', 'TIF', 'ULH', 'YNB'];
 
 // EK/OAL Excess Baggage Rates per Piece (USD / CAD for Canada)
 const EK_OAL_EXCESS_RATES_PER_PIECE = {
