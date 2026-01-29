@@ -26,6 +26,7 @@ const CURRENCY_MAPPING = {
     'CHF': ['BSL'],
     'CZK': ['PRG'],
     'EGP': ['HBE', 'SSH', 'SPX', 'DBB'],
+    'ERN': ['ASM'],
     'EUR': ['BEG', 'BGY', 'BTS', 'CAG', 'CFU', 'CLJ', 'CTA', 'DBV', 'JMK', 'JTR', 'HEL', 'LJU', 'KIV', 'MLA', 'NAP', 'OTP', 'OLB', 'PSA', 'SJJ', 'SKP', 'SOF', 'SZG', 'TIA', 'TIV', 'ZAG'],
     'HUF': ['BUD'],
     'INR': ['AMD', 'BOM', 'BLR', 'CCU', 'CCJ', 'COK', 'DEL', 'HYD', 'LKO', 'MAA', 'TRV'],
@@ -385,6 +386,8 @@ const UPGRADE_ON_BOARD_RATES = {
     'AED': { 1: 1400, 2: 2100, 3: 2300 },
     'PKR': { 1: 115205, 2: 184330, 3: 207375 }
 };
+// Exception: when paying in AED from PKR airport (Pakistan), On Board AED is 1500/2400/2700 (not 1400/2100/2300)
+const UPGRADE_ON_BOARD_AED_PKR = { 1: 1500, 2: 2400, 3: 2700 };
 
 // Excess baggage route exceptions (from PDF page 22)
 const EXCESS_BAGGAGE_EXCEPTIONS = {
@@ -451,6 +454,19 @@ export function getUpgradeOnBoardRate(origin, currency) {
     if (!zone) {
         return { error: `Upgrade On Board rate not available for ${origin}` };
     }
+    // Exception: AED from PKR airport uses 1500/2400/2700 (Page 13)
+    if (currency === 'AED' && getCurrencyForDestination(origin) === 'PKR') {
+        const rate = UPGRADE_ON_BOARD_AED_PKR[zone];
+        if (rate != null) {
+            return {
+                origin: origin.toUpperCase(),
+                zone: parseInt(zone),
+                currency: 'AED',
+                rate,
+                description: `Upgrade to Business Class On Board from Zone ${zone} (PKR airport exception)`
+            };
+        }
+    }
     const rate = UPGRADE_ON_BOARD_RATES[currency] && UPGRADE_ON_BOARD_RATES[currency][zone];
     if (rate == null) {
         return { error: `Upgrade On Board rate not available for ${currency} from Zone ${zone}` };
@@ -476,7 +492,7 @@ const GOSHOW_FARES = {
         'AMM': { currency: 'JOD', adult: 530, infant: 15 },
         'AQI': { currency: 'SAR', adult: 2565, infant: 75 },
         'ASB': { currency: 'USD', adult: 715, infant: 20 },
-        'ASM': { currency: 'USD', adult: 705, infant: 20 },
+        'ASM': { currency: 'USD', adult: 705, infant: 20, alt: { ERN: { adult: 10790, infant: 300 } } },
         'BAH': { currency: 'BHD', adult: 260, infant: 10 },
         'BEG': { currency: 'EUR', adult: 630, infant: 20 },
         'BEY': { currency: 'LBP', adult: 65142500, infant: 1835000 },
@@ -982,7 +998,7 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
 }
 
 // Get Go-Show fare
-export function getGoShowFare(origin, classType = 'ECONOMY') {
+export function getGoShowFare(origin, classType = 'ECONOMY', currency = null) {
     const originCode = origin.toUpperCase();
     const fare = GOSHOW_FARES[classType] && GOSHOW_FARES[classType][originCode];
     
@@ -992,12 +1008,16 @@ export function getGoShowFare(origin, classType = 'ECONOMY') {
         };
     }
     
+    const requestedCurrency = currency || getCurrencyForDestination(originCode);
+    const altFare = fare.alt && fare.alt[requestedCurrency];
+    const useAlt = altFare && requestedCurrency in fare.alt;
+    
     return {
         origin: originCode,
         classType,
-        currency: fare.currency,
-        adult: fare.adult,
-        infant: fare.infant,
+        currency: useAlt ? requestedCurrency : fare.currency,
+        adult: useAlt ? altFare.adult : fare.adult,
+        infant: useAlt ? altFare.infant : fare.infant,
         destination: 'DXB'
     };
 }
