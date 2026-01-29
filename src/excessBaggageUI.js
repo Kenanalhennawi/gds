@@ -14,7 +14,8 @@ import {
     getSportsEquipmentRate,
     getReportingRate,
     getTransferBaggageFee,
-    getUpgradeRate
+    getUpgradeRate,
+    getUpgradeOnBoardRate
 } from "./excessBaggage.js";
 import { translateAirline, translateCity } from "./translator.js";
 import { searchAirports, getAirportByCode } from "./airportSearch.js";
@@ -632,6 +633,10 @@ export function renderExcessBaggageCalculator(container) {
                 }
                 
                 result = getUpgradeRate(origin, currency);
+                if (!result.error) {
+                    const onBoard = getUpgradeOnBoardRate(origin, currency);
+                    result.onBoard = onBoard.error ? null : onBoard;
+                }
             }
             
             displayResult(resultDiv, result, service);
@@ -703,7 +708,7 @@ function displayUpgradeResult(result) {
         </div>
         
         <div style="background:rgba(96,165,250,0.1); padding:15px; border-radius:8px; border-left:3px solid var(--info-blue);">
-            <div style="font-weight:700; margin-bottom:10px; color:var(--info-blue);">Upgrade Rate</div>
+            <div style="font-weight:700; margin-bottom:10px; color:var(--info-blue);">Upgrade Rate (at airport)</div>
             <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-bottom:5px;">
                 ${result.rate.toLocaleString()} ${result.currency}
             </div>
@@ -711,6 +716,17 @@ function displayUpgradeResult(result) {
                 Adult/Child rate for upgrade to Business Class
             </div>
         </div>
+        ${result.onBoard ? `
+        <div style="background:rgba(251,191,36,0.08); padding:15px; border-radius:8px; border-left:3px solid var(--warning-amber); margin-top:12px;">
+            <div style="font-weight:700; margin-bottom:10px; color:var(--warning-amber);">Upgrade On Board</div>
+            <div style="font-size:20px; font-weight:700; color:var(--text-main); margin-bottom:5px;">
+                ${result.onBoard.rate.toLocaleString()} ${result.onBoard.currency}
+            </div>
+            <div style="font-size:13px; color:var(--text-muted);">
+                Adult/Child rate when upgrading on board
+            </div>
+        </div>
+        ` : ''}
     `;
 }
 
@@ -768,6 +784,7 @@ function displayExcessBaggageResult(result) {
     if (result.airline === 'FZ') {
         html += `
             <div style="background:rgba(96,165,250,0.1); padding:15px; border-radius:8px; border-left:3px solid var(--info-blue);">
+                ${result.isException ? '<div style="font-size:11px; color:var(--warning-amber); margin-bottom:8px; font-weight:600;">Exception rate for this route</div>' : ''}
                 <div style="font-weight:700; margin-bottom:10px; color:var(--info-blue);">Excess Baggage Rate</div>
                 <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-bottom:5px;">
                     ${result.ratePerKg} ${result.currency}
