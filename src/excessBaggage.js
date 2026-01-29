@@ -15,7 +15,7 @@ const ZONE_MAPPING = {
     'JIB': 5, 'ASM': 5, 'ADD': 5, 'MBA': 5, 'HGA': 5, 'MGQ': 5, 'JUB': 5, 'KRT': 5, 'PZU': 5, 'DAR': 5, 'JRO': 5, 'ZNZ': 5, 'EBB': 5, 'HBE': 5, 'SSH': 5, 'HMB': 5, 'SPX': 5, 'DBB': 5,
     'AMD': 6, 'BOM': 6, 'BLR': 6, 'CCJ': 6, 'CCU': 6, 'COK': 6, 'DEL': 6, 'HYD': 6, 'LKO': 6, 'MAA': 6, 'TRV': 6, 'KBL': 6, 'CGP': 6, 'DAC': 6, 'KTM': 6, 'BWA': 6, 'ISB': 6, 'KHI': 6, 'MUX': 6, 'LYP': 6, 'SKT': 6, 'UET': 6, 'LHE': 6, 'PEW': 6, 'CMB': 6, 'HRI': 6, 'LGK': 6, 'PEN': 6,
     'MLE': 7, 'GAN': 7, 'RGN': 7, 'KBV': 7, 'UTP': 7,
-    'GYD': 8, 'MSQ': 8, 'BUS': 8, 'TBS': 8, 'GRV': 8, 'EVN': 8, 'ALA': 8, 'CIT': 8, 'TSE': 8, 'FRU': 8, 'OSS': 8, 'DYU': 8, 'ASB': 8, 'TAS': 8, 'SKD': 8, 'NMA': 8, 'SZG': 8, 'TIA': 8, 'SJJ': 8, 'SOF': 8, 'DBV': 8, 'ZAG': 8, 'PRG': 8, 'JMK': 8, 'JTR': 8, 'CFU': 8, 'TLL': 8, 'HEL': 8, 'CTA': 8, 'NAP': 8, 'PSA': 8, 'BGY': 8, 'CAG': 8, 'OLB': 8, 'RIX': 8, 'VNO': 8, 'MLA': 8, 'TIV': 8, 'SKP': 8, 'KRK': 8, 'WAW': 8, 'POZ': 8, 'OTP': 8, 'CLJ': 8, 'AER': 8, 'KUF': 8, 'KRR': 8, 'KZN': 8, 'MCX': 8, 'MRV': 8, 'OVB': 8, 'PEE': 8, 'ROV': 8, 'SVX': 8, 'UFA': 8, 'VOG': 8, 'VKO': 8, 'ZIA': 8, 'LED': 8, 'BEG': 8, 'BTS': 8, 'LJU': 8, 'BSL': 8, 'ADB': 8, 'AYT': 8, 'SAW': 8, 'IST': 8, 'BJV': 8, 'TZX': 8, 'IEV': 8, 'KBP': 8, 'ODS': 8,
+    'GYD': 8, 'MSQ': 8, 'BUS': 8, 'TBS': 8, 'GRV': 8, 'EVN': 8, 'ALA': 8, 'CIT': 8, 'TSE': 8, 'FRU': 8, 'OSS': 8, 'DYU': 8, 'ASB': 8, 'TAS': 8, 'SKD': 8, 'NMA': 8, 'SZG': 8, 'TIA': 8, 'SJJ': 8, 'SOF': 8, 'DBV': 8, 'ZAG': 8, 'PRG': 8, 'JMK': 8, 'JTR': 8, 'CFU': 8, 'TLL': 8, 'HEL': 8, 'CTA': 8, 'NAP': 8, 'PSA': 8, 'BGY': 8, 'CAG': 8, 'OLB': 8, 'RIX': 8, 'VNO': 8, 'MLA': 8, 'TIV': 8, 'SKP': 8, 'KRK': 8, 'WAW': 8, 'POZ': 8, 'OTP': 8, 'CLJ': 8, 'AER': 8, 'KUF': 8, 'KRR': 8, 'KZN': 8, 'MCX': 8, 'MRV': 8, 'OVB': 8, 'PEE': 8, 'ROV': 8, 'SVX': 8, 'UFA': 8, 'VOG': 8, 'VKO': 8, 'ZIA': 8, 'LED': 8, 'BEG': 8, 'BTS': 8, 'LJU': 8, 'BSL': 8, 'ADB': 8, 'AYT': 8, 'SAW': 8, 'IST': 8, 'BJV': 8, 'TZX': 8, 'IEV': 8, 'KBP': 8, 'ODS': 8, 'KIV': 8,
     'ADE': 4, 'AWZ': 4, 'BND': 7, 'DOH': 2, 'ESB': 8, 'FIH': 5, 'DOK': 5, 'GBB': 8, 'HDM': 4, 'HRK': 8, 'SAH': 4, 'SVO': 8, 'TGD': 8, 'XWC': 8, 'ZYL': 6, 'GOI': 6, 'GOJ': 8, 'KGL': 5, 'MBX': 8, 'KDH': 6
 };
 
@@ -841,6 +841,133 @@ const TRANSFER_BAGGAGE_FEE = {
     'OUTSTATION': { currency: 'USD', amount: 30, ghaFee: 'As applicable' }
 };
 
+// Extra Legroom rates – Airport Rate / On Board Rate (from PDF pages 26-29)
+const EXTRA_LEGROOM_RATES = {
+    'AED': { airport: 175, onBoard: 200 },
+    'AFN': { airport: 3385, onBoard: 3868 },
+    'AOA': { airport: 44081, onBoard: 50378 },
+    'ARS': { airport: 56090, onBoard: 64103 },
+    'AUD': { airport: 74, onBoard: 85 },
+    'AZN': { airport: 81, onBoard: 93 },
+    'BAM': { airport: 82, onBoard: 94 },
+    'BBD': { airport: 95, onBoard: 109 },
+    'BDT': { airport: 5813, onBoard: 6643 },
+    'BGN': { airport: 82, onBoard: 94 },
+    'BHD': { airport: 18, onBoard: 21 },
+    'BMD': { airport: 48, onBoard: 54 },
+    'BND': { airport: 62, onBoard: 71 },
+    'BOB': { airport: 329, onBoard: 376 },
+    'BRL': { airport: 269, onBoard: 308 },
+    'BWP': { airport: 656, onBoard: 750 },
+    'CAD': { airport: 66, onBoard: 76 },
+    'CHF': { airport: 39, onBoard: 45 },
+    'CLP': { airport: 44987, onBoard: 51414 },
+    'CNY': { airport: 347, onBoard: 396 },
+    'COP': { airport: 201149, onBoard: 229885 },
+    'CZK': { airport: 1100, onBoard: 1257 },
+    'DJF': { airport: 8462, onBoard: 9671 },
+    'DKK': { airport: 312, onBoard: 357 },
+    'DZD': { airport: 6299, onBoard: 7199 },
+    'EGP': { airport: 2421, onBoard: 2767 },
+    'ERN': { airport: 715, onBoard: 817 },
+    'ETB': { airport: 6003, onBoard: 6861 },
+    'EUR': { airport: 42, onBoard: 48 },
+    'FJD': { airport: 109, onBoard: 124 },
+    'GBP': { airport: 36, onBoard: 41 },
+    'GEL': { airport: 131, onBoard: 150 },
+    'GHS': { airport: 685, onBoard: 783 },
+    'GNF': { airport: 416667, onBoard: 476190 },
+    'GYD': { airport: 9977, onBoard: 11403 },
+    'HKD': { airport: 370, onBoard: 422 },
+    'HRK': { airport: 315, onBoard: 360 },
+    'HUF': { airport: 17803, onBoard: 20346 },
+    'IDR': { airport: 795455, onBoard: 909091 },
+    'ILS': { airport: 174, onBoard: 199 },
+    'INR': { airport: 4077, onBoard: 4660 },
+    'IQD': { airport: 62500, onBoard: 71429 },
+    'IRR': { airport: 32956685, onBoard: 37664783 },
+    'ISK': { airport: 6112, onBoard: 6986 },
+    'JMD': { airport: 7498, onBoard: 8569 },
+    'JOD': { airport: 34, onBoard: 39 },
+    'JPY': { airport: 6788, onBoard: 7758 },
+    'KES': { airport: 6164, onBoard: 7045 },
+    'KHR': { airport: 190217, onBoard: 217391 },
+    'KMF': { airport: 20588, onBoard: 23529 },
+    'KRW': { airport: 68627, onBoard: 78431 },
+    'KWD': { airport: 15, onBoard: 17 },
+    'KZT': { airport: 25698, onBoard: 29369 },
+    'LBP': { airport: 4375000, onBoard: 5000000 },
+    'LKR': { airport: 14274, onBoard: 16313 },
+    'LSL': { airport: 884, onBoard: 1010 },
+    'LYD': { airport: 261, onBoard: 298 },
+    'MAD': { airport: 441, onBoard: 505 },
+    'MGA': { airport: 213415, onBoard: 243902 },
+    'MKD': { airport: 2578, onBoard: 2946 },
+    'MMK': { airport: 100000, onBoard: 114286 },
+    'MOP': { airport: 381, onBoard: 435 },
+    'MRU': { airport: 1889, onBoard: 2159 },
+    'MUR': { airport: 2154, onBoard: 2461 },
+    'MVR': { airport: 729, onBoard: 833 },
+    'MWK': { airport: 82547, onBoard: 94340 },
+    'MXN': { airport: 935, onBoard: 1068 },
+    'MYR': { airport: 206, onBoard: 236 },
+    'MZN': { airport: 3041, onBoard: 3476 },
+    'NAD': { airport: 884, onBoard: 1010 },
+    'NGN': { airport: 76419, onBoard: 87336 },
+    'NOK': { airport: 494, onBoard: 565 },
+    'NPR': { airport: 6515, onBoard: 7446 },
+    'NZD': { airport: 80, onBoard: 92 },
+    'OMR': { airport: 18, onBoard: 21 },
+    'PHP': { airport: 2683, onBoard: 3067 },
+    'PKR': { airport: 13441, onBoard: 15361 },
+    'PLN': { airport: 179, onBoard: 205 },
+    'PYG': { airport: 380435, onBoard: 434783 },
+    'QAR': { airport: 180, onBoard: 206 },
+    'RON': { airport: 219, onBoard: 250 },
+    'RSD': { airport: 4906, onBoard: 5607 },
+    'RUB': { airport: 4080, onBoard: 4663 },
+    'SAR': { airport: 179, onBoard: 204 },
+    'SCR': { airport: 693, onBoard: 792 },
+    'SDG': { airport: 96685, onBoard: 110497 },
+    'SDR': { airport: 35, onBoard: 40 },
+    'SEK': { airport: 459, onBoard: 524 },
+    'SGD': { airport: 62, onBoard: 71 },
+    'SOS': { airport: 28878, onBoard: 33003 },
+    'SSP': { airport: 213415, onBoard: 243902 },
+    'SYP': { airport: 583333, onBoard: 666667 },
+    'SZL': { airport: 884, onBoard: 1010 },
+    'THB': { airport: 1593, onBoard: 1820 },
+    'TJS': { airport: 510, onBoard: 583 },
+    'TND': { airport: 142, onBoard: 162 },
+    'TRY': { airport: 1848, onBoard: 2112 },
+    'TTD': { airport: 322, onBoard: 369 },
+    'TWD': { airport: 1538, onBoard: 1757 },
+    'TZS': { airport: 127737, onBoard: 145985 },
+    'UAH': { airport: 1986, onBoard: 2270 },
+    'UGX': { airport: 175000, onBoard: 200000 },
+    'USD': { airport: 48, onBoard: 54 },
+    'UYU': { airport: 1997, onBoard: 2283 },
+    'UZS': { airport: 616871, onBoard: 704995 },
+    'VND': { airport: 1250000, onBoard: 1428571 },
+    'XAF': { airport: 27473, onBoard: 31397 },
+    'XCD': { airport: 129, onBoard: 147 },
+    'XOF': { airport: 27473, onBoard: 31397 },
+    'YER': { airport: 11674, onBoard: 13342 },
+    'ZAR': { airport: 884, onBoard: 1010 },
+    'ZIG': { airport: 1277, onBoard: 1459 },
+    'ZMW': { airport: 1333, onBoard: 1524 },
+    'AMD': { airport: 18677, onBoard: 21345 },
+    'BYN': { airport: 156, onBoard: 178 },
+    'CDF': { airport: 135659, onBoard: 155039 },
+    'CRC': { airport: 23713, onBoard: 27100 },
+    'DOP': { airport: 2840, onBoard: 3246 },
+    'KGS': { airport: 4167, onBoard: 4762 },
+    'MDL': { airport: 819, onBoard: 937 },
+    'RWF': { airport: 68627, onBoard: 78431 },
+    'STN': { airport: 1023, onBoard: 1170 },
+    'TMT': { airport: 167, onBoard: 191 }
+};
+
 // Get excess baggage exception for a route (CMB-MLE, MLE-CMB)
 export function getExcessBaggageException(origin, destination) {
     const key = `${origin.toUpperCase()}-${destination.toUpperCase()}`;
@@ -1063,6 +1190,26 @@ export function getTransferBaggageFee(location) {
         return TRANSFER_BAGGAGE_FEE.DXB;
     }
     return TRANSFER_BAGGAGE_FEE.OUTSTATION;
+}
+
+// Get Extra Legroom rate (from PDF pages 26-29)
+export function getExtraLegroomRate(currency) {
+    const rates = EXTRA_LEGROOM_RATES[currency];
+    if (!rates) {
+        return {
+            error: `Extra Legroom rates not available for currency ${currency}`
+        };
+    }
+    return {
+        currency,
+        airport: rates.airport,
+        onBoard: rates.onBoard,
+        description: 'Extra Legroom (XLGR) seats'
+    };
+}
+
+export function getExtraLegroomCurrencies() {
+    return Object.keys(EXTRA_LEGROOM_RATES).sort();
 }
 
 // EK Excess Rates
