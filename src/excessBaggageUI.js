@@ -15,7 +15,9 @@ import {
     getReportingRate,
     getTransferBaggageFee,
     getUpgradeRate,
-    getUpgradeOnBoardRate
+    getUpgradeOnBoardRate,
+    getExtraLegroomRate,
+    getExtraLegroomCurrencies
 } from "./excessBaggage.js";
 import { translateAirline, translateCity } from "./translator.js";
 import { searchAirports, getAirportByCode } from "./airportSearch.js";
@@ -69,6 +71,9 @@ export function renderExcessBaggageCalculator(container) {
                         </button>
                         <button class="service-tab" data-service="upgrade" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Upgrade to Business
+                        </button>
+                        <button class="service-tab" data-service="extralegroom" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                            Extra Legroom
                         </button>
                     </div>
                     
@@ -283,6 +288,24 @@ export function renderExcessBaggageCalculator(container) {
                         </div>
                     </div>
                     
+                    <!-- Extra Legroom Section -->
+                    <div id="extralegroomSection" class="service-section" style="display:none;">
+                        <div style="display:grid; grid-template-columns:1fr; gap:15px; margin-bottom:20px;">
+                            <div>
+                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
+                                    Currency
+                                </label>
+                                <select 
+                                    id="extralegroomCurrency"
+                                    class="styled-select"
+                                    style="width:100%; max-width:280px; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
+                                >
+                                    <option value="AED">AED</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div style="display:flex; gap:10px; margin-bottom:20px;">
                         <button id="calculateBtn" class="btn-primary" style="flex:1;">
                             Calculate
@@ -323,6 +346,11 @@ export function renderExcessBaggageCalculator(container) {
     const upgradeCurrencies = ['AED', 'PKR', 'BHD', 'BYN', 'CHF', 'CZK', 'EGP', 'EUR', 'HUF', 'INR', 'JOD', 'KWD', 'KZT', 'LBP', 'LKR', 'MYR', 'NPR', 'OMR', 'PLN', 'QAR', 'RUB', 'SAR', 'TJS', 'THB', 'USD', 'UZS', 'IRR'];
     if (upgradeSelect) {
         upgradeSelect.innerHTML = upgradeCurrencies.map(curr => `<option value="${curr}">${curr}</option>`).join('');
+    }
+    const extralegroomCurrencySelect = container.querySelector('#extralegroomCurrency');
+    if (extralegroomCurrencySelect) {
+        const xlgrCurrencies = getExtraLegroomCurrencies();
+        extralegroomCurrencySelect.innerHTML = xlgrCurrencies.map(curr => `<option value="${curr}">${curr}</option>`).join('');
     }
     
     // Tab switching
@@ -532,6 +560,7 @@ export function renderExcessBaggageCalculator(container) {
             if (container.querySelector('#reportingType')) container.querySelector('#reportingType').value = 'LRTP';
             if (container.querySelector('#transferLocation')) container.querySelector('#transferLocation').value = 'DXB';
             if (container.querySelector('#upgradeCurrency')) container.querySelector('#upgradeCurrency').value = 'AED';
+            if (container.querySelector('#extralegroomCurrency')) container.querySelector('#extralegroomCurrency').value = 'AED';
             
             // Clear info displays
             originInfo.textContent = '';
@@ -637,6 +666,9 @@ export function renderExcessBaggageCalculator(container) {
                     const onBoard = getUpgradeOnBoardRate(origin, currency);
                     result.onBoard = onBoard.error ? null : onBoard;
                 }
+            } else if (service === 'extralegroom') {
+                const currency = container.querySelector('#extralegroomCurrency').value;
+                result = getExtraLegroomRate(currency);
             }
             
             displayResult(resultDiv, result, service);
@@ -683,10 +715,38 @@ function displayResult(container, result, service) {
         html += displayTransferResult(result);
     } else if (service === 'upgrade') {
         html += displayUpgradeResult(result);
+    } else if (service === 'extralegroom') {
+        html += displayExtraLegroomResult(result);
     }
     
     html += `</div></div>`;
     container.innerHTML = html;
+}
+
+function displayExtraLegroomResult(result) {
+    return `
+        <div style="font-weight:700; font-size:18px; margin-bottom:15px; color:var(--info-blue);">
+            ✓ Extra Legroom (XLGR) Rates
+        </div>
+        
+        <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:8px; margin-bottom:15px;">
+            <div style="font-weight:600; margin-bottom:5px; color:var(--text-muted); font-size:12px;">Currency</div>
+            <div style="font-size:16px; color:var(--text-main);">${result.currency}</div>
+        </div>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div style="background:rgba(96,165,250,0.1); padding:15px; border-radius:8px; border-left:3px solid var(--info-blue);">
+                <div style="font-weight:700; margin-bottom:8px; color:var(--info-blue); font-size:13px;">Airport Rate</div>
+                <div style="font-size:22px; font-weight:800; color:var(--text-main);">${result.airport.toLocaleString()} ${result.currency}</div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">At check-in / airport</div>
+            </div>
+            <div style="background:rgba(251,191,36,0.08); padding:15px; border-radius:8px; border-left:3px solid var(--warning-amber);">
+                <div style="font-weight:700; margin-bottom:8px; color:var(--warning-amber); font-size:13px;">On Board Rate</div>
+                <div style="font-size:22px; font-weight:800; color:var(--text-main);">${result.onBoard.toLocaleString()} ${result.currency}</div>
+                <div style="font-size:12px; color:var(--text-muted); margin-top:4px;">When purchased on board</div>
+            </div>
+        </div>
+    `;
 }
 
 function displayUpgradeResult(result) {
