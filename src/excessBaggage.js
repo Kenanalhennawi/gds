@@ -1092,16 +1092,22 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
             };
         }
         
+        const o = origin.toUpperCase();
+        const d = destination.toUpperCase();
+        const indiaNote = (INDIA_AIRPORT_CODES.includes(o) || INDIA_AIRPORT_CODES.includes(d))
+            ? (EXCESS_BAGGAGE_EXCEPTIONS.INDIA_NO_PREPURCHASE && EXCESS_BAGGAGE_EXCEPTIONS.INDIA_NO_PREPURCHASE.note)
+            : null;
         return {
             airline: 'FZ',
-            origin: origin.toUpperCase(),
-            destination: destination.toUpperCase(),
+            origin: o,
+            destination: d,
             originZone,
             destZone,
             currency: selectedCurrency,
             ratePerKg: rate,
             rateDescription: `${rate} ${selectedCurrency} per kg`,
-            carrierName: translateAirline('FZ')
+            carrierName: translateAirline('FZ'),
+            indiaNote: indiaNote || undefined
         };
     }
     
@@ -1139,7 +1145,10 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
         
         const perKgRate = EK_OAL_EXCESS_RATES_PER_KG[originRegion] && 
                          EK_OAL_EXCESS_RATES_PER_KG[originRegion][destRegion];
-        
+        const pieceOrigin = CANADA_AIRPORT_CODES.includes(o) ? 'CANADA' : originRegion;
+        const pieceRates = EK_OAL_EXCESS_RATES_PER_PIECE[pieceOrigin];
+        const ratePerPiece = pieceRates && pieceRates[destRegion] != null ? pieceRates[destRegion] : null;
+        const pieceCurrency = pieceOrigin === 'CANADA' && EK_OAL_EXCESS_RATES_PER_PIECE.CANADA && EK_OAL_EXCESS_RATES_PER_PIECE.CANADA.currency ? 'CAD' : 'USD';
         return {
             airline: 'EK',
             origin: o,
@@ -1151,6 +1160,9 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
             currency: 'USD',
             ratePerKg: perKgRate ?? null,
             rateDescription: perKgRate != null ? `$${perKgRate} USD per kg` : 'Rate not available for this route',
+            ratePerPiece: ratePerPiece != null ? ratePerPiece : undefined,
+            pieceCurrency: ratePerPiece != null ? pieceCurrency : undefined,
+            referToFSSUP: perKgRate == null,
             carrierName: translateAirline('EK')
         };
     }
@@ -1212,7 +1224,10 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
         
         const perKgRate = EK_OAL_EXCESS_RATES_PER_KG[originRegion] && 
                          EK_OAL_EXCESS_RATES_PER_KG[originRegion][destRegion];
-        
+        const pieceOrigin = CANADA_AIRPORT_CODES.includes(o) ? 'CANADA' : originRegion;
+        const pieceRates = EK_OAL_EXCESS_RATES_PER_PIECE[pieceOrigin];
+        const ratePerPiece = pieceRates && pieceRates[destRegion] != null ? pieceRates[destRegion] : null;
+        const pieceCurrency = pieceOrigin === 'CANADA' && EK_OAL_EXCESS_RATES_PER_PIECE.CANADA && EK_OAL_EXCESS_RATES_PER_PIECE.CANADA.currency ? 'CAD' : 'USD';
         return {
             airline: 'OAL',
             origin: o,
@@ -1224,6 +1239,9 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
             currency: 'USD',
             ratePerKg: perKgRate ?? null,
             rateDescription: perKgRate != null ? `$${perKgRate} USD per kg` : 'Rate not available for this route',
+            ratePerPiece: ratePerPiece != null ? ratePerPiece : undefined,
+            pieceCurrency: ratePerPiece != null ? pieceCurrency : undefined,
+            referToFSSUP: perKgRate == null,
             carrierName: 'Other Airlines (OAL)',
             note: 'Using EK/OAL interline rates'
         };
@@ -1447,7 +1465,13 @@ const EK_OAL_EXCESS_RATES_PER_KG = {
     }
 };
 
-// EK/OAL Excess Baggage Rates per Piece (USD)
+// Canadian airport codes – for EK/OAL per-piece (CAD)
+const CANADA_AIRPORT_CODES = ['YYZ', 'YVR', 'YUL', 'YYC', 'YOW', 'YHZ', 'YEG'];
+
+// India airport codes (FZ zone 6) – for India excess baggage note
+const INDIA_AIRPORT_CODES = ['AMD', 'BOM', 'BLR', 'CCJ', 'CCU', 'COK', 'DEL', 'HYD', 'LKO', 'MAA', 'TRV', 'GOI'];
+
+// EK/OAL Excess Baggage Rates per Piece (USD / CAD for Canada)
 const EK_OAL_EXCESS_RATES_PER_PIECE = {
     'AFRICA': {
         'ME': 200,
