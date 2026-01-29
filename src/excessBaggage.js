@@ -5,35 +5,18 @@
 
 import { translateAirline, translateCity } from "./translator.js";
 
-// Zone mapping for airports (from PDF page 13-14)
+// Zone mapping for airports – Excess Baggage (from PDF pages 13–14)
+// Zone 1: UAE | Zone 2: Gulf (Kuwait, Bahrain, Oman) | Zone 3: KSA | Zone 4: Middle East | Zone 5: Africa | Zone 6: Sub-Continent | Zone 7: SEA | Zone 8: Europe/CIS
 const ZONE_MAPPING = {
-    'DXB': 1, 'DWC': 1, 'AWZ': 1, 'AQI': 1, 'BAH': 1, 'BND': 1, 'BSR': 1, 'DMM': 1, 'DOH': 1, 'ELQ': 1,
-    'HAS': 1, 'HOF': 1, 'IFN': 1, 'KER': 1, 'KHI': 1, 'KIH': 1, 'KWI': 1, 'LRR': 1, 'MCT': 1, 'OHS': 1,
-    'RUH': 1, 'SLL': 1, 'SYZ': 1,
-    
+    'DXB': 1, 'DWC': 1,
     'KWI': 2, 'BAH': 2, 'MCT': 2, 'SLL': 2, 'OHS': 2,
-    'ADE': 2, 'AHB': 2, 'AJF': 2, 'AMD': 2, 'AMM': 2, 'AQJ': 2, 'BEY': 2, 'BGW': 2, 'BOM': 2, 'BLR': 2,
-    'DAM': 2, 'ALP': 2, 'LTK': 2,
-    'BUS': 2, 'BUZ': 2, 'CCJ': 2, 'CCU': 2, 'COK': 2, 'DEL': 2, 'EAM': 2, 'EBL': 2, 'EVN': 2, 'GBB': 2,
-    'GIZ': 2, 'GSM': 2, 'GYD': 2, 'HDM': 2, 'HRI': 2, 'HYD': 2, 'IKA': 2, 'ISB': 2, 'ISU': 2, 'JED': 2,
-    'JIB': 2, 'KBL': 2, 'KDH': 2, 'LKO': 2, 'LHE': 2, 'LYP': 2, 'MAA': 2, 'MED': 2, 'MHD': 2, 'MRV': 2,
-    'MUX': 2, 'NJF': 2, 'NUM': 2, 'RSI': 2, 'SAH': 2, 'SKT': 2, 'TBS': 2, 'TBZ': 2, 'TIF': 2, 'TRV': 2,
-    'TUU': 2, 'UET': 2, 'ULH': 2, 'YNB': 2,
-    
-    'AHB': 3, 'AQI': 3, 'AJF': 3, 'DMM': 3, 'ELQ': 3, 'EAM': 3, 'GIZ': 3, 'HAS': 3, 'HOF': 3,
-    'JED': 3, 'NUM': 3, 'MED': 3, 'RUH': 3, 'RSI': 3, 'TUU': 3, 'TIF': 3, 'ULH': 3, 'YNB': 3,
-    'ADB': 3, 'ADD': 3, 'AER': 3, 'ALA': 3, 'ASB': 3, 'ASM': 3, 'AYT': 3, 'BEG': 3, 'BGY': 3, 'BJM': 3,
-    'BJV': 3, 'BKK': 3, 'BSL': 3, 'BUD': 3, 'BTS': 3, 'BWA': 3, 'CAG': 3, 'CLJ': 3, 'CMB': 3, 'CTA': 3,
-    'CIT': 3, 'CFU': 3, 'CGP': 3, 'DAC': 3, 'DAR': 3, 'DBB': 3, 'DBV': 3, 'DYU': 3, 'EBB': 3, 'ESB': 3,
-    'DOK': 3, 'FIH': 3, 'FRU': 3, 'GAN': 3, 'GOI': 3, 'GOJ': 3, 'GRV': 3, 'HBE': 3, 'HGA': 3, 'HMB': 3,
-    'HRI': 3, 'HEL': 3, 'HRK': 3, 'IEV': 3, 'IST': 3, 'JMK': 3, 'JRO': 3, 'JTR': 3, 'KBP': 3, 'KBV': 3,
-    'KGL': 3, 'JUB': 3, 'KIV': 3, 'KRR': 3, 'KRK': 3, 'KRT': 3, 'KTM': 3, 'KUF': 3, 'KUT': 3, 'KZN': 3,
-    'LED': 3, 'LGK': 3, 'LJU': 3, 'MBA': 3, 'MBX': 3, 'MCX': 3, 'MGQ': 3, 'MLA': 3, 'MLE': 3, 'MSQ': 3,
-    'NAP': 3, 'NMA': 3, 'NQZ': 3, 'OLB': 3, 'OSS': 3, 'OTP': 3, 'OVB': 3, 'ODS': 3, 'PEE': 3, 'PEN': 3,
-    'PEW': 3, 'POZ': 3, 'PRG': 3, 'PSA': 3, 'PZU': 3, 'RIX': 3, 'RGN': 3, 'ROV': 3, 'SJJ': 3, 'SKG': 3,
-    'SKP': 3, 'SAW': 3, 'SKD': 3, 'SOF': 3, 'SPX': 3, 'SSH': 3, 'SVO': 3, 'SVX': 3, 'SZG': 3, 'TAS': 3,
-    'TIA': 3, 'TIV': 3, 'TLL': 3, 'TLV': 3, 'TGD': 3, 'TZX': 3, 'UTP': 3, 'UFA': 3, 'VNO': 3, 'VKO': 3,
-    'VOG': 3, 'WAW': 3, 'XWC': 3, 'ZIA': 3, 'ZNZ': 3, 'ZYL': 3, 'ZAG': 3
+    'AHB': 3, 'AQI': 3, 'AJF': 3, 'DMM': 3, 'ELQ': 3, 'EAM': 3, 'GIZ': 3, 'HAS': 3, 'HOF': 3, 'JED': 3, 'NUM': 3, 'MED': 3, 'RUH': 3, 'RSI': 3, 'TUU': 3, 'TIF': 3, 'ULH': 3, 'YNB': 3,
+    'BUZ': 4, 'GSM': 4, 'IFN': 4, 'IKA': 4, 'LRR': 4, 'MHD': 4, 'SYZ': 4, 'TBZ': 4, 'KIH': 4, 'KER': 4, 'BGW': 4, 'BSR': 4, 'EBL': 4, 'ISU': 4, 'NJF': 4, 'TLV': 4, 'AMM': 4, 'BEY': 4,
+    'JIB': 5, 'ASM': 5, 'ADD': 5, 'MBA': 5, 'HGA': 5, 'MGQ': 5, 'JUB': 5, 'KRT': 5, 'PZU': 5, 'DAR': 5, 'JRO': 5, 'ZNZ': 5, 'EBB': 5, 'HBE': 5, 'SSH': 5, 'HMB': 5, 'SPX': 5, 'DBB': 5,
+    'AMD': 6, 'BOM': 6, 'BLR': 6, 'CCJ': 6, 'CCU': 6, 'COK': 6, 'DEL': 6, 'HYD': 6, 'LKO': 6, 'MAA': 6, 'TRV': 6, 'KBL': 6, 'CGP': 6, 'DAC': 6, 'KTM': 6, 'BWA': 6, 'ISB': 6, 'KHI': 6, 'MUX': 6, 'LYP': 6, 'SKT': 6, 'UET': 6, 'LHE': 6, 'PEW': 6, 'CMB': 6, 'HRI': 6, 'LGK': 6, 'PEN': 6,
+    'MLE': 7, 'GAN': 7, 'RGN': 7, 'KBV': 7, 'UTP': 7,
+    'GYD': 8, 'MSQ': 8, 'BUS': 8, 'TBS': 8, 'GRV': 8, 'EVN': 8, 'ALA': 8, 'CIT': 8, 'TSE': 8, 'FRU': 8, 'OSS': 8, 'DYU': 8, 'ASB': 8, 'TAS': 8, 'SKD': 8, 'NMA': 8, 'SZG': 8, 'TIA': 8, 'SJJ': 8, 'SOF': 8, 'DBV': 8, 'ZAG': 8, 'PRG': 8, 'JMK': 8, 'JTR': 8, 'CFU': 8, 'TLL': 8, 'HEL': 8, 'CTA': 8, 'NAP': 8, 'PSA': 8, 'BGY': 8, 'CAG': 8, 'OLB': 8, 'RIX': 8, 'VNO': 8, 'MLA': 8, 'TIV': 8, 'SKP': 8, 'KRK': 8, 'WAW': 8, 'POZ': 8, 'OTP': 8, 'CLJ': 8, 'AER': 8, 'KUF': 8, 'KRR': 8, 'KZN': 8, 'MCX': 8, 'MRV': 8, 'OVB': 8, 'PEE': 8, 'ROV': 8, 'SVX': 8, 'UFA': 8, 'VOG': 8, 'VKO': 8, 'ZIA': 8, 'LED': 8, 'BEG': 8, 'BTS': 8, 'LJU': 8, 'BSL': 8, 'ADB': 8, 'AYT': 8, 'SAW': 8, 'IST': 8, 'BJV': 8, 'TZX': 8, 'IEV': 8, 'KBP': 8, 'ODS': 8,
+    'ADE': 4, 'AWZ': 4, 'BND': 7, 'DOH': 2, 'ESB': 8, 'FIH': 5, 'DOK': 5, 'GBB': 8, 'HDM': 4, 'HRK': 8, 'SAH': 4, 'SVO': 8, 'TGD': 8, 'XWC': 8, 'ZYL': 6, 'GOI': 6, 'GOJ': 8, 'KGL': 5, 'MBX': 8, 'KDH': 6
 };
 
 // Currency mapping by destination (from PDF page 23)
@@ -59,7 +42,7 @@ const CURRENCY_MAPPING = {
     'RUB': ['AER', 'GOJ', 'GRV', 'KRR', 'KUF', 'KZN', 'LED', 'MCX', 'MRV', 'OVB', 'PEE', 'ROV', 'SVO', 'SVX', 'UFA', 'VKO', 'VOG', 'VOZ', 'ZIA'],
     'SAR': ['AHB', 'AJF', 'AQI', 'DMM', 'EAM', 'ELQ', 'GIZ', 'HAS', 'HOF', 'JED', 'NUM', 'MED', 'RUH', 'RSI', 'TIF', 'TUU', 'ULH', 'YNB'],
     'THB': ['KBV', 'UTP'],
-    'USD': ['ADB', 'ADD', 'ADE', 'ALP', 'ASB', 'ASM', 'AYT', 'AWZ', 'BGW', 'BJM', 'BJV', 'BND', 'BUS', 'BUZ', 'BSR', 'CGP', 'DAC', 'DAM', 'DAR', 'DOK', 'DYU', 'EBB', 'EBL', 'ESB', 'EVN', 'FIH', 'FRU', 'GAN', 'GBB', 'GSM', 'GYD', 'HDM', 'HGA', 'HRK', 'IEV', 'IFN', 'IKA', 'ISU', 'JIB', 'JRO', 'JUB', 'KBL', 'KBP', 'KDH', 'KER', 'KGL', 'KIH', 'KUT', 'LRR', 'LTK', 'MBA', 'MGQ', 'MHD', 'MLE', 'MSQ', 'NJF', 'NMA', 'ODS', 'OSS', 'RGN', 'SAH', 'SAW', 'SKD', 'SKG', 'TBS', 'TBZ', 'TGD', 'TLV', 'TZX', 'ZNZ', 'ZYL'],
+    'USD': ['ADB', 'ADD', 'ADE', 'ASB', 'ASM', 'AYT', 'AWZ', 'BGW', 'BJM', 'BJV', 'BND', 'BUS', 'BUZ', 'BSR', 'CGP', 'DAC', 'DAR', 'DOK', 'DYU', 'EBB', 'EBL', 'ESB', 'EVN', 'FIH', 'FRU', 'GAN', 'GBB', 'GSM', 'GYD', 'HDM', 'HGA', 'HRK', 'IEV', 'IFN', 'IKA', 'ISU', 'JIB', 'JRO', 'JUB', 'KBL', 'KBP', 'KDH', 'KER', 'KGL', 'KIH', 'KUT', 'LRR', 'MBA', 'MGQ', 'MHD', 'MLE', 'MSQ', 'NJF', 'NMA', 'ODS', 'OSS', 'RGN', 'SAH', 'SAW', 'SKD', 'SKG', 'TBS', 'TBZ', 'TGD', 'TLV', 'TZX', 'ZNZ', 'ZYL'],
     'UZS': ['TAS']
 };
 
@@ -124,7 +107,7 @@ export function getZoneName(zone) {
 // Excess Baggage Rates Table (from PDF pages 15-22)
 const EXCESS_BAGGAGE_RATES = {
     'AED': {
-        1: { 1: 0, 2: 40, 3: 40, 4: 60, 5: 40, 6: 40, 7: 60, 8: 60 },
+        1: { 1: 0, 2: 40, 3: 40, 4: 60, 5: 40, 6: 40, 7: 60, 8: 80 },
         2: { 1: 40, 2: 60, 3: 60, 4: 60, 5: 60, 6: 60, 7: 80, 8: 80 },
         3: { 1: 40, 2: 60, 3: 60, 4: 60, 5: 60, 6: 60, 7: 80, 8: 80 },
         4: { 1: 60, 2: 60, 3: 60, 4: 60, 5: 60, 6: 60, 7: 60, 8: 60 },
@@ -133,8 +116,168 @@ const EXCESS_BAGGAGE_RATES = {
         7: { 1: 60, 2: 80, 3: 80, 4: 60, 5: 60, 6: 80, 7: 80, 8: 80 },
         8: { 1: 60, 2: 80, 3: 80, 4: 60, 5: 60, 6: 80, 7: 80, 8: 80 }
     },
+    'BHD': {
+        1: { 1: 0, 2: 4, 3: 4, 4: 6, 5: 4, 6: 4, 7: 6, 8: 8 },
+        2: { 1: 4, 2: 6, 3: 6, 4: 6, 5: 6, 6: 6, 7: 8, 8: 8 },
+        3: { 1: 4, 2: 6, 3: 6, 4: 6, 5: 6, 6: 6, 7: 8, 8: 8 },
+        4: { 1: 6, 2: 6, 3: 6, 4: 6, 5: 6, 6: 6, 7: 6, 8: 6 },
+        5: { 1: 4, 2: 6, 3: 6, 4: 6, 5: 6, 6: 6, 7: 6, 8: 6 },
+        6: { 1: 4, 2: 6, 3: 6, 4: 6, 5: 6, 6: 6, 7: 8, 8: 8 },
+        7: { 1: 6, 2: 8, 3: 8, 4: 6, 5: 6, 6: 8, 7: 8, 8: 8 },
+        8: { 1: 6, 2: 8, 3: 8, 4: 6, 5: 6, 6: 8, 7: 8, 8: 8 }
+    },
+    'BYN': {
+        1: { 1: 0, 2: 35, 3: 35, 4: 55, 5: 35, 6: 35, 7: 55, 8: 75 },
+        2: { 1: 35, 2: 55, 3: 55, 4: 55, 5: 55, 6: 55, 7: 75, 8: 75 },
+        3: { 1: 35, 2: 55, 3: 55, 4: 55, 5: 55, 6: 55, 7: 75, 8: 75 },
+        4: { 1: 55, 2: 55, 3: 55, 4: 55, 5: 55, 6: 55, 7: 55, 8: 55 },
+        5: { 1: 35, 2: 55, 3: 55, 4: 55, 5: 55, 6: 55, 7: 55, 8: 55 },
+        6: { 1: 35, 2: 55, 3: 55, 4: 55, 5: 55, 6: 55, 7: 75, 8: 75 },
+        7: { 1: 55, 2: 75, 3: 75, 4: 55, 5: 55, 6: 75, 7: 75, 8: 75 },
+        8: { 1: 55, 2: 75, 3: 75, 4: 55, 5: 55, 6: 75, 7: 75, 8: 75 }
+    },
+    'CHF': {
+        1: { 1: 0, 2: 9, 3: 9, 4: 14, 5: 9, 6: 9, 7: 14, 8: 18 },
+        2: { 1: 9, 2: 14, 3: 14, 4: 14, 5: 14, 6: 14, 7: 18, 8: 18 },
+        3: { 1: 9, 2: 14, 3: 14, 4: 14, 5: 14, 6: 14, 7: 18, 8: 18 },
+        4: { 1: 14, 2: 14, 3: 14, 4: 14, 5: 14, 6: 14, 7: 14, 8: 14 },
+        5: { 1: 9, 2: 14, 3: 14, 4: 14, 5: 14, 6: 14, 7: 14, 8: 14 },
+        6: { 1: 9, 2: 14, 3: 14, 4: 14, 5: 14, 6: 14, 7: 18, 8: 18 },
+        7: { 1: 14, 2: 18, 3: 18, 4: 14, 5: 14, 6: 18, 7: 18, 8: 18 },
+        8: { 1: 14, 2: 18, 3: 18, 4: 14, 5: 14, 6: 18, 7: 18, 8: 18 }
+    },
+    'CZK': {
+        1: { 1: 0, 2: 260, 3: 260, 4: 390, 5: 260, 6: 260, 7: 390, 8: 520 },
+        2: { 1: 260, 2: 390, 3: 390, 4: 390, 5: 390, 6: 390, 7: 520, 8: 520 },
+        3: { 1: 260, 2: 390, 3: 390, 4: 390, 5: 390, 6: 390, 7: 520, 8: 520 },
+        4: { 1: 390, 2: 390, 3: 390, 4: 390, 5: 390, 6: 390, 7: 390, 8: 390 },
+        5: { 1: 260, 2: 390, 3: 390, 4: 390, 5: 390, 6: 390, 7: 390, 8: 390 },
+        6: { 1: 260, 2: 390, 3: 390, 4: 390, 5: 390, 6: 390, 7: 520, 8: 520 },
+        7: { 1: 390, 2: 520, 3: 520, 4: 390, 5: 390, 6: 520, 7: 520, 8: 520 },
+        8: { 1: 390, 2: 520, 3: 520, 4: 390, 5: 390, 6: 520, 7: 520, 8: 520 }
+    },
+    'EGP': {
+        1: { 1: 0, 2: 570, 3: 570, 4: 855, 5: 570, 6: 570, 7: 855, 8: 1140 },
+        2: { 1: 570, 2: 855, 3: 855, 4: 855, 5: 855, 6: 855, 7: 1140, 8: 1140 },
+        3: { 1: 570, 2: 855, 3: 855, 4: 855, 5: 855, 6: 855, 7: 1140, 8: 1140 },
+        4: { 1: 855, 2: 855, 3: 855, 4: 855, 5: 855, 6: 855, 7: 855, 8: 855 },
+        5: { 1: 570, 2: 855, 3: 855, 4: 855, 5: 855, 6: 855, 7: 855, 8: 855 },
+        6: { 1: 570, 2: 855, 3: 855, 4: 855, 5: 855, 6: 855, 7: 1140, 8: 1140 },
+        7: { 1: 855, 2: 1140, 3: 1140, 4: 855, 5: 855, 6: 1140, 7: 1140, 8: 1140 },
+        8: { 1: 855, 2: 1140, 3: 1140, 4: 855, 5: 855, 6: 1140, 7: 1140, 8: 1140 }
+    },
+    'HUF': {
+        1: { 1: 0, 2: 4195, 3: 4195, 4: 6295, 5: 4195, 6: 4195, 7: 6295, 8: 8390 },
+        2: { 1: 4195, 2: 6295, 3: 6295, 4: 6295, 5: 6295, 6: 6295, 7: 8390, 8: 8390 },
+        3: { 1: 4195, 2: 6295, 3: 6295, 4: 6295, 5: 6295, 6: 6295, 7: 8390, 8: 8390 },
+        4: { 1: 6295, 2: 6295, 3: 6295, 4: 6295, 5: 6295, 6: 6295, 7: 6295, 8: 6295 },
+        5: { 1: 4195, 2: 6295, 3: 6295, 4: 6295, 5: 6295, 6: 6295, 7: 6295, 8: 6295 },
+        6: { 1: 4195, 2: 6295, 3: 6295, 4: 6295, 5: 6295, 6: 6295, 7: 8390, 8: 8390 },
+        7: { 1: 6295, 2: 8390, 3: 8390, 4: 6295, 5: 6295, 6: 8390, 7: 8390, 8: 8390 },
+        8: { 1: 6295, 2: 8390, 3: 8390, 4: 6295, 5: 6295, 6: 8390, 7: 8390, 8: 8390 }
+    },
+    'JOD': {
+        1: { 1: 0, 2: 8, 3: 8, 4: 12, 5: 8, 6: 8, 7: 12, 8: 16 },
+        2: { 1: 8, 2: 12, 3: 12, 4: 12, 5: 12, 6: 12, 7: 16, 8: 16 },
+        3: { 1: 8, 2: 12, 3: 12, 4: 12, 5: 12, 6: 12, 7: 16, 8: 16 },
+        4: { 1: 12, 2: 12, 3: 12, 4: 12, 5: 12, 6: 12, 7: 12, 8: 12 },
+        5: { 1: 8, 2: 12, 3: 12, 4: 12, 5: 12, 6: 12, 7: 12, 8: 12 },
+        6: { 1: 8, 2: 12, 3: 12, 4: 12, 5: 12, 6: 12, 7: 16, 8: 16 },
+        7: { 1: 12, 2: 16, 3: 16, 4: 12, 5: 12, 6: 16, 7: 16, 8: 16 },
+        8: { 1: 12, 2: 16, 3: 16, 4: 12, 5: 12, 6: 16, 7: 16, 8: 16 }
+    },
+    'KWD': {
+        1: { 1: 0, 2: 3, 3: 3, 4: 5, 5: 3, 6: 3, 7: 5, 8: 7 },
+        2: { 1: 3, 2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 7, 8: 7 },
+        3: { 1: 3, 2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 7, 8: 7 },
+        4: { 1: 5, 2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5, 8: 5 },
+        5: { 1: 3, 2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 5, 8: 5 },
+        6: { 1: 3, 2: 5, 3: 5, 4: 5, 5: 5, 6: 5, 7: 7, 8: 7 },
+        7: { 1: 5, 2: 7, 3: 7, 4: 5, 5: 5, 6: 7, 7: 7, 8: 7 },
+        8: { 1: 5, 2: 7, 3: 7, 4: 5, 5: 5, 6: 7, 7: 7, 8: 7 }
+    },
+    'KZT': {
+        1: { 1: 0, 2: 6055, 3: 6055, 4: 9085, 5: 6055, 6: 6055, 7: 9085, 8: 12110 },
+        2: { 1: 6055, 2: 9085, 3: 9085, 4: 9085, 5: 9085, 6: 9085, 7: 12110, 8: 12110 },
+        3: { 1: 6055, 2: 9085, 3: 9085, 4: 9085, 5: 9085, 6: 9085, 7: 12110, 8: 12110 },
+        4: { 1: 9085, 2: 9085, 3: 9085, 4: 9085, 5: 9085, 6: 9085, 7: 9085, 8: 9085 },
+        5: { 1: 6055, 2: 9085, 3: 9085, 4: 9085, 5: 9085, 6: 9085, 7: 9085, 8: 9085 },
+        6: { 1: 6055, 2: 9085, 3: 9085, 4: 9085, 5: 9085, 6: 9085, 7: 12110, 8: 12110 },
+        7: { 1: 9085, 2: 12110, 3: 12110, 4: 9085, 5: 9085, 6: 12110, 7: 12110, 8: 12110 },
+        8: { 1: 9085, 2: 12110, 3: 12110, 4: 9085, 5: 9085, 6: 12110, 7: 12110, 8: 12110 }
+    },
+    'LKR': {
+        1: { 1: 0, 2: 3365, 3: 3365, 4: 5045, 5: 3365, 6: 3365, 7: 5045, 8: 6725 },
+        2: { 1: 3365, 2: 5045, 3: 5045, 4: 5045, 5: 5045, 6: 5045, 7: 6725, 8: 6725 },
+        3: { 1: 3365, 2: 5045, 3: 5045, 4: 5045, 5: 5045, 6: 5045, 7: 6725, 8: 6725 },
+        4: { 1: 5045, 2: 5045, 3: 5045, 4: 5045, 5: 5045, 6: 5045, 7: 5045, 8: 5045 },
+        5: { 1: 3365, 2: 5045, 3: 5045, 4: 5045, 5: 5045, 6: 5045, 7: 5045, 8: 5045 },
+        6: { 1: 3365, 2: 5045, 3: 5045, 4: 5045, 5: 5045, 6: 5045, 7: 6725, 8: 6725 },
+        7: { 1: 5045, 2: 6725, 3: 6725, 4: 5045, 5: 5045, 6: 6725, 7: 6725, 8: 6725 },
+        8: { 1: 5045, 2: 6725, 3: 6725, 4: 5045, 5: 5045, 6: 6725, 7: 6725, 8: 6725 }
+    },
+    'MYR': {
+        1: { 1: 0, 2: 50, 3: 50, 4: 75, 5: 50, 6: 50, 7: 75, 8: 95 },
+        2: { 1: 50, 2: 75, 3: 75, 4: 75, 5: 75, 6: 75, 7: 95, 8: 95 },
+        3: { 1: 50, 2: 75, 3: 75, 4: 75, 5: 75, 6: 75, 7: 95, 8: 95 },
+        4: { 1: 75, 2: 75, 3: 75, 4: 75, 5: 75, 6: 75, 7: 75, 8: 75 },
+        5: { 1: 50, 2: 75, 3: 75, 4: 75, 5: 75, 6: 75, 7: 75, 8: 75 },
+        6: { 1: 50, 2: 75, 3: 75, 4: 75, 5: 75, 6: 75, 7: 95, 8: 95 },
+        7: { 1: 75, 2: 95, 3: 95, 4: 75, 5: 75, 6: 95, 7: 95, 8: 95 },
+        8: { 1: 75, 2: 95, 3: 95, 4: 75, 5: 75, 6: 95, 7: 95, 8: 95 }
+    },
+    'NPR': {
+        1: { 1: 0, 2: 1765, 3: 1765, 4: 2650, 5: 1765, 6: 1765, 7: 2650, 8: 3530 },
+        2: { 1: 1765, 2: 2650, 3: 2650, 4: 2650, 5: 2650, 6: 2650, 7: 3530, 8: 3530 },
+        3: { 1: 1765, 2: 2650, 3: 2650, 4: 2650, 5: 2650, 6: 2650, 7: 3530, 8: 3530 },
+        4: { 1: 2650, 2: 2650, 3: 2650, 4: 2650, 5: 2650, 6: 2650, 7: 2650, 8: 2650 },
+        5: { 1: 1765, 2: 2650, 3: 2650, 4: 2650, 5: 2650, 6: 2650, 7: 2650, 8: 2650 },
+        6: { 1: 1765, 2: 2650, 3: 2650, 4: 2650, 5: 2650, 6: 2650, 7: 3530, 8: 3530 },
+        7: { 1: 2650, 2: 3530, 3: 3530, 4: 2650, 5: 2650, 6: 3530, 7: 3530, 8: 3530 },
+        8: { 1: 2650, 2: 3530, 3: 3530, 4: 2650, 5: 2650, 6: 3530, 7: 3530, 8: 3530 }
+    },
+    'OMR': {
+        1: { 1: 0, 2: 4, 3: 4, 4: 6, 5: 4, 6: 4, 7: 6, 8: 9 },
+        2: { 1: 4, 2: 6, 3: 6, 4: 6, 5: 6, 6: 6, 7: 9, 8: 9 },
+        3: { 1: 4, 2: 6, 3: 6, 4: 6, 5: 6, 6: 6, 7: 9, 8: 9 },
+        4: { 1: 6, 2: 6, 3: 6, 4: 6, 5: 6, 6: 6, 7: 6, 8: 6 },
+        5: { 1: 4, 2: 6, 3: 6, 4: 6, 5: 6, 6: 6, 7: 6, 8: 6 },
+        6: { 1: 4, 2: 6, 3: 6, 4: 6, 5: 6, 6: 6, 7: 9, 8: 9 },
+        7: { 1: 6, 2: 9, 3: 9, 4: 6, 5: 6, 6: 9, 7: 9, 8: 9 },
+        8: { 1: 6, 2: 9, 3: 9, 4: 6, 5: 6, 6: 9, 7: 9, 8: 9 }
+    },
+    'PLN': {
+        1: { 1: 0, 2: 40, 3: 40, 4: 65, 5: 40, 6: 40, 7: 65, 8: 85 },
+        2: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 85, 8: 85 },
+        3: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 85, 8: 85 },
+        4: { 1: 65, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 65, 8: 65 },
+        5: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 65, 8: 65 },
+        6: { 1: 40, 2: 65, 3: 65, 4: 65, 5: 65, 6: 65, 7: 85, 8: 85 },
+        7: { 1: 65, 2: 85, 3: 85, 4: 65, 5: 65, 6: 85, 7: 85, 8: 85 },
+        8: { 1: 65, 2: 85, 3: 85, 4: 65, 5: 65, 6: 85, 7: 85, 8: 85 }
+    },
+    'THB': {
+        1: { 1: 0, 2: 375, 3: 375, 4: 565, 5: 375, 6: 375, 7: 565, 8: 750 },
+        2: { 1: 375, 2: 565, 3: 565, 4: 565, 5: 565, 6: 565, 7: 750, 8: 750 },
+        3: { 1: 375, 2: 565, 3: 565, 4: 565, 5: 565, 6: 565, 7: 750, 8: 750 },
+        4: { 1: 565, 2: 565, 3: 565, 4: 565, 5: 565, 6: 565, 7: 565, 8: 565 },
+        5: { 1: 375, 2: 565, 3: 565, 4: 565, 5: 565, 6: 565, 7: 565, 8: 565 },
+        6: { 1: 375, 2: 565, 3: 565, 4: 565, 5: 565, 6: 565, 7: 750, 8: 750 },
+        7: { 1: 565, 2: 750, 3: 750, 4: 565, 5: 565, 6: 750, 7: 750, 8: 750 },
+        8: { 1: 565, 2: 750, 3: 750, 4: 565, 5: 565, 6: 750, 7: 750, 8: 750 }
+    },
+    'UZS': {
+        1: { 1: 0, 2: 145360, 3: 145360, 4: 218040, 5: 145360, 6: 145360, 7: 218040, 8: 290720 },
+        2: { 1: 145360, 2: 218040, 3: 218040, 4: 218040, 5: 218040, 6: 218040, 7: 290720, 8: 290720 },
+        3: { 1: 145360, 2: 218040, 3: 218040, 4: 218040, 5: 218040, 6: 218040, 7: 290720, 8: 290720 },
+        4: { 1: 218040, 2: 218040, 3: 218040, 4: 218040, 5: 218040, 6: 218040, 7: 218040, 8: 218040 },
+        5: { 1: 145360, 2: 218040, 3: 218040, 4: 218040, 5: 218040, 6: 218040, 7: 218040, 8: 218040 },
+        6: { 1: 145360, 2: 218040, 3: 218040, 4: 218040, 5: 218040, 6: 218040, 7: 290720, 8: 290720 },
+        7: { 1: 218040, 2: 290720, 3: 290720, 4: 218040, 5: 218040, 6: 290720, 7: 290720, 8: 290720 },
+        8: { 1: 218040, 2: 290720, 3: 290720, 4: 218040, 5: 218040, 6: 290720, 7: 290720, 8: 290720 }
+    },
     'USD': {
-        1: { 1: 0, 2: 11, 3: 11, 4: 17, 5: 11, 6: 11, 7: 17, 8: 17 },
+        1: { 1: 0, 2: 11, 3: 11, 4: 17, 5: 11, 6: 11, 7: 17, 8: 22 },
         2: { 1: 11, 2: 17, 3: 17, 4: 17, 5: 17, 6: 17, 7: 22, 8: 22 },
         3: { 1: 11, 2: 17, 3: 17, 4: 17, 5: 17, 6: 17, 7: 22, 8: 22 },
         4: { 1: 17, 2: 17, 3: 17, 4: 17, 5: 17, 6: 17, 7: 17, 8: 17 },
@@ -144,7 +287,7 @@ const EXCESS_BAGGAGE_RATES = {
         8: { 1: 17, 2: 22, 3: 22, 4: 17, 5: 17, 6: 22, 7: 22, 8: 22 }
     },
     'EUR': {
-        1: { 1: 0, 2: 10, 3: 10, 4: 15, 5: 10, 6: 10, 7: 15, 8: 15 },
+        1: { 1: 0, 2: 10, 3: 10, 4: 15, 5: 10, 6: 10, 7: 15, 8: 20 },
         2: { 1: 10, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 20, 8: 20 },
         3: { 1: 10, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 20, 8: 20 },
         4: { 1: 15, 2: 15, 3: 15, 4: 15, 5: 15, 6: 15, 7: 15, 8: 15 },
@@ -230,11 +373,38 @@ const UPGRADE_RATES = {
     }
 };
 
-// Upgrade Zone Mapping
+// Upgrade Zone Mapping (from PDF page 11)
 const UPGRADE_ZONE_MAPPING = {
     1: ['AWZ', 'AQI', 'BAH', 'BND', 'BSR', 'DMM', 'DOH', 'DWC', 'DXB', 'ELQ', 'HAS', 'HOF', 'IFN', 'KER', 'KHI', 'KIH', 'KWI', 'LRR', 'MCT', 'OHS', 'RUH', 'SLL', 'SYZ'],
     2: ['ADE', 'AHB', 'AJF', 'AMD', 'AMM', 'AQJ', 'BEY', 'BGW', 'BOM', 'BLR', 'BUS', 'BUZ', 'CCJ', 'CCU', 'COK', 'DEL', 'EAM', 'EBL', 'EVN', 'GBB', 'GIZ', 'GSM', 'GYD', 'HDM', 'HRI', 'HYD', 'IKA', 'ISB', 'ISU', 'JED', 'JIB', 'KBL', 'KDH', 'LKO', 'LHE', 'LYP', 'MAA', 'MED', 'MHD', 'MRV', 'MUX', 'NJF', 'NUM', 'RSI', 'SAH', 'SKT', 'TBS', 'TBZ', 'TIF', 'TRV', 'TUU', 'UET', 'ULH', 'YNB'],
     3: ['ADB', 'ADD', 'AER', 'ALA', 'ASB', 'ASM', 'AYT', 'BEG', 'BGY', 'BJM', 'BJV', 'BKK', 'BSL', 'BUD', 'BTS', 'BWA', 'CAG', 'CLJ', 'CMB', 'CTA', 'CIT', 'CFU', 'CGP', 'DAC', 'DAR', 'DBB', 'DBV', 'DYU', 'EBB', 'ESB', 'DOK', 'FIH', 'FRU', 'GAN', 'GOI', 'GOJ', 'GRV', 'HBE', 'HGA', 'HMB', 'HRI', 'HEL', 'HRK', 'IEV', 'IST', 'JMK', 'JRO', 'JTR', 'KBP', 'KBV', 'KGL', 'JUB', 'KIV', 'KRR', 'KRK', 'KRT', 'KTM', 'KUF', 'KUT', 'KZN', 'LED', 'LGK', 'LJU', 'MBA', 'MBX', 'MCX', 'MGQ', 'MLA', 'MLE', 'MSQ', 'NAP', 'NMA', 'NQZ', 'OLB', 'OSS', 'OTP', 'OVB', 'ODS', 'PEE', 'PEN', 'PEW', 'POZ', 'PRG', 'PSA', 'PZU', 'RIX', 'RGN', 'ROV', 'SJJ', 'SKG', 'SKP', 'SAW', 'SKD', 'SOF', 'SPX', 'SSH', 'SVO', 'SVX', 'SZG', 'TAS', 'TIA', 'TIV', 'TLL', 'TLV', 'TGD', 'TZX', 'UTP', 'UFA', 'VNO', 'VKO', 'VOG', 'WAW', 'XWC', 'ZIA', 'ZNZ', 'ZYL', 'ZAG']
+};
+
+// Upgrade to Business – On Board rates (from PDF page 13)
+const UPGRADE_ON_BOARD_RATES = {
+    'AED': { 1: 1400, 2: 2100, 3: 2300 },
+    'PKR': { 1: 115205, 2: 184330, 3: 207375 }
+};
+
+// Excess baggage route exceptions (from PDF page 22)
+const EXCESS_BAGGAGE_EXCEPTIONS = {
+    'CMB-MLE': { currency: 'LKR', amount: 3025 },
+    'MLE-CMB': { currency: 'USD', amount: 10 },
+    'INDIA_NO_PREPURCHASE': { note: 'Without pre-purchased baggage: INR 900 plus taxes for baggage up to 20 kg. Excess above 20 kg at normal rates.' }
+};
+
+// Upgrade to Business – exceptions by route/market (from PDF page 12)
+const UPGRADE_EXCEPTIONS = {
+    'SAUDI': { from: 'All KSA points', AED: 1175, SAR: 1200 },
+    'INDIA': { from: 'All India points', AED: 1315, INR: 30640 },
+    'CMB-MLE': { from: 'Sri Lanka–Maldives', AED: 745, LKR: 60080 },
+    'MLE-CMB': { from: 'Maldives–Sri Lanka', AED: 920, USD: 250 },
+    'BGW': { from: 'Iraq (BGW)', AED: 1650, USD: 450 },
+    'TLV': { from: 'Israel (TLV)', AED: 2185, USD: 595 },
+    'KTM': { from: 'Nepal (KTM)', AED: 2185, NPR: 81350 },
+    'KWI': { from: 'Kuwait (KWI)', AED: 660, KWD: 55 },
+    'BAH': { from: 'Bahrain (BAH)', AED: 535, BHD: 55 },
+    'MCT': { from: 'Muscat (MCT)', AED: 715, OMR: 75 }
 };
 
 // Get upgrade zone for airport
@@ -272,6 +442,25 @@ export function getUpgradeRate(origin, currency) {
         currency,
         rate,
         description: `Upgrade to Business Class from Zone ${zone}`
+    };
+}
+
+// Get Upgrade to Business – On Board rate (from PDF page 13)
+export function getUpgradeOnBoardRate(origin, currency) {
+    const zone = getUpgradeZone(origin);
+    if (!zone) {
+        return { error: `Upgrade On Board rate not available for ${origin}` };
+    }
+    const rate = UPGRADE_ON_BOARD_RATES[currency] && UPGRADE_ON_BOARD_RATES[currency][zone];
+    if (rate == null) {
+        return { error: `Upgrade On Board rate not available for ${currency} from Zone ${zone}` };
+    }
+    return {
+        origin: origin.toUpperCase(),
+        zone: parseInt(zone),
+        currency,
+        rate,
+        description: `Upgrade to Business Class On Board from Zone ${zone}`
     };
 }
 
@@ -636,6 +825,12 @@ const TRANSFER_BAGGAGE_FEE = {
     'OUTSTATION': { currency: 'USD', amount: 30, ghaFee: 'As applicable' }
 };
 
+// Get excess baggage exception for a route (CMB-MLE, MLE-CMB)
+export function getExcessBaggageException(origin, destination) {
+    const key = `${origin.toUpperCase()}-${destination.toUpperCase()}`;
+    return EXCESS_BAGGAGE_EXCEPTIONS[key] || null;
+}
+
 // Calculate excess baggage rate
 export function calculateExcessBaggageRate(origin, destination, airline, currency = null) {
     const originZone = getZoneForAirport(origin);
@@ -653,6 +848,23 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
     
     // Handle FZ rates
     if (airline === 'FZ') {
+        // Route exceptions (CMB-MLE, MLE-CMB)
+        const exception = getExcessBaggageException(origin, destination);
+        if (exception && exception.amount != null) {
+            return {
+                airline: 'FZ',
+                origin: origin.toUpperCase(),
+                destination: destination.toUpperCase(),
+                originZone,
+                destZone,
+                currency: exception.currency,
+                ratePerKg: exception.amount,
+                rateDescription: `${exception.amount} ${exception.currency} (exception rate for this route)`,
+                carrierName: translateAirline('FZ'),
+                isException: true
+            };
+        }
+        
         const rates = EXCESS_BAGGAGE_RATES[selectedCurrency] || EXCESS_BAGGAGE_RATES['USD'];
         const rate = rates[originZone] && rates[originZone][destZone];
         
