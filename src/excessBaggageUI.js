@@ -17,7 +17,11 @@ import {
     getUpgradeRate,
     getUpgradeOnBoardRate,
     getExtraLegroomRate,
-    getExtraLegroomCurrencies
+    getExtraLegroomCurrencies,
+    AIRCRAFT_XLGR_REFERENCE,
+    REFERENCE_TEXTS,
+    INTERLINE_JOURNEY_RULES,
+    EXCESS_BAGGAGE_DISCLAIMER
 } from "./excessBaggage.js";
 import { translateAirline, translateCity } from "./translator.js";
 import { searchAirports, getAirportByCode } from "./airportSearch.js";
@@ -74,6 +78,9 @@ export function renderExcessBaggageCalculator(container) {
                         </button>
                         <button class="service-tab" data-service="extralegroom" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Extra Legroom
+                        </button>
+                        <button class="service-tab" data-service="reference" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                            Reference
                         </button>
                     </div>
                     
@@ -306,6 +313,11 @@ export function renderExcessBaggageCalculator(container) {
                         </div>
                     </div>
                     
+                    <!-- Reference Section (document reference data) -->
+                    <div id="referenceSection" class="service-section" style="display:none;">
+                        <div id="referenceContent"></div>
+                    </div>
+                    
                     <div style="display:flex; gap:10px; margin-bottom:20px;">
                         <button id="calculateBtn" class="btn-primary" style="flex:1;">
                             Calculate
@@ -377,7 +389,22 @@ export function renderExcessBaggageCalculator(container) {
             // Update sections
             sections.forEach(s => s.style.display = 'none');
             const activeSection = container.querySelector(`#${service}Section`);
-            if (activeSection) activeSection.style.display = 'block';
+            const calcBtn = container.querySelector('#calculateBtn');
+            const clearBtnEl = container.querySelector('#clearBtn');
+            const rateResultEl = container.querySelector('#rateResult');
+            const buttonsRow = calcBtn && calcBtn.parentElement;
+            if (activeSection) {
+                activeSection.style.display = 'block';
+                if (service === 'reference') {
+                    const refContent = container.querySelector('#referenceContent');
+                    if (refContent) refContent.innerHTML = renderReferenceContent();
+                    if (buttonsRow) buttonsRow.style.display = 'none';
+                    if (rateResultEl) rateResultEl.style.display = 'none';
+                } else {
+                    if (buttonsRow) buttonsRow.style.display = 'flex';
+                    if (rateResultEl) rateResultEl.style.display = 'none';
+                }
+            }
         });
     });
     
@@ -680,6 +707,64 @@ export function renderExcessBaggageCalculator(container) {
     });
 }
 
+function renderReferenceContent() {
+    const aircraftRows = AIRCRAFT_XLGR_REFERENCE.map(a =>
+        `<tr><td>${a.type}</td><td>${a.cabin || 'Y'}</td><td>${a.capacity}</td><td>${a.xlgrRows}</td></tr>`
+    ).join('');
+    const interlineRows = INTERLINE_JOURNEY_RULES.map(r =>
+        `<tr><td style="padding:8px; border:1px solid var(--glass-border);">${r.journey}</td><td style="padding:8px; border:1px solid var(--glass-border);">${r.condition}</td></tr>`
+    ).join('');
+    return `
+        <div style="margin-bottom:28px;">
+            <h3 style="font-size:16px; font-weight:700; color:var(--info-blue); margin-bottom:12px; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">Interline Excess Baggage – Which Carrier's Rates Apply</h3>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">For interline bookings, the following carrier's excess baggage rates apply. Document: GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES Version 2025.112(A) Outstation, Effective 17 May 2025.</p>
+            <div style="overflow-x:auto; margin-bottom:16px;">
+                <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead>
+                        <tr style="background:rgba(59,130,246,0.15);">
+                            <th style="text-align:left; padding:10px; border:1px solid var(--glass-border);">Journey</th>
+                            <th style="text-align:left; padding:10px; border:1px solid var(--glass-border);">Condition</th>
+                        </tr>
+                    </thead>
+                    <tbody>${interlineRows}</tbody>
+                </table>
+            </div>
+            <div style="padding:12px; background:rgba(251,191,36,0.08); border-radius:8px; border-left:3px solid var(--warning-amber); font-size:13px; color:var(--text-muted); margin-bottom:20px;">
+                <strong style="color:var(--warning-amber);">Customer disclaimer:</strong> ${EXCESS_BAGGAGE_DISCLAIMER}
+            </div>
+        </div>
+        <div style="margin-bottom:28px;">
+            <h3 style="font-size:16px; font-weight:700; color:var(--info-blue); margin-bottom:12px; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">Aircraft Type & Extra Legroom (XLGR) Seats</h3>
+            <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">Reference: flydubai document Page 26 – aircraft types, capacity and XLGR seat rows.</p>
+            <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:13px;">
+                    <thead>
+                        <tr style="background:rgba(59,130,246,0.15);">
+                            <th style="text-align:left; padding:10px; border:1px solid var(--glass-border);">A/C Type</th>
+                            <th style="text-align:left; padding:10px; border:1px solid var(--glass-border);">Cabin</th>
+                            <th style="text-align:left; padding:10px; border:1px solid var(--glass-border);">Capacity</th>
+                            <th style="text-align:left; padding:10px; border:1px solid var(--glass-border);">XLGR Rows</th>
+                        </tr>
+                    </thead>
+                    <tbody>${aircraftRows}</tbody>
+                </table>
+            </div>
+        </div>
+        <div style="margin-bottom:28px;">
+            <h3 style="font-size:16px; font-weight:700; color:var(--info-blue); margin-bottom:12px; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">EK / OAL Excess Baggage (Emirates & Other Airlines)</h3>
+            <p style="color:var(--text-muted); font-size:13px; line-height:1.6;">${REFERENCE_TEXTS.EK_OAL_EXCESS}</p>
+        </div>
+        <div style="margin-bottom:28px;">
+            <h3 style="font-size:16px; font-weight:700; color:var(--info-blue); margin-bottom:12px; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">UA / AC Excess Baggage (United & Air Canada)</h3>
+            <p style="color:var(--text-muted); font-size:13px; line-height:1.6;">${REFERENCE_TEXTS.UA_AC_EXCESS}</p>
+        </div>
+        <div style="margin-bottom:12px;">
+            <h3 style="font-size:16px; font-weight:700; color:var(--info-blue); margin-bottom:12px; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">Regional Classification (EK/OAL)</h3>
+            <p style="color:var(--text-muted); font-size:13px; line-height:1.6;">${REFERENCE_TEXTS.REGIONAL_CLASSIFICATION}</p>
+        </div>
+    `;
+}
+
 function showError(container, message) {
     container.style.display = 'block';
     container.innerHTML = `
@@ -724,6 +809,9 @@ function displayResult(container, result, service) {
 }
 
 function displayExtraLegroomResult(result) {
+    const exchangeLine = result.currencyExchange != null
+        ? `<div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:8px; margin-bottom:15px;"><div style="font-weight:600; margin-bottom:4px; color:var(--text-muted); font-size:12px;">Currency Exchange (to USD)</div><div style="font-size:15px; color:var(--text-main);">1 USD = ${result.currencyExchange} ${result.currency}</div></div>`
+        : '';
     return `
         <div style="font-weight:700; font-size:18px; margin-bottom:15px; color:var(--info-blue);">
             ✓ Extra Legroom (XLGR) Rates
@@ -733,7 +821,7 @@ function displayExtraLegroomResult(result) {
             <div style="font-weight:600; margin-bottom:5px; color:var(--text-muted); font-size:12px;">Currency</div>
             <div style="font-size:16px; color:var(--text-main);">${result.currency}</div>
         </div>
-        
+        ${exchangeLine}
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
             <div style="background:rgba(96,165,250,0.1); padding:15px; border-radius:8px; border-left:3px solid var(--info-blue);">
                 <div style="font-weight:700; margin-bottom:8px; color:var(--info-blue); font-size:13px;">Airport Rate</div>
@@ -772,9 +860,10 @@ function displayUpgradeResult(result) {
             <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-bottom:5px;">
                 ${result.rate.toLocaleString()} ${result.currency}
             </div>
-            <div style="font-size:13px; color:var(--text-muted);">
+            <div style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">
                 Adult/Child rate for upgrade to Business Class
             </div>
+            ${result.infantRate != null ? `<div style="font-size:13px; color:var(--text-muted);"><strong>Infant:</strong> ${result.infantRate.toLocaleString()} ${result.currency}</div>` : ''}
         </div>
         ${result.onBoard ? `
         <div style="background:rgba(251,191,36,0.08); padding:15px; border-radius:8px; border-left:3px solid var(--warning-amber); margin-top:12px;">
@@ -782,9 +871,10 @@ function displayUpgradeResult(result) {
             <div style="font-size:20px; font-weight:700; color:var(--text-main); margin-bottom:5px;">
                 ${result.onBoard.rate.toLocaleString()} ${result.onBoard.currency}
             </div>
-            <div style="font-size:13px; color:var(--text-muted);">
+            <div style="font-size:13px; color:var(--text-muted); margin-bottom:8px;">
                 Adult/Child rate when upgrading on board
             </div>
+            ${result.onBoard.infantRate != null ? `<div style="font-size:13px; color:var(--text-muted);"><strong>Infant:</strong> ${result.onBoard.infantRate.toLocaleString()} ${result.onBoard.currency}</div>` : ''}
         </div>
         ` : ''}
     `;
@@ -858,8 +948,12 @@ function displayExcessBaggageResult(result) {
         const routeInfo = result.originRegion && result.destRegion 
             ? `Route: ${result.originRegion} → ${result.destRegion}`
             : '';
+        const lcaMlaBadge = result.isLarnacaMaltaException 
+            ? '<div style="font-size:11px; color:var(--warning-amber); margin-bottom:8px; font-weight:600;">Larnaca–Malta exception: $15 per kg</div>' 
+            : '';
         html += `
             <div style="background:rgba(96,165,250,0.1); padding:15px; border-radius:8px; border-left:3px solid var(--info-blue);">
+                ${lcaMlaBadge}
                 <div style="font-weight:700; margin-bottom:10px; color:var(--info-blue);">Excess Baggage Rate</div>
                 <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-bottom:5px;">
                     ${result.ratePerKg === null || result.ratePerKg === 'N/A' || result.ratePerKg === undefined ? 'Rate not available' : `$${result.ratePerKg} USD`}
@@ -867,8 +961,6 @@ function displayExcessBaggageResult(result) {
                 <div style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">
                     Per kilogram (kg) of excess baggage
                     ${routeInfo ? `<br><span style="font-size:11px; color:var(--text-dim); margin-top:5px; display:block;">${routeInfo}</span>` : ''}
-                </div>
-                    Route: ${result.originRegion} → ${result.destRegion}
                 </div>
             </div>
         `;
@@ -915,6 +1007,11 @@ function displayExcessBaggageResult(result) {
         `;
     }
     
+    html += `
+        <div style="margin-top:16px; padding:12px; background:rgba(251,191,36,0.08); border-radius:8px; border-left:3px solid var(--warning-amber); font-size:12px; color:var(--text-muted); line-height:1.5;">
+            <strong style="color:var(--warning-amber);">Note:</strong> ${EXCESS_BAGGAGE_DISCLAIMER}
+        </div>
+    `;
     return html;
 }
 
