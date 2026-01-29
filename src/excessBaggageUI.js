@@ -729,9 +729,10 @@ function renderReferenceContent() {
                     <tbody>${interlineRows}</tbody>
                 </table>
             </div>
-            <div style="padding:12px; background:rgba(251,191,36,0.08); border-radius:8px; border-left:3px solid var(--warning-amber); font-size:13px; color:var(--text-muted); margin-bottom:20px;">
+            <div style="padding:12px; background:rgba(251,191,36,0.08); border-radius:8px; border-left:3px solid var(--warning-amber); font-size:13px; color:var(--text-muted); margin-bottom:10px;">
                 <strong style="color:var(--warning-amber);">Customer disclaimer:</strong> ${EXCESS_BAGGAGE_DISCLAIMER}
             </div>
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:20px;">In case excess baggage rate is missing for a specific destination, please refer to FS/SUP in charge.</p>
         </div>
         <div style="margin-bottom:28px;">
             <h3 style="font-size:16px; font-weight:700; color:var(--info-blue); margin-bottom:12px; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">Aircraft Type & Extra Legroom (XLGR) Seats</h3>
@@ -942,6 +943,7 @@ function displayExcessBaggageResult(result) {
                 <div style="font-size:13px; color:var(--text-muted);">
                     Per kilogram (kg) of excess baggage
                 </div>
+                ${result.indiaNote ? `<div style="margin-top:12px; padding:10px; background:rgba(251,191,36,0.08); border-radius:6px; font-size:12px; color:var(--text-muted); border-left:3px solid var(--warning-amber);"><strong>India (without pre-purchased baggage):</strong> ${result.indiaNote}</div>` : ''}
             </div>
         `;
     } else if (result.airline === 'EK' || result.airline === 'OAL') {
@@ -951,10 +953,16 @@ function displayExcessBaggageResult(result) {
         const lcaMlaBadge = result.isLarnacaMaltaException 
             ? '<div style="font-size:11px; color:var(--warning-amber); margin-bottom:8px; font-weight:600;">Larnaca–Malta exception: $15 per kg</div>' 
             : '';
+        const fsSupNote = result.referToFSSUP 
+            ? '<div style="margin-top:10px; padding:10px; background:rgba(251,191,36,0.08); border-radius:6px; font-size:12px; color:var(--text-muted); border-left:3px solid var(--warning-amber);">If rate is missing for this destination, refer to FS/SUP in charge.</div>' 
+            : '';
+        const perPieceBlock = result.ratePerPiece != null 
+            ? `<div style="margin-top:12px; padding:10px; background:rgba(0,0,0,0.2); border-radius:6px;"><div style="font-weight:600; margin-bottom:4px; color:var(--text-muted); font-size:12px;">Additional piece (at airport)</div><div style="font-size:18px; font-weight:700; color:var(--text-main);">${result.ratePerPiece.toLocaleString()} ${result.pieceCurrency}</div><div style="font-size:11px; color:var(--text-muted);">Per additional piece of baggage</div></div>` 
+            : '';
         html += `
             <div style="background:rgba(96,165,250,0.1); padding:15px; border-radius:8px; border-left:3px solid var(--info-blue);">
                 ${lcaMlaBadge}
-                <div style="font-weight:700; margin-bottom:10px; color:var(--info-blue);">Excess Baggage Rate</div>
+                <div style="font-weight:700; margin-bottom:10px; color:var(--info-blue);">Excess Baggage Rate (per kg)</div>
                 <div style="font-size:24px; font-weight:800; color:var(--text-main); margin-bottom:5px;">
                     ${result.ratePerKg === null || result.ratePerKg === 'N/A' || result.ratePerKg === undefined ? 'Rate not available' : `$${result.ratePerKg} USD`}
                 </div>
@@ -962,6 +970,8 @@ function displayExcessBaggageResult(result) {
                     Per kilogram (kg) of excess baggage
                     ${routeInfo ? `<br><span style="font-size:11px; color:var(--text-dim); margin-top:5px; display:block;">${routeInfo}</span>` : ''}
                 </div>
+                ${perPieceBlock}
+                ${fsSupNote}
             </div>
         `;
     } else if (result.airline === 'AC' || result.airline === 'UA') {
