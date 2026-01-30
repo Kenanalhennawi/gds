@@ -57,40 +57,52 @@ export function renderExcessBaggageCalculator(container) {
                         Calculate rates for excess baggage, go-show fares, sports equipment, and other services.
                     </p>
                     
+                    <!-- How to use (collapsible) -->
+                    <div class="how-to-use-wrap" style="margin-bottom:16px;">
+                        <button type="button" id="howToUseToggle" class="how-to-use-toggle" aria-expanded="false" aria-controls="howToUseContent" style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:rgba(59,130,246,0.1); border:1px solid var(--glass-border); border-radius:8px; color:var(--info-blue); font-size:13px; font-weight:600; cursor:pointer; width:100%; text-align:left;">
+                            <span aria-hidden="true">?</span> How to use
+                        </button>
+                        <div id="howToUseContent" class="how-to-use-content" hidden style="padding:14px; background:rgba(0,0,0,0.2); border-radius:8px; margin-top:6px; font-size:13px; color:var(--text-muted); line-height:1.6;">
+                            <p style="margin-bottom:8px;"><strong style="color:var(--text-main);">1.</strong> Choose a tab (Excess Baggage, Go-Show, Upgrade, etc.).</p>
+                            <p style="margin-bottom:8px;"><strong style="color:var(--text-main);">2.</strong> Fill in the fields (e.g. origin, destination, airline, currency).</p>
+                            <p style="margin-bottom:8px;"><strong style="color:var(--text-main);">3.</strong> Click <strong>Calculate</strong> or press <kbd style="background:rgba(0,0,0,0.3); padding:2px 6px; border-radius:4px;">Ctrl+Enter</kbd>.</p>
+                            <p style="margin-bottom:0;"><strong style="color:var(--text-main);">4.</strong> Use <strong>Ask Agent</strong> for questions about rates and rules.</p>
+                        </div>
+                    </div>
                     <!-- Service Tabs -->
-                    <div class="service-tabs-container" style="display:flex; gap:10px; margin-bottom:20px; border-bottom:2px solid var(--glass-border); padding-bottom:2px;">
-                        <button class="service-tab active" data-service="excess" style="padding:10px 20px; background:rgba(59,130,246,0.25); border:none; border-bottom:2px solid var(--primary-blue); color:var(--primary-blue); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                    <div class="service-tabs-container service-tabs-scroll" role="tablist" aria-label="Rate calculator services" style="display:flex; gap:10px; margin-bottom:20px; border-bottom:2px solid var(--glass-border); padding-bottom:2px; overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch;">
+                        <button class="service-tab active" data-service="excess" role="tab" aria-selected="true" aria-controls="excessSection" id="tabExcess" style="padding:10px 20px; background:rgba(59,130,246,0.25); border:none; border-bottom:2px solid var(--primary-blue); color:var(--primary-blue); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Excess Baggage
                         </button>
-                        <button class="service-tab" data-service="goshow" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" data-service="goshow" role="tab" aria-selected="false" aria-controls="goshowSection" id="tabGoshow" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Go-Show Fares
                         </button>
-                        <button class="service-tab" data-service="sports" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabSports" data-service="sports" role="tab" aria-selected="false" aria-controls="sportsSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Sports Equipment
                         </button>
-                        <button class="service-tab" data-service="reporting" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabReporting" data-service="reporting" role="tab" aria-selected="false" aria-controls="reportingSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Reporting Fees
                         </button>
-                        <button class="service-tab" data-service="transfer" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabTransfer" data-service="transfer" role="tab" aria-selected="false" aria-controls="transferSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Transfer Baggage
                         </button>
-                        <button class="service-tab" data-service="upgrade" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabUpgrade" data-service="upgrade" role="tab" aria-selected="false" aria-controls="upgradeSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Upgrade to Business
                         </button>
-                        <button class="service-tab" data-service="extralegroom" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabExtralegroom" data-service="extralegroom" role="tab" aria-selected="false" aria-controls="extralegroomSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Extra Legroom
                         </button>
-                        <button class="service-tab" data-service="reference" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabReference" data-service="reference" role="tab" aria-selected="false" aria-controls="referenceSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Reference
                         </button>
-                        <button class="service-tab" data-service="agent" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabAgent" data-service="agent" role="tab" aria-selected="false" aria-controls="agentSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Ask Agent
                         </button>
                     </div>
                     
                     <!-- Excess Baggage Section -->
-                    <div id="excessSection" class="service-section">
-                        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:15px; margin-bottom:20px;">
+                    <div id="excessSection" class="service-section" role="tabpanel" aria-labelledby="tabExcess" aria-hidden="false">
+                        <div class="excess-form-grid" style="gap:15px; margin-bottom:20px;">
                             <div style="position:relative;">
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);" title="3-letter IATA code or search by city/country">Origin Airport</label>
                                 <input 
@@ -105,7 +117,9 @@ export function renderExcessBaggageCalculator(container) {
                                 <div id="originAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                                 <div id="originInfo" style="margin-top:5px; font-size:11px; color:var(--text-muted);"></div>
                             </div>
-                            
+                            <div style="display:flex; align-items:flex-end; padding-bottom:2px;">
+                                <button type="button" id="swapOriginDestBtn" class="swap-btn" title="Swap origin and destination" aria-label="Swap origin and destination" style="width:44px; height:44px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(59,130,246,0.15); color:var(--info-blue); cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0;">⇄</button>
+                            </div>
                             <div style="position:relative;">
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);" title="3-letter IATA code or search by city/country">Destination Airport</label>
                                 <input 
@@ -152,7 +166,7 @@ export function renderExcessBaggageCalculator(container) {
                     </div>
                     
                     <!-- Go-Show Section -->
-                    <div id="goshowSection" class="service-section" style="display:none;">
+                    <div id="goshowSection" class="service-section" role="tabpanel" aria-labelledby="tabGoshow" aria-hidden="true" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                             <div style="position:relative;">
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);" title="3-letter IATA or search by city/country">Origin Airport</label>
@@ -184,7 +198,7 @@ export function renderExcessBaggageCalculator(container) {
                     </div>
                     
                     <!-- Sports Equipment Section -->
-                    <div id="sportsSection" class="service-section" style="display:none;">
+                    <div id="sportsSection" class="service-section" role="tabpanel" aria-labelledby="tabSports" aria-hidden="true" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                             <div>
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
@@ -215,7 +229,7 @@ export function renderExcessBaggageCalculator(container) {
                     </div>
                     
                     <!-- Reporting Section -->
-                    <div id="reportingSection" class="service-section" style="display:none;">
+                    <div id="reportingSection" class="service-section" role="tabpanel" aria-labelledby="tabReporting" aria-hidden="true" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                             <div>
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
@@ -246,7 +260,7 @@ export function renderExcessBaggageCalculator(container) {
                     </div>
                     
                     <!-- Transfer Section -->
-                    <div id="transferSection" class="service-section" style="display:none;">
+                    <div id="transferSection" class="service-section" role="tabpanel" aria-labelledby="tabTransfer" aria-hidden="true" style="display:none;">
                         <div style="margin-bottom:20px;">
                             <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
                                 Location
@@ -263,7 +277,7 @@ export function renderExcessBaggageCalculator(container) {
                     </div>
                     
                     <!-- Upgrade Section -->
-                    <div id="upgradeSection" class="service-section" style="display:none;">
+                    <div id="upgradeSection" class="service-section" role="tabpanel" aria-labelledby="tabUpgrade" aria-hidden="true" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                             <div style="position:relative;">
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);" title="3-letter IATA or search by city/country">Origin Airport</label>
@@ -293,7 +307,7 @@ export function renderExcessBaggageCalculator(container) {
                     </div>
                     
                     <!-- Extra Legroom Section -->
-                    <div id="extralegroomSection" class="service-section" style="display:none;">
+                    <div id="extralegroomSection" class="service-section" role="tabpanel" aria-labelledby="tabExtralegroom" aria-hidden="true" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr; gap:15px; margin-bottom:20px;">
                             <div>
                                 <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
@@ -311,12 +325,12 @@ export function renderExcessBaggageCalculator(container) {
                     </div>
                     
                     <!-- Reference Section (document reference data) -->
-                    <div id="referenceSection" class="service-section" style="display:none;">
+                    <div id="referenceSection" class="service-section" role="tabpanel" aria-labelledby="tabReference" aria-hidden="true" style="display:none;">
                         <div id="referenceContent"></div>
                     </div>
                     
                     <!-- Ask Agent Section -->
-                    <div id="agentSection" class="service-section" style="display:none;">
+                    <div id="agentSection" class="service-section" role="tabpanel" aria-labelledby="tabAgent" aria-hidden="true" style="display:none;">
                         <p style="color:var(--text-muted); font-size:14px; line-height:1.6; margin-bottom:16px;">
                             Ask anything about excess baggage, interline rates, upgrade, go-show, extra legroom, regional classification, or document rules. The agent answers from the official reference (GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES).
                         </p>
@@ -352,7 +366,7 @@ export function renderExcessBaggageCalculator(container) {
                         </button>
                     </div>
                     
-                    <div id="rateResult" style="display:none;"></div>
+                    <div id="rateResult" class="rate-result-panel" role="region" aria-live="polite" aria-atomic="true" style="display:none;"></div>
                 </div>
             </div>
         </div>
@@ -390,6 +404,29 @@ export function renderExcessBaggageCalculator(container) {
         extralegroomCurrencySelect.innerHTML = xlgrCurrencies.map(curr => `<option value="${curr}">${curr}</option>`).join('');
     }
     
+    // Restore last-used excess baggage (origin, destination, airline, currency)
+    try {
+        const last = localStorage.getItem('gds_excess_last');
+        if (last && originInput && destInput && airlineSelect && currencySelect) {
+            const data = JSON.parse(last);
+            if (data.origin) originInput.value = data.origin;
+            if (data.destination) destInput.value = data.destination;
+            if (data.airline && [...airlineSelect.options].some(o => o.value === data.airline)) airlineSelect.value = data.airline;
+            if (data.currency && (data.currency === 'AUTO' || [...currencySelect.options].some(o => o.value === data.currency))) currencySelect.value = data.currency;
+        }
+    } catch (_) {}
+    
+    // How to use toggle
+    const howToUseToggle = container.querySelector('#howToUseToggle');
+    const howToUseContent = container.querySelector('#howToUseContent');
+    if (howToUseToggle && howToUseContent) {
+        howToUseToggle.addEventListener('click', () => {
+            const isOpen = howToUseContent.hidden === false;
+            howToUseContent.hidden = isOpen;
+            howToUseToggle.setAttribute('aria-expanded', !isOpen);
+        });
+    }
+    
     // Tab switching
     const tabs = container.querySelectorAll('.service-tab');
     const sections = container.querySelectorAll('.service-section');
@@ -398,21 +435,26 @@ export function renderExcessBaggageCalculator(container) {
         tab.addEventListener('click', () => {
             const service = tab.dataset.service;
             
-            // Update tabs
+            // Update tabs (aria)
             tabs.forEach(t => {
                 t.classList.remove('active');
                 t.style.background = 'transparent';
                 t.style.borderBottom = 'none';
                 t.style.color = 'var(--text-muted)';
+                t.setAttribute('aria-selected', 'false');
             });
             tab.classList.add('active');
             tab.style.background = 'rgba(59,130,246,0.25)';
             tab.style.borderBottom = '2px solid var(--primary-blue)';
             tab.style.color = 'var(--primary-blue)';
             tab.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.2)';
+            tab.setAttribute('aria-selected', 'true');
             
-            // Update sections
-            sections.forEach(s => s.style.display = 'none');
+            // Update sections (aria-hidden)
+            sections.forEach(s => {
+                s.style.display = 'none';
+                s.setAttribute('aria-hidden', 'true');
+            });
             const activeSection = container.querySelector(`#${service}Section`);
             const calcBtn = container.querySelector('#calculateBtn');
             const clearBtnEl = container.querySelector('#clearBtn');
@@ -420,6 +462,7 @@ export function renderExcessBaggageCalculator(container) {
             const buttonsRow = calcBtn && calcBtn.parentElement;
             if (activeSection) {
                 activeSection.style.display = 'block';
+                activeSection.setAttribute('aria-hidden', 'false');
                 if (service === 'reference') {
                     const refContent = container.querySelector('#referenceContent');
                     if (refContent) refContent.innerHTML = renderReferenceContent();
@@ -480,7 +523,7 @@ export function renderExcessBaggageCalculator(container) {
             }
             
             debounceTimer = setTimeout(() => {
-                const results = searchAirports(query, 8);
+                const results = searchAirports(query, 15);
                 
                 if (results.length === 0) {
                     dropdown.style.display = 'none';
@@ -514,7 +557,7 @@ export function renderExcessBaggageCalculator(container) {
                 });
                 
                 dropdown.style.display = 'block';
-            }, 150);
+            }, 200);
         });
         
         // Handle Enter key
@@ -580,6 +623,23 @@ export function renderExcessBaggageCalculator(container) {
             currencySelect.value = currency;
         }
     });
+    
+    // Swap origin ↔ destination
+    const swapOriginDestBtn = container.querySelector('#swapOriginDestBtn');
+    if (swapOriginDestBtn && originInput && destInput) {
+        swapOriginDestBtn.addEventListener('click', () => {
+            const o = originInput.value;
+            const oInfo = originInfo ? originInfo.textContent : '';
+            originInput.value = destInput.value;
+            destInput.value = o;
+            if (originInfo) originInfo.textContent = destInfo ? destInfo.textContent : '';
+            if (destInfo) destInfo.textContent = oInfo;
+            if (currencySelect && currencySelect.value === 'AUTO') {
+                const currency = getCurrencyForOriginOrDestination(originInput.value.trim(), destInput.value.trim());
+                currencySelect.value = currency;
+            }
+        });
+    }
     
     // Setup autocomplete for go-show origin
     const goshowOrigin = container.querySelector('#goshowOrigin');
@@ -654,6 +714,12 @@ export function renderExcessBaggageCalculator(container) {
                 e.preventDefault();
                 agentAskBtn.click();
             }
+            if (e.key === 'Escape') {
+                agentQuestionInput.value = '';
+                agentResponseArea.textContent = 'Your answer will appear here after you ask.';
+                agentResponseArea.style.color = 'var(--text-muted)';
+                if (agentCopyBtn) agentCopyBtn.style.display = 'none';
+            }
         });
         if (agentCopyBtn) {
             agentCopyBtn.addEventListener('click', () => {
@@ -710,10 +776,18 @@ export function renderExcessBaggageCalculator(container) {
         });
     }
     
-    // Calculate button
-    btn.addEventListener('click', () => {
+    // Calculate button (with loading state and Ctrl+Enter)
+    function doCalculate() {
         const activeTab = container.querySelector('.service-tab.active');
         const service = activeTab ? activeTab.dataset.service : 'excess';
+        const origBtnText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Calculating…';
+        
+        const done = () => {
+            btn.disabled = false;
+            btn.textContent = origBtnText;
+        };
         
         try {
             let result;
@@ -744,11 +818,17 @@ export function renderExcessBaggageCalculator(container) {
                 const currency = currencySelect.value === 'AUTO' ? null : currencySelect.value;
                 
                 if (!origin || origin.length !== 3 || !destination || destination.length !== 3) {
+                    done();
                     showError(resultDiv, 'Enter a 3-letter IATA airport code or select an airport from the search (type city or country name). Both origin and destination are required.');
                     return;
                 }
                 
                 result = calculateExcessBaggageRate(origin, destination, airline, currency);
+                if (!result.error) {
+                    try {
+                        localStorage.setItem('gds_excess_last', JSON.stringify({ origin, destination, airline, currency: currencySelect.value }));
+                    } catch (_) {}
+                }
             } else if (service === 'goshow') {
                 let origin = container.querySelector('#goshowOrigin').value.trim().toUpperCase();
                 const originMatch = origin.match(/\b([A-Z]{3})\b/);
@@ -760,6 +840,7 @@ export function renderExcessBaggageCalculator(container) {
                 const classType = container.querySelector('#goshowClass').value;
                 
                 if (!origin || origin.length !== 3) {
+                    done();
                     showError(resultDiv, 'Enter a 3-letter IATA code or select an airport from the search (by city or country).');
                     return;
                 }
@@ -790,6 +871,7 @@ export function renderExcessBaggageCalculator(container) {
                 const currency = container.querySelector('#upgradeCurrency').value;
                 
                 if (!origin || origin.length !== 3) {
+                    done();
                     showError(resultDiv, 'Enter a 3-letter IATA code or select an airport from the search (by city or country).');
                     return;
                 }
@@ -806,12 +888,29 @@ export function renderExcessBaggageCalculator(container) {
             
             displayResult(resultDiv, result, service);
         } catch (e) {
-            // Better error handling without console.error
             const errorMessage = e.message || "An error occurred while calculating rates";
             showError(resultDiv, `Error: ${errorMessage}`);
+        } finally {
+            done();
+        }
+    }
+    
+    btn.addEventListener('click', doCalculate);
+    
+    // Ctrl+Enter / Cmd+Enter to calculate (when calculator visible and not in agent/reference)
+    container.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+            const activeTab = container.querySelector('.service-tab.active');
+            const service = activeTab ? activeTab.dataset.service : '';
+            if (service && service !== 'reference' && service !== 'agent') {
+                e.preventDefault();
+                doCalculate();
+            }
         }
     });
 }
+
+const RATE_DOC_VALIDITY = 'Rates based on document GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES (Version 2025.112(A) Outstation), effective 17 May 2025. Confirm with latest source before use.';
 
 function renderReferenceContent() {
     const aircraftRows = AIRCRAFT_XLGR_REFERENCE.map(a =>
@@ -821,6 +920,9 @@ function renderReferenceContent() {
         `<tr><td style="padding:8px; border:1px solid var(--glass-border);">${r.journey}</td><td style="padding:8px; border:1px solid var(--glass-border);">${r.condition}</td></tr>`
     ).join('');
     return `
+        <div style="margin-bottom:20px; padding:14px; background:rgba(59,130,246,0.08); border-radius:8px; border-left:3px solid var(--primary-blue); font-size:13px; color:var(--text-muted);">
+            <strong style="color:var(--text-main);">Document / rate validity:</strong> ${RATE_DOC_VALIDITY}
+        </div>
         <div style="margin-bottom:28px;">
             <h3 style="font-size:16px; font-weight:700; color:var(--info-blue); margin-bottom:12px; border-bottom:1px solid var(--glass-border); padding-bottom:6px;">Interline Excess Baggage – Which Carrier's Rates Apply</h3>
             <p style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">For interline bookings, the following carrier's excess baggage rates apply. Document: GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES Version 2025.112(A) Outstation, Effective 17 May 2025.</p>
@@ -893,7 +995,7 @@ function displayResult(container, result, service) {
         return;
     }
     
-    let html = `<div class="glass-panel" style="margin-top:20px;"><div style="padding:20px; position:relative;"><button type="button" id="copyResultBtn" style="position:absolute; top:12px; right:12px; padding:8px 14px; background:rgba(59,130,246,0.2); border:1px solid var(--glass-border); border-radius:6px; color:var(--info-blue); font-size:12px; cursor:pointer;">Copy result</button><div id="rateResultContent">`;
+    let html = `<div class="glass-panel rate-result-panel" style="margin-top:20px;"><div style="padding:20px; position:relative;"><div style="position:absolute; top:12px; right:12px; display:flex; gap:8px;"><button type="button" id="printResultBtn" style="padding:8px 14px; background:rgba(59,130,246,0.2); border:1px solid var(--glass-border); border-radius:6px; color:var(--info-blue); font-size:12px; cursor:pointer;">Print result</button><button type="button" id="copyResultBtn" style="padding:8px 14px; background:rgba(59,130,246,0.2); border:1px solid var(--glass-border); border-radius:6px; color:var(--info-blue); font-size:12px; cursor:pointer;">Copy result</button></div><div id="rateResultContent">`;
     
     if (service === 'excess') {
         html += displayExcessBaggageResult(result);
@@ -914,6 +1016,7 @@ function displayResult(container, result, service) {
     html += `</div></div></div>`;
     container.innerHTML = html;
     const copyResultBtn = container.querySelector('#copyResultBtn');
+    const printResultBtn = container.querySelector('#printResultBtn');
     const rateResultContent = container.querySelector('#rateResultContent');
     if (copyResultBtn && rateResultContent) {
         copyResultBtn.addEventListener('click', () => {
@@ -924,6 +1027,20 @@ function displayResult(container, result, service) {
                 copyResultBtn.textContent = 'Copied!';
                 setTimeout(() => { copyResultBtn.textContent = orig; }, 1500);
             }).catch(() => {});
+        });
+    }
+    if (printResultBtn && rateResultContent) {
+        printResultBtn.addEventListener('click', () => {
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) return;
+            printWindow.document.write(`
+                <!DOCTYPE html><html><head><title>Rate Result</title>
+                <style>body{font-family:system-ui,sans-serif;padding:24px;background:#fff;color:#111;}</style>
+                </head><body><pre style="white-space:pre-wrap;word-wrap:break-word;">${(rateResultContent.textContent || rateResultContent.innerText || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre></body></html>`);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            printWindow.close();
         });
     }
 }
