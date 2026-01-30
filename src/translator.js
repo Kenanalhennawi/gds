@@ -21,10 +21,9 @@ export const translateStatus = (code) => {
 };
 
 const AIRLINES = {
-    // --- Major Systems ---
+
     "1A": "Amadeus", "1G": "Galileo", "1B": "Abacus", "1S": "Sabre", "1P": "Worldspan", "1F": "Infini",
 
-    // --- Middle East & Africa ---
     FZ: "Flydubai", EK: "Emirates", QR: "Qatar Airways", EY: "Etihad Airways",
     TK: "Turkish Airlines", MS: "EgyptAir", SV: "Saudia", XY: "Flynas",
     G9: "Air Arabia", J9: "Jazeera Airways", KU: "Kuwait Airways", WY: "Oman Air",
@@ -38,8 +37,7 @@ const AIRLINES = {
     KP: "ASKY Airlines", UG: "Tunisair Express", RB: "Syrian Air",
     MK: "Air Mauritius", P4: "Air Peace", "8M": "Myanmar Airways Int", ID: "Batik Air Indonesia", OD: "Batik Air Malaysia",
     PG: "Bangkok Airways", Z5: "GMG Airlines", "4M": "LATAM Argentina", "4C": "LATAM Colombia",
-    
-    // --- Europe ---
+
     LH: "Lufthansa", AF: "Air France", KL: "KLM", BA: "British Airways",
     IB: "Iberia", TP: "TAP Air Portugal", AZ: "ITA Airways", LX: "Swiss Int. Air Lines",
     OS: "Austrian Airlines", SN: "Brussels Airlines", EI: "Aer Lingus",
@@ -53,7 +51,6 @@ const AIRLINES = {
     J2: "Azerbaijan Airlines", A9: "Georgian Airways", HY: "Uzbekistan Airways",
     KC: "Air Astana", DV: "SCAT Airlines", 
 
-    // --- Americas ---
     UA: "United Airlines", AA: "American Airlines", DL: "Delta Air Lines",
     AC: "Air Canada", TS: "Air Transat", WS: "WestJet", AS: "Alaska Airlines",
     B6: "JetBlue", NK: "Spirit Airlines", F9: "Frontier Airlines", WN: "Southwest",
@@ -61,7 +58,6 @@ const AIRLINES = {
     AV: "Avianca", LA: "LATAM Airlines", JJ: "LATAM Brasil", XL: "LATAM Ecuador",
     AR: "Aerolineas Argentinas", G3: "Gol", AD: "Azul", H2: "Sky Airline",
 
-    // --- Asia Pacific ---
     SQ: "Singapore Airlines", MH: "Malaysia Airlines", TG: "Thai Airways",
     VN: "Vietnam Airlines", GA: "Garuda Indonesia", PR: "Philippine Airlines",
     CX: "Cathay Pacific", BR: "EVA Air", CI: "China Airlines", HX: "Hong Kong Airlines",
@@ -85,7 +81,7 @@ export const translateAirline = (code) => {
 };
 
 const CITIES = {
-    // --- Middle East ---
+
     DXB: "Dubai (Intl)", DWC: "Dubai (World Central)", SHJ: "Sharjah", AUH: "Abu Dhabi",
     DOH: "Doha", BAH: "Bahrain", MCT: "Muscat", KWI: "Kuwait",
     RUH: "Riyadh", JED: "Jeddah", DMM: "Dammam", MED: "Madinah",
@@ -94,16 +90,14 @@ const CITIES = {
     AMM: "Amman", BEY: "Beirut", DAM: "Damascus", BGW: "Baghdad", EBL: "Erbil",
     NJF: "Najaf", BSR: "Basra", KWI: "Kuwait", TLV: "Tel Aviv",
     IKA: "Tehran (Imam Khomeini)", THR: "Tehran (Mehrabad)", MHD: "Mashhad", SYZ: "Shiraz",
-    
-    // --- Africa ---
+
     CAI: "Cairo", HBE: "Alexandria", LXR: "Luxor", SSH: "Sharm El Sheikh", HRG: "Hurghada",
     KRT: "Khartoum", JUB: "Juba", ADD: "Addis Ababa", JIB: "Djibouti",
     NBO: "Nairobi", MBA: "Mombasa", DAR: "Dar Es Salaam", JRO: "Kilimanjaro", ZNZ: "Zanzibar",
     EBB: "Entebbe", KGL: "Kigali", BJM: "Bujumbura", FIH: "Kinshasa",
     LOS: "Lagos", ABV: "Abuja", ACC: "Accra", DKR: "Dakar", CMN: "Casablanca",
     TUN: "Tunis", ALG: "Algiers", TIP: "Tripoli", JNB: "Johannesburg", CPT: "Cape Town",
-    
-    // --- Europe ---
+
     LHR: "London (Heathrow)", LGW: "London (Gatwick)", STN: "London (Stansted)", LTN: "Luton",
     MAN: "Manchester", BHX: "Birmingham", GLA: "Glasgow", EDI: "Edinburgh", DUB: "Dublin",
     CDG: "Paris (CDG)", ORY: "Paris (Orly)", NCE: "Nice", LYS: "Lyon", MRS: "Marseille",
@@ -118,7 +112,6 @@ const CITIES = {
     OTP: "Bucharest", SOF: "Sofia", BEG: "Belgrade", ZAG: "Zagreb", SJJ: "Sarajevo",
     TIA: "Tirana", SKP: "Skopje", PRN: "Pristina", VNO: "Vilnius", RIX: "Riga", TLL: "Tallinn",
 
-    // --- Asia ---
     DEL: "Delhi", BOM: "Mumbai", BLR: "Bangalore", MAA: "Chennai", HYD: "Hyderabad",
     COK: "Kochi", CCJ: "Kozhikode", TRV: "Thiruvananthapuram", CCU: "Kolkata", AMD: "Ahmedabad",
     KHI: "Karachi", LHE: "Lahore", ISB: "Islamabad", PEW: "Peshawar", SKT: "Sialkot", Multan: "MUX",
@@ -132,7 +125,6 @@ const CITIES = {
     KBL: "Kabul", TAS: "Tashkent", ALA: "Almaty", NQZ: "Astana", DYU: "Dushanbe", ASB: "Ashgabat",
     GYD: "Baku", EVN: "Yerevan", TBS: "Tbilisi",
 
-    // --- Americas ---
     JFK: "New York (JFK)", EWR: "Newark", LGA: "LaGuardia", BOS: "Boston", IAD: "Washington (Dulles)",
     DCA: "Washington (Reagan)", ATL: "Atlanta", MCO: "Orlando", MIA: "Miami", FLL: "Fort Lauderdale",
     ORD: "Chicago (O'Hare)", DFW: "Dallas Fort Worth", IAH: "Houston", DEN: "Denver",
@@ -141,7 +133,6 @@ const CITIES = {
     MEX: "Mexico City", CUN: "Cancun", PTY: "Panama City", BOG: "Bogota",
     GRU: "Sao Paulo", GIG: "Rio de Janeiro", EZE: "Buenos Aires", SCL: "Santiago", LIM: "Lima",
 
-    // --- Oceania ---
     SYD: "Sydney", MEL: "Melbourne", BNE: "Brisbane", PER: "Perth", AKL: "Auckland"
 };
 
@@ -150,9 +141,8 @@ export const translateCity = (code) => {
     return CITIES[code.toUpperCase()] || code;
 };
 
-// Comprehensive SSR Code explanations - All SSR codes used in GDS systems
 const SSR_EXPLANATIONS = {
-    // Ticket & Document Related
+
     'TKNE': { title: 'E-Ticket Number', desc: 'Electronic ticket number issued for this booking.' },
     'TKNM': { title: 'Ticket Number (Manual)', desc: 'Manual ticket number entry.' },
     'DOCS': { title: 'Travel Documents', desc: 'Passport/ID document information for APIS (Advanced Passenger Information System).' },
@@ -162,16 +152,14 @@ const SSR_EXPLANATIONS = {
     'FQTV': { title: 'Frequent Flyer', desc: 'Frequent flyer program membership information.' },
     'FQTU': { title: 'Frequent Flyer Update', desc: 'Update to frequent flyer information.' },
     'FQTR': { title: 'Frequent Flyer Request', desc: 'Request for frequent flyer credit.' },
-    
-    // Contact Information
+
     'CTCE': { title: 'Contact Email', desc: 'Passenger contact email address.' },
     'CTCM': { title: 'Contact Mobile', desc: 'Passenger contact mobile phone number.' },
     'CTCH': { title: 'Contact Home', desc: 'Passenger contact home phone number.' },
     'CTCT': { title: 'Contact Telephone', desc: 'Passenger contact telephone number.' },
     'CTCP': { title: 'Contact Phone (Primary)', desc: 'Primary phone contact number.' },
     'CTCF': { title: 'Contact Fax', desc: 'Passenger contact fax number.' },
-    
-    // Wheelchair & Mobility Assistance
+
     'WCHR': { title: 'Wheelchair (Ramp)', desc: 'Passenger needs wheelchair but can walk to seat.' },
     'WCHS': { title: 'Wheelchair (Steps)', desc: 'Passenger needs wheelchair and cannot ascend stairs.' },
     'WCHC': { title: 'Wheelchair (Cabin)', desc: 'Passenger is completely immobile and needs wheelchair in cabin.' },
@@ -180,8 +168,7 @@ const SSR_EXPLANATIONS = {
     'WCBD': { title: 'Wheelchair (Battery)', desc: 'Passenger traveling with battery-powered wheelchair.' },
     'WCBW': { title: 'Wheelchair (Wet Cell)', desc: 'Wet cell battery wheelchair.' },
     'WCCO': { title: 'Wheelchair (Collapsible)', desc: 'Collapsible wheelchair.' },
-    
-    // Special Meals
+
     'VGML': { title: 'Vegetarian Meal', desc: 'Request for vegetarian meal.' },
     'AVML': { title: 'Asian Vegetarian Meal', desc: 'Request for Asian vegetarian meal.' },
     'VLML': { title: 'Vegetarian Lacto-Ovo Meal', desc: 'Vegetarian meal with dairy and eggs.' },
@@ -207,8 +194,7 @@ const SSR_EXPLANATIONS = {
     'HFML': { title: 'High Fiber Meal', desc: 'Request for high fiber meal.' },
     'PRML': { title: 'Low Purine Meal', desc: 'Request for low purine meal.' },
     'RVML': { title: 'Raw Vegetarian Meal', desc: 'Request for raw vegetarian meal.' },
-    
-    // Special Services
+
     'BSCT': { title: 'Bassinet', desc: 'Request for baby bassinet seat.' },
     'UMNR': { title: 'Unaccompanied Minor', desc: 'Child traveling alone without adult supervision.' },
     'UMNL': { title: 'Unaccompanied Minor (Local)', desc: 'Unaccompanied minor for local travel.' },
@@ -228,29 +214,25 @@ const SSR_EXPLANATIONS = {
     'DEPU': { title: 'Deportee', desc: 'Deportee under escort.' },
     'INAD': { title: 'Inadmissible Passenger', desc: 'Inadmissible passenger information.' },
     'PAXL': { title: 'Pax Locator', desc: 'Passenger locator information.' },
-    
-    // Seat & Cabin Services
+
     'NSST': { title: 'Seat Status', desc: 'Seat assignment status transmitted to airline.' },
     'SEAT': { title: 'Seat Request', desc: 'Specific seat request.' },
     'SMOK': { title: 'Smoking Seat', desc: 'Smoking seat preference (rarely used).' },
     'NSSA': { title: 'No Smoking Seat Aisle', desc: 'Non-smoking aisle seat preference.' },
     'NSSW': { title: 'No Smoking Seat Window', desc: 'Non-smoking window seat preference.' },
     'NSSM': { title: 'No Smoking Seat Middle', desc: 'Non-smoking middle seat preference.' },
-    
-    // Other Service Information
+
     'OTHS': { title: 'Other Service Information', desc: 'Additional service information or special instructions.' },
     'ADTK': { title: 'Advise Ticketing', desc: 'Ticket deadline warning - issue ticket by deadline or booking cancels.' },
     'TKTL': { title: 'Ticket Time Limit', desc: 'Ticket time limit information.' },
     'TKTN': { title: 'Ticket Number', desc: 'Ticket number information.' },
     'TKTT': { title: 'Ticket Type', desc: 'Ticket type information.' },
-    
-    // India GST Related
+
     'GSTN': { title: 'GST Number', desc: 'Goods and Services Tax identification number (India).' },
     'GSTE': { title: 'GST Email', desc: 'GST email address for invoice.' },
     'GSTP': { title: 'GST Phone', desc: 'GST phone number for invoice.' },
     'GSTC': { title: 'GST Company', desc: 'GST company name for invoice.' },
-    
-    // Security & Immigration
+
     'REDS': { title: 'Redress Number', desc: 'TSA Redress Number (US security).' },
     'APIS': { title: 'APIS Data', desc: 'Advanced Passenger Information System data.' },
     'SSSS': { title: 'Secondary Security Screening', desc: 'Passenger selected for secondary security screening.' },
@@ -258,8 +240,7 @@ const SSR_EXPLANATIONS = {
     'TSAP': { title: 'TSA PreCheck', desc: 'TSA PreCheck program member.' },
     'NEXU': { title: 'NEXUS', desc: 'NEXUS program member (US/Canada border).' },
     'SENT': { title: 'SENTRI', desc: 'SENTRI program member (US/Mexico border).' },
-    
-    // Special Requests
+
     'VALG': { title: 'Valuable Baggage', desc: 'Valuable baggage declaration.' },
     'AUTH': { title: 'Authorization', desc: 'Special authorization required.' },
     'INFT': { title: 'Infant', desc: 'Infant traveling with adult.' },
@@ -268,15 +249,13 @@ const SSR_EXPLANATIONS = {
     'STUD': { title: 'Student', desc: 'Student passenger information.' },
     'MILT': { title: 'Military', desc: 'Military personnel information.' },
     'DIPL': { title: 'Diplomatic', desc: 'Diplomatic passenger information.' },
-    
-    // Payment & Financial
+
     'FOPC': { title: 'Form of Payment Cash', desc: 'Cash payment form.' },
     'FOPD': { title: 'Form of Payment Credit', desc: 'Credit card payment form.' },
     'FOPK': { title: 'Form of Payment Check', desc: 'Check payment form.' },
     'FOPO': { title: 'Form of Payment Other', desc: 'Other payment form.' }
 };
 
-// Parse SSR status
 const parseSSRStatus = (status) => {
     if (!status) return { label: 'Pending', class: 'status-tk', icon: '⧖' };
     const s = status.substring(0, 2).toUpperCase();
@@ -292,13 +271,11 @@ const parseSSRStatus = (status) => {
 
 export const translateSSR = (text) => {
     const t = (text || "").toUpperCase();
-    
-    // Critical messages
+
     if (t.includes("NOSHO")) return { title: "No Show", msg: "Passenger missed flight.", type: "critical" };
     if (t.includes("CANCELLED") || t.includes("CANCELED") || t.includes("XLD")) return { title: "Cancellation", msg: "Booking/Segment cancelled.", type: "critical" };
     if (t.includes("UNABLE")) return { title: "Request Failed", msg: "System rejected request.", type: "critical" };
-    
-    // Warnings
+
     if (t.includes("ADTK") || t.includes("TIME LIMIT")) {
         const timeMatch = t.match(/ADTK\s+BY\s+(\d{2}[A-Z]{3}\d{2})\s+(\d{4})/);
         if (timeMatch) {
@@ -306,19 +283,17 @@ export const translateSSR = (text) => {
         }
         return { title: "Ticket Deadline", msg: "Issue ticket by deadline or booking cancels.", type: "warning" };
     }
-    
-    // Parse specific SSR codes
+
     for (const [code, info] of Object.entries(SSR_EXPLANATIONS)) {
         const ssrPattern = new RegExp(`SSR\\s*${code}(?:\\s+[A-Z0-9]{2})?\\s+([A-Z]{2}\\d+)?`, 'i');
         if (t.match(ssrPattern) || t.includes(`SSR ${code}`) || t.includes(`SSR${code}`)) {
             const statusMatch = t.match(ssrPattern);
             const status = statusMatch && statusMatch[1] ? parseSSRStatus(statusMatch[1]) : null;
-            
-            // Special handling for TKNE (ticket numbers)
+
             if (code === 'TKNE') {
                 const ticketMatch = t.match(/(\d{13})/);
                 if (ticketMatch) {
-                    // Extract flight info if available
+
                     const flightMatch = t.match(/([A-Z]{3})([A-Z]{3})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})/);
                     const flightInfo = flightMatch ? ` for ${flightMatch[1]}-${flightMatch[2]} ${flightMatch[3]} on ${flightMatch[4]}` : '';
                     return { 
@@ -330,8 +305,7 @@ export const translateSSR = (text) => {
                     };
                 }
             }
-            
-            // Special handling for DOCS
+
             if (code === 'DOCS') {
                 const docMatch = t.match(/DOCS[^\/]+\/P\/([A-Z]{3})\/([A-Z0-9]+)\/([A-Z]{3})\/(\d{2}[A-Z]{3}\d{2})\/([MF])\/(\d{2}[A-Z]{3}\d{2})/);
                 if (docMatch) {
@@ -344,8 +318,7 @@ export const translateSSR = (text) => {
                     };
                 }
             }
-            
-            // Special handling for OTHS (other service information)
+
             if (code === 'OTHS') {
                 const othsText = t.substring(t.indexOf('OTHS') + 4).replace(/^[A-Z0-9\s]+\s+/, '');
                 return {
@@ -370,7 +343,6 @@ export const translateSSR = (text) => {
     return null;
 };
 
-// OSI Type explanations
 const OSI_TYPES = {
     'CTCE': { title: 'Contact Email', desc: 'Email contact information.' },
     'CTCM': { title: 'Contact Mobile', desc: 'Mobile phone contact information.' },
@@ -479,8 +451,7 @@ export const translateOSI = (text) => {
     
     const carrier = osiMatch[1];
     const message = osiMatch[2];
-    
-    // Explain YY carrier code
+
     let carrierExplanation = "";
     if (carrier === "YY") {
         carrierExplanation = " (YY = System/Any Carrier - applies to all airlines)";
@@ -490,12 +461,11 @@ export const translateOSI = (text) => {
             carrierExplanation = ` (${carrierName})`;
         }
     }
-    
-    // Parse CTCP (Contact Phone Primary)
+
     if (message.includes("CTCP")) {
         const ctcpMatch = message.match(/CTCP\s*(.+)/i);
         const contactInfo = ctcpMatch ? ctcpMatch[1].trim() : message.replace(/CTCP\s*/i, '');
-        // Try to extract phone number and company name
+
         const phoneMatch = contactInfo.match(/([\d\s\-\(\)]+)/);
         const phone = phoneMatch ? phoneMatch[1].trim() : '';
         const company = contactInfo.replace(phone, '').replace(/^[\s\-]+|[\s\-]+$/g, '').trim();
@@ -508,12 +478,11 @@ export const translateOSI = (text) => {
             details: contactInfo
         };
     }
-    
-    // Parse CTCT (Contact Telephone)
+
     if (message.includes("CTCT")) {
         const ctctMatch = message.match(/CTCT\s*(.+)/i);
         const contactInfo = ctctMatch ? ctctMatch[1].trim() : message.replace(/CTCT\s*/i, '');
-        // Try to extract phone number and company name
+
         const phoneMatch = contactInfo.match(/([\d\s\-\(\)]+)/);
         const phone = phoneMatch ? phoneMatch[1].trim() : '';
         const company = contactInfo.replace(phone, '').replace(/^[\s\-]+|[\s\-]+$/g, '').trim();
@@ -526,8 +495,7 @@ export const translateOSI = (text) => {
             details: contactInfo
         };
     }
-    
-    // Check for known OSI types
+
     for (const [code, info] of Object.entries(OSI_TYPES)) {
         if (message.includes(code)) {
             return {
@@ -538,8 +506,7 @@ export const translateOSI = (text) => {
             };
         }
     }
-    
-    // Categorize by content
+
     if (message.includes("CTCE") || message.includes("EMAIL") || message.includes("@")) {
         return {
             title: "Contact Email",
@@ -575,7 +542,6 @@ export const translateOSI = (text) => {
     };
 };
 
-// Comprehensive Envelope Type explanations
 export const translateEnvelope = (code) => {
     const map = {
         'QP': { title: 'Response (Output)', desc: 'System response or output message from the GDS. This is a response to a previous request.' },
@@ -594,7 +560,6 @@ export const translateEnvelope = (code) => {
     return map[code] || { title: code, desc: 'Unknown message envelope type.' };
 };
 
-// Comprehensive Header Type explanations - Actual GDS header types used in practice
 export const translateHeaderType = (code) => {
     const map = {
         'TRL': { title: 'Trailer', desc: 'End of message or transaction trailer. Indicates the end of a message block.' },
