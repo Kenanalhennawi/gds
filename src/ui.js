@@ -2,13 +2,11 @@ import { translateAirline, translateCity, translateStatus, translateEnvelope, tr
 
 export const renderTimeline = (container, data) => {
     container.innerHTML = "";
-    
-    // Handle both new format {events, summary} and old format [events]
+
     const events = Array.isArray(data) ? data : (data.events || []);
     const summary = Array.isArray(data) ? null : data.summary;
     const changes = Array.isArray(data) ? null : (data.changes || []);
-    
-    // Create a map of changes by event index for quick lookup
+
     const changesByEventIndex = new Map();
     if (changes) {
         changes.forEach(changeGroup => {
@@ -16,7 +14,6 @@ export const renderTimeline = (container, data) => {
         });
     }
 
-    // 1. Render Summary Dashboard (always show if we have events)
     if (summary && events.length > 0) {
         const summaryCard = document.createElement("div");
         summaryCard.className = `glass-panel summary-card ${summary.alertLevel}`;
@@ -35,18 +32,14 @@ export const renderTimeline = (container, data) => {
         container.appendChild(summaryCard);
     }
 
-    // 2. No events: render nothing (no placeholder)
     if (!events || events.length === 0) {
         return;
     }
-    
 
-    // 3. Render Events
     events.forEach((evt, eventIndex) => {
         const card = document.createElement("div");
         card.className = "timeline-card";
-        
-        // Check if this event has changes
+
         const eventChanges = changesByEventIndex.get(eventIndex) || [];
         const hasChanges = eventChanges.length > 0;
         
@@ -56,15 +49,13 @@ export const renderTimeline = (container, data) => {
             card.style.background = "linear-gradient(135deg, rgba(255, 200, 0, 0.05), var(--glass))";
         }
 
-        // Get envelope explanation
         const envelopeInfo = translateEnvelope(evt.envelope);
         let action = envelopeInfo.title;
         let actionDesc = envelopeInfo.desc;
-        
-        // Parse header for additional context
+
         let headerInfo = "";
         if (evt.rawHeader) {
-            // Check for PEKRMCA format (Office + RM + Airline)
+
             const officeRmMatch = evt.rawHeader.match(/([A-Z]{3})RM([A-Z0-9]{2})/);
             if (officeRmMatch) {
                 headerInfo = `${translateCity(officeRmMatch[1])} (${officeRmMatch[1]}) - ${translateAirline(officeRmMatch[2])} (${officeRmMatch[2]})`;
@@ -76,7 +67,6 @@ export const renderTimeline = (container, data) => {
         if (evt.context.office) sourceName += ` (${translateCity(evt.context.office)})`;
         if (headerInfo && !evt.context.office) sourceName = headerInfo;
 
-        // Get header type explanation
         let headerTypeHtml = "";
         if (evt.headerType) {
             const headerInfo = translateHeaderType(evt.headerType);
@@ -88,7 +78,6 @@ export const renderTimeline = (container, data) => {
             }
         }
 
-        // Build detailed explanation section
         let contextHtml = "";
         let hasContext = evt.context.recordLocator || evt.context.airline || evt.context.office || evt.headerType || evt.timestamp || evt.rawHeader;
         
@@ -104,7 +93,7 @@ export const renderTimeline = (container, data) => {
                 </div>`;
             
             if (evt.rawHeader) {
-                // Parse header components for detailed explanation
+
                 const headerParts = [];
                 if (evt.rawHeader.includes('HDQ')) {
                     if (evt.rawHeader.includes('HDQRM')) {
@@ -143,7 +132,7 @@ export const renderTimeline = (container, data) => {
             }
             
             if (evt.timestamp) {
-                // Format timestamp: 050437 -> 05:04:37 or date format
+
                 const ts = evt.timestamp;
                 const formattedTime = ts.length === 6 ? `${ts.substring(0,2)}:${ts.substring(2,4)}:${ts.substring(4,6)}` : ts;
                 contextHtml += `<div class="context-row">
@@ -173,8 +162,7 @@ export const renderTimeline = (container, data) => {
             contextHtml += headerTypeHtml;
             contextHtml += `</div>`;
         }
-        
-        // Add change explanation section
+
         let changesHtml = "";
         if (hasChanges) {
             changesHtml = `<div class="changes-section" style="margin-top:15px; padding:15px; background:rgba(251,191,36,0.1); border-radius:8px; border-left:3px solid var(--warning-amber);">
@@ -242,14 +230,12 @@ export const renderTimeline = (container, data) => {
                 const from = translateCity(seg.from);
                 const to = translateCity(seg.to);
                 const st = translateStatus(seg.status);
-                
-                // Build flight display with fare class if available
+
                 let flightDisplay = `${seg.carrier}${seg.flight}`;
                 if (seg.fareClass) {
                     flightDisplay += seg.fareClass;
                 }
-                
-                // Detailed segment explanation
+
                 let segmentDetails = `<div style="font-size:10px; color:var(--text-muted); margin-top:4px; line-height:1.4;">
                     <div><strong>Carrier:</strong> ${seg.carrier} (${carrier})</div>
                     <div><strong>Flight:</strong> ${seg.flight}${seg.fareClass ? `, Fare Class: ${seg.fareClass}` : ''}</div>
@@ -258,8 +244,7 @@ export const renderTimeline = (container, data) => {
                     <div><strong>Status:</strong> ${seg.status} (${st.label})</div>
                     ${seg.ticketNumber ? `<div style="margin-top:4px;"><strong style="color:var(--success-green);">Ticket Number:</strong> <span style="font-family:var(--font-code); font-weight:700; color:var(--success-green);">${seg.ticketNumber}</span></div>` : ''}
                 `;
-                
-                // Add codeshare info if available
+
                 let codeshareInfo = '';
                 if (seg.codeshare) {
                     const marketingCarrierName = seg.marketingCarrier ? translateAirline(seg.marketingCarrier) : seg.marketingCarrier;
@@ -285,10 +270,9 @@ export const renderTimeline = (container, data) => {
             html += `</div>`;
         }
 
-        // Display E-Ticket Numbers prominently (NEW)
         const ticketNumbers = evt.ticketNumbers || [];
         const ssrTicketNumbers = evt.ssrs.filter(ssr => ssr.ticketNumber).map(ssr => ssr.ticketNumber);
-        // Also extract ticket numbers from segments (DK format: DK1/19002110)
+
         const segmentTicketNumbers = (evt.segments || [])
             .filter(seg => seg.ticketNumber)
             .map(seg => seg.ticketNumber);
@@ -315,7 +299,6 @@ export const renderTimeline = (container, data) => {
             html += `</div>`;
         }
 
-        // Display SSR codes with explanations
         if (evt.ssrs && evt.ssrs.length > 0) {
             html += `<div class="ssr-container" style="margin-top:15px; padding-left:15px;">
                 <div style="font-weight:700; color:var(--info-blue); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">
@@ -347,7 +330,6 @@ export const renderTimeline = (container, data) => {
             html += `</div>`;
         }
 
-        // Display OSI messages
         if (evt.osis && evt.osis.length > 0) {
             html += `<div class="osi-container" style="margin-top:15px; padding-left:15px;">
                 <div style="font-weight:700; color:var(--success-green); margin-bottom:10px; font-size:12px; text-transform:uppercase; letter-spacing:0.5px;">
@@ -358,8 +340,7 @@ export const renderTimeline = (container, data) => {
                 const carrierDisplay = osiInfo && osiInfo.carrier ? osiInfo.carrier : (osi.carrier === "YY" ? "YY (System/Any Carrier)" : osi.carrier);
                 const title = osiInfo ? osiInfo.title : "Other Service Information";
                 const explanation = osiInfo ? osiInfo.msg : osi.message;
-                
-                // Parse contact information details
+
                 let detailsHtml = '';
                 if (osi.message.includes('CTCP') || osi.message.includes('CTCT')) {
                     const contactMatch = osi.message.match(/(CTCP|CTCT)\s*(.+)/i);
@@ -399,7 +380,7 @@ export const renderTimeline = (container, data) => {
         if (evt.messages.length > 0) {
             html += `<div class="alerts-container" style="margin-top:15px;">`;
             evt.messages.forEach(msg => {
-                // Skip SSR and OSI messages that are already displayed above
+
                 if (msg.ssrCode || msg.title && (msg.title.includes('Contact') || msg.title.includes('E-Ticket'))) {
                     return;
                 }
@@ -411,8 +392,7 @@ export const renderTimeline = (container, data) => {
             });
             html += `</div>`;
         }
-        
-        // Add changes section before closing
+
         html += changesHtml;
 
         card.innerHTML = html;
