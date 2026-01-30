@@ -136,6 +136,7 @@ const AIRPORT_DATA = {
     'DYU': { code: 'DYU', city: 'Dushanbe', country: 'Tajikistan', name: 'Dushanbe' },
     'ASB': { code: 'ASB', city: 'Ashgabat', country: 'Turkmenistan', name: 'Ashgabat' },
     'FRU': { code: 'FRU', city: 'Bishkek', country: 'Kyrgyzstan', name: 'Bishkek' },
+    'BSZ': { code: 'BSZ', city: 'Bishkek', country: 'Kyrgyzstan', name: 'Bishkek (same as FRU)' },
     'OSS': { code: 'OSS', city: 'Osh', country: 'Kyrgyzstan', name: 'Osh' },
     'GYD': { code: 'GYD', city: 'Baku', country: 'Azerbaijan', name: 'Baku' },
     'GBB': { code: 'GBB', city: 'Guba', country: 'Azerbaijan', name: 'Guba' },
