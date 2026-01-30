@@ -92,15 +92,14 @@ export function renderExcessBaggageCalculator(container) {
                     <div id="excessSection" class="service-section">
                         <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:15px; margin-bottom:20px;">
                             <div style="position:relative;">
-                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
-                                    Origin Airport
-                                </label>
+                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);" title="3-letter IATA code or search by city/country">Origin Airport</label>
                                 <input 
                                     type="text" 
                                     id="originInput" 
                                     class="styled-input"
-                                    placeholder="Search by code, city, or country..."
+                                    placeholder="e.g. DXB or Dubai"
                                     autocomplete="off"
+                                    title="Enter 3-letter IATA code (e.g. DXB) or type city/country to search"
                                     style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
                                 <div id="originAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
@@ -108,15 +107,14 @@ export function renderExcessBaggageCalculator(container) {
                             </div>
                             
                             <div style="position:relative;">
-                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
-                                    Destination Airport
-                                </label>
+                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);" title="3-letter IATA code or search by city/country">Destination Airport</label>
                                 <input 
                                     type="text" 
                                     id="destinationInput" 
                                     class="styled-input"
-                                    placeholder="Search by code, city, or country..."
+                                    placeholder="e.g. DXB or Dubai"
                                     autocomplete="off"
+                                    title="Enter 3-letter IATA code (e.g. DXB) or type city/country to search"
                                     style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
                                 <div id="destinationAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
@@ -124,12 +122,11 @@ export function renderExcessBaggageCalculator(container) {
                             </div>
                             
                             <div>
-                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
-                                    Airline
-                                </label>
+                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);" title="Carrier for excess baggage rate">Airline</label>
                                 <select 
                                     id="airlineSelect"
                                     class="styled-select"
+                                    title="FZ Flydubai, EK Emirates, AC Air Canada, UA United, OAL Other airlines"
                                     style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
                                     <option value="FZ">Flydubai (FZ)</option>
@@ -141,12 +138,11 @@ export function renderExcessBaggageCalculator(container) {
                             </div>
                             
                             <div>
-                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
-                                    Currency
-                                </label>
+                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);" title="Display currency for rates">Currency</label>
                                 <select 
                                     id="currencySelect"
                                     class="styled-select"
+                                    title="Auto picks by origin/destination; or choose a specific currency"
                                     style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
                                     <option value="AUTO">Auto (by origin/destination)</option>
@@ -159,15 +155,14 @@ export function renderExcessBaggageCalculator(container) {
                     <div id="goshowSection" class="service-section" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                             <div style="position:relative;">
-                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
-                                    Origin Airport
-                                </label>
+                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);" title="3-letter IATA or search by city/country">Origin Airport</label>
                                 <input 
                                     type="text" 
                                     id="goshowOrigin" 
                                     class="styled-input"
-                                    placeholder="Search by code, city, or country..."
+                                    placeholder="e.g. DXB or Dubai"
                                     autocomplete="off"
+                                    title="Enter 3-letter IATA code or type city/country to search"
                                     style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
                                 <div id="goshowAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
@@ -271,26 +266,24 @@ export function renderExcessBaggageCalculator(container) {
                     <div id="upgradeSection" class="service-section" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                             <div style="position:relative;">
-                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
-                                    Origin Airport
-                                </label>
+                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);" title="3-letter IATA or search by city/country">Origin Airport</label>
                                 <input 
                                     type="text" 
                                     id="upgradeOrigin" 
                                     class="styled-input"
-                                    placeholder="Search by code, city, or country..."
+                                    placeholder="e.g. DXB or Dubai"
                                     autocomplete="off"
+                                    title="Enter 3-letter IATA code or type city/country to search"
                                     style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-family:var(--font-code); font-size:14px; outline:none;"
                                 />
                                 <div id="upgradeAutocomplete" class="autocomplete-dropdown" style="display:none; position:absolute; top:100%; left:0; right:0; background:rgba(20,20,30,0.95); border:1px solid var(--glass-border); border-radius:8px; margin-top:4px; max-height:200px; overflow-y:auto; z-index:1000; box-shadow:0 4px 12px rgba(0,0,0,0.3);"></div>
                             </div>
                             <div>
-                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
-                                    Currency
-                                </label>
+                                <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);" title="Currency for upgrade rate">Currency</label>
                                 <select 
                                     id="upgradeCurrency"
                                     class="styled-select"
+                                    title="Choose currency for at-airport and on-board upgrade rates"
                                     style="width:100%; padding:12px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none; cursor:pointer;"
                                 >
                                     <option value="AED">AED - UAE Dirham</option>
@@ -327,7 +320,7 @@ export function renderExcessBaggageCalculator(container) {
                         <p style="color:var(--text-muted); font-size:14px; line-height:1.6; margin-bottom:16px;">
                             Ask anything about excess baggage, interline rates, upgrade, go-show, extra legroom, regional classification, or document rules. The agent answers from the official reference (GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES).
                         </p>
-                        <div style="display:flex; gap:10px; margin-bottom:16px;">
+                        <div style="display:flex; gap:10px; margin-bottom:12px;">
                             <input 
                                 type="text" 
                                 id="agentQuestionInput" 
@@ -339,8 +332,13 @@ export function renderExcessBaggageCalculator(container) {
                                 Ask
                             </button>
                         </div>
-                        <div id="agentResponseArea" style="min-height:120px; padding:16px; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid var(--glass-border); color:var(--text-muted); font-size:14px; line-height:1.6; white-space:pre-wrap;">
-                            Your answer will appear here after you ask.
+                        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Try:</p>
+                        <div id="agentSuggestedQuestions" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;"></div>
+                        <div style="display:flex; align-items:flex-start; gap:10px;">
+                            <div id="agentResponseArea" style="flex:1; min-height:120px; padding:16px; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid var(--glass-border); color:var(--text-muted); font-size:14px; line-height:1.6; white-space:pre-wrap;">
+                                Your answer will appear here after you ask.
+                            </div>
+                            <button id="agentCopyBtn" type="button" title="Copy answer" style="display:none; padding:10px 14px; background:rgba(59,130,246,0.2); border:1px solid var(--glass-border); border-radius:8px; color:var(--info-blue); font-size:13px; cursor:pointer; white-space:nowrap; align-self:flex-start;">Copy</button>
                         </div>
                         <div id="agentHistory" style="margin-top:16px;"></div>
                     </div>
@@ -601,6 +599,38 @@ export function renderExcessBaggageCalculator(container) {
     const agentQuestionInput = container.querySelector('#agentQuestionInput');
     const agentAskBtn = container.querySelector('#agentAskBtn');
     const agentResponseArea = container.querySelector('#agentResponseArea');
+    const agentCopyBtn = container.querySelector('#agentCopyBtn');
+    const agentSuggestedQuestions = container.querySelector('#agentSuggestedQuestions');
+    const SUGGESTED_QUESTIONS = [
+        'What is excess baggage?',
+        'Which carrier for FZ–EK?',
+        'Upgrade from Kuwait?',
+        'Larnaca Malta rate?',
+        'UA AC flat fees?',
+        'How many tabs?',
+        'Clear All'
+    ];
+    if (agentSuggestedQuestions) {
+        agentSuggestedQuestions.innerHTML = SUGGESTED_QUESTIONS.map(q =>
+            `<button type="button" class="agent-suggest-chip" data-question="${q.replace(/"/g, '&quot;')}" style="padding:8px 14px; background:rgba(59,130,246,0.15); border:1px solid var(--glass-border); border-radius:20px; color:var(--info-blue); font-size:12px; cursor:pointer; white-space:nowrap;">${q}</button>`
+        ).join('');
+        agentSuggestedQuestions.querySelectorAll('.agent-suggest-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                const q = chip.getAttribute('data-question');
+                if (q === 'Clear All') {
+                    if (agentQuestionInput) agentQuestionInput.value = '';
+                    if (agentResponseArea) {
+                        agentResponseArea.textContent = 'Your answer will appear here after you ask.';
+                        agentResponseArea.style.color = 'var(--text-muted)';
+                    }
+                    if (agentCopyBtn) agentCopyBtn.style.display = 'none';
+                } else if (q && agentQuestionInput && agentAskBtn) {
+                    agentQuestionInput.value = q;
+                    agentAskBtn.click();
+                }
+            });
+        });
+    }
     if (agentAskBtn && agentQuestionInput && agentResponseArea) {
         function formatAgentAnswer(text) {
             if (!text) return '';
@@ -608,18 +638,34 @@ export function renderExcessBaggageCalculator(container) {
                 .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--text-main);">$1</strong>')
                 .replace(/\n/g, '<br>');
         }
-        agentAskBtn.addEventListener('click', () => {
+        function askAgent() {
             const query = agentQuestionInput.value.trim();
             const answer = answerAgentQuestion(query);
             agentResponseArea.innerHTML = formatAgentAnswer(answer);
             agentResponseArea.style.color = 'var(--text-main)';
-        });
+            if (agentCopyBtn) {
+                agentCopyBtn.style.display = 'block';
+                agentCopyBtn.dataset.copyText = answer.replace(/<[^>]+>/g, '\n').replace(/&nbsp;/g, ' ');
+            }
+        }
+        agentAskBtn.addEventListener('click', askAgent);
         agentQuestionInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 agentAskBtn.click();
             }
         });
+        if (agentCopyBtn) {
+            agentCopyBtn.addEventListener('click', () => {
+                const text = agentCopyBtn.dataset.copyText || (agentResponseArea.textContent || agentResponseArea.innerText || '').trim();
+                if (!text) return;
+                navigator.clipboard.writeText(text).then(() => {
+                    const orig = agentCopyBtn.textContent;
+                    agentCopyBtn.textContent = 'Copied!';
+                    setTimeout(() => { agentCopyBtn.textContent = orig; }, 1500);
+                }).catch(() => {});
+            });
+        }
     }
     
     // Clear button handler
@@ -698,7 +744,7 @@ export function renderExcessBaggageCalculator(container) {
                 const currency = currencySelect.value === 'AUTO' ? null : currencySelect.value;
                 
                 if (!origin || origin.length !== 3 || !destination || destination.length !== 3) {
-                    showError(resultDiv, 'Please enter valid airport codes for origin and destination.');
+                    showError(resultDiv, 'Enter a 3-letter IATA airport code or select an airport from the search (type city or country name). Both origin and destination are required.');
                     return;
                 }
                 
@@ -714,7 +760,7 @@ export function renderExcessBaggageCalculator(container) {
                 const classType = container.querySelector('#goshowClass').value;
                 
                 if (!origin || origin.length !== 3) {
-                    showError(resultDiv, 'Please enter a valid origin airport code.');
+                    showError(resultDiv, 'Enter a 3-letter IATA code or select an airport from the search (by city or country).');
                     return;
                 }
                 
@@ -744,7 +790,7 @@ export function renderExcessBaggageCalculator(container) {
                 const currency = container.querySelector('#upgradeCurrency').value;
                 
                 if (!origin || origin.length !== 3) {
-                    showError(resultDiv, 'Please enter a valid origin airport code.');
+                    showError(resultDiv, 'Enter a 3-letter IATA code or select an airport from the search (by city or country).');
                     return;
                 }
                 
@@ -847,7 +893,7 @@ function displayResult(container, result, service) {
         return;
     }
     
-    let html = `<div class="glass-panel" style="margin-top:20px;"><div style="padding:20px;">`;
+    let html = `<div class="glass-panel" style="margin-top:20px;"><div style="padding:20px; position:relative;"><button type="button" id="copyResultBtn" style="position:absolute; top:12px; right:12px; padding:8px 14px; background:rgba(59,130,246,0.2); border:1px solid var(--glass-border); border-radius:6px; color:var(--info-blue); font-size:12px; cursor:pointer;">Copy result</button><div id="rateResultContent">`;
     
     if (service === 'excess') {
         html += displayExcessBaggageResult(result);
@@ -865,8 +911,21 @@ function displayResult(container, result, service) {
         html += displayExtraLegroomResult(result);
     }
     
-    html += `</div></div>`;
+    html += `</div></div></div>`;
     container.innerHTML = html;
+    const copyResultBtn = container.querySelector('#copyResultBtn');
+    const rateResultContent = container.querySelector('#rateResultContent');
+    if (copyResultBtn && rateResultContent) {
+        copyResultBtn.addEventListener('click', () => {
+            const text = (rateResultContent.textContent || rateResultContent.innerText || '').trim();
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                const orig = copyResultBtn.textContent;
+                copyResultBtn.textContent = 'Copied!';
+                setTimeout(() => { copyResultBtn.textContent = orig; }, 1500);
+            }).catch(() => {});
+        });
+    }
 }
 
 function displayExtraLegroomResult(result) {
