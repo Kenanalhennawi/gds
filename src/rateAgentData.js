@@ -51,7 +51,8 @@ export const SYNONYMS = {
     'ruh': ['riyadh', 'ruh'], 'jed': ['jeddah', 'jed'], 'dmm': ['dammam', 'dmm'],
     'maa': ['chennai', 'maa'], 'hyd': ['hyderabad', 'hyd'], 'blr': ['bangalore', 'blr'],
     'doh': ['doha', 'doh'], 'ist': ['istanbul', 'ist'], 'bkk': ['bangkok', 'bkk'],
-    'svo': ['moscow', 'svo'], 'led': ['st petersburg', 'led'], 'prg': ['prague', 'prg']
+    'svo': ['moscow', 'svo'], 'led': ['st petersburg', 'led'], 'prg': ['prague', 'prg'],
+    'tas': ['tashkent', 'tas']
 };
 
 // =============================================================================
@@ -132,6 +133,22 @@ const EK_OAL_QA = [
 ];
 
 // =============================================================================
+// Q&A PAIRS – Route-style excess (excess from X to Y, to Dubai, from TAS, etc.)
+// Placed before UA/AC so "excess from TAS to Dubai" matches FZ/EK guidance, not UA/AC.
+// =============================================================================
+
+const ROUTE_EXCESS_QA = [
+    {
+        keywords: ['excess from', 'excess to', 'to dubai', 'to dxb', 'from tas', 'from dxb', 'excess tas', 'excess dubai', 'excess dxb', 'rate from', 'rate to', 'baggage from', 'baggage to'],
+        answer: `**Excess baggage for a specific route (e.g. from TAS to Dubai):**\n\nFor **Flydubai (FZ)** or **Emirates (EK)** routes to/from Dubai (DXB), use the **Excess Baggage** tab:\n1. Enter **origin** (e.g. TAS for Tashkent) and **destination** (e.g. DXB for Dubai).\n2. Select airline **FZ** (Flydubai – per kg by zone) or **EK** (Emirates – per kg USD by region).\n3. Choose **currency** and click **Calculate**.\n\n**UA/AC** flat fees ($75/$100/$200) apply only on **interline** journeys when United or Air Canada is the long-haul carrier (e.g. FZ–UA, FZ–AC), not for FZ-only or FZ–EK routes to Dubai.`
+    },
+    {
+        keywords: ['to dxb', 'from dxb', 'dubai excess', 'dxb excess'],
+        answer: `**Excess baggage to/from Dubai (DXB):** Use **Excess Baggage** tab – enter origin and destination DXB, select **FZ** (Flydubai) or **EK** (Emirates), choose currency, click **Calculate**. FZ uses per-kg by zone; EK uses per-kg USD by region. UA/AC rates apply only on FZ–UA or FZ–AC interline, not for Dubai-only routes.`
+    }
+];
+
+// =============================================================================
 // Q&A PAIRS – Larnaca Malta, UA/AC
 // =============================================================================
 
@@ -142,11 +159,15 @@ const LCA_MLA_UA_AC_QA = [
     },
     {
         keywords: ['ua rate', 'united rate', 'ac rate', 'air canada', 'free allowance', '75', '100', '200', 'oversize', 'overweight', 'united baggage', 'air canada baggage'],
-        answer: `**United Airlines (UA) / Air Canada (AC) Excess Baggage:**\n\n${REFERENCE_TEXTS.UA_AC_EXCESS}\n\n**Summary:** Free allowance Economy 0–23 kg, Business 0–32 kg. 1st excess bag $75, 2nd $100, 3 or more $200. Oversize $200, Overweight $200. Use the **Excess Baggage** tab and select UA or AC.`
+        answer: `**United Airlines (UA) / Air Canada (AC) Excess Baggage – Flat USD fees:**\n\n**"Flat USD fees"** = fixed charges in US dollars **per bag** (not per kg). Same price regardless of weight (within limits): 1st bag $75, 2nd $100, 3+ $200; oversize/overweight $200 each.\n\n${REFERENCE_TEXTS.UA_AC_EXCESS}\n\n**Summary:** Free allowance Economy 0–23 kg, Business 0–32 kg. 1st excess bag $75, 2nd $100, 3 or more $200. Oversize $200, Overweight $200. Use the **Excess Baggage** tab and select **UA or AC** only when your journey is FZ–UA or FZ–AC interline. For FZ or EK routes (e.g. to Dubai), use airline **FZ** or **EK** in the tab.`
     },
     {
         keywords: ['free allowance', '23 kg', '32 kg', 'economy business allowance'],
         answer: `**UA/AC Free Baggage Allowance:**\n\n• **Economy:** 0–23 kg (free allowance)\n• **Business:** 0–32 kg (free allowance)\n\nExcess above that: 1st bag $75, 2nd $100, 3 or more $200. Oversize $200, Overweight $200. Use **Excess Baggage** tab, airline UA or AC.`
+    },
+    {
+        keywords: ['flat usd', 'flat fee', 'flat fees', 'what is flat', 'flat rate'],
+        answer: `**Flat USD fees** = **fixed charges in US dollars per bag** (not per kilogram). Used for **UA** and **AC** excess baggage: 1st bag $75, 2nd $100, 3 or more $200; oversize $200, overweight $200. Same dollar amount per bag regardless of weight (within limits). **FZ** and **EK** use **per-kg** rates (or per piece from some regions), not flat fees. UA/AC flat fees apply only on FZ–UA or FZ–AC interline journeys.`
     }
 ];
 
@@ -475,6 +496,7 @@ export const QA_PAIRS = [
     ...INTERLINE_QA,
     ...DISCLAIMER_QA,
     ...EK_OAL_QA,
+    ...ROUTE_EXCESS_QA,
     ...LCA_MLA_UA_AC_QA,
     ...REGIONAL_QA,
     ...UPGRADE_QA,
