@@ -1406,7 +1406,7 @@ const EK_OAL_ZONE_MAPPING = {
     'AMERICAS': ['ARG', 'BRA', 'CHL', 'CAN', 'USA', 'MEX']
 };
 
-function getEKRegionForAirport(airport) {
+export function getEKRegionForAirport(airport) {
     const code = airport.toUpperCase();
 
     if (['BAH', 'IKA', 'THR', 'BGW', 'BSR', 'EBL', 'ISU', 'NJF', 'AMM', 'AQJ', 'KWI', 'BEY', 'DAM', 'ALP', 'LTK', 'MCT', 'OHS', 'SLL', 'DOH', 'RUH', 'JED', 'DMM', 'MED', 'AHB', 'ELQ', 'TIF', 'TUU', 'HAS', 'YNB', 'AJF', 'EAM', 'GIZ', 'HOF', 'NUM', 'RSI', 'ULH', 'DXB', 'DWC', 'AUH', 'SHJ', 'TLV'].includes(code)) {
