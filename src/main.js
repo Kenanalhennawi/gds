@@ -4,7 +4,6 @@ import { analyzeBookingChanges } from "./analyzer.js";
 import { renderExcessBaggageCalculator } from "./excessBaggageUI.js";
 import { detectSystem, getKnownSystems } from "./systemDetector.js";
 
-// Register service worker for cache (works over HTTP/HTTPS only)
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').catch(() => {});
@@ -29,16 +28,13 @@ const els = {
     excessBaggageContainer: document.getElementById("excessBaggageContainer")
 };
 
-// Show loading state
 const showLoading = () => {
     if (els.status) {
         els.status.innerHTML = `<span class="status-dot" style="animation:pulse 1.5s infinite;"></span><span>Analyzing...</span>`;
     }
-    // Hide hint and show loading bar
     if (els.outputHint) els.outputHint.style.display = "none";
     if (els.loadingBar) {
         els.loadingBar.style.display = "block";
-        // Animate progress bar
         const fill = els.loadingBar.querySelector(".loading-bar-fill");
         if (fill) {
             fill.style.width = "0%";
@@ -62,10 +58,8 @@ const processInput = () => {
     if (!raw || !raw.trim()) {
         renderTimeline(els.timeline, []);
         if (els.status) els.status.innerHTML = `<span class="status-dot"></span><span>Ready - Auto-Analyzing</span>`;
-        // Show hint and hide loading bar when input is empty
         if (els.outputHint) els.outputHint.style.display = "flex";
         if (els.loadingBar) els.loadingBar.style.display = "none";
-        // Reset system detection
         if (els.detectedSystemPill) {
             els.detectedSystemPill.textContent = "Unknown / Generic";
             els.detectedSystemPill.className = "system-pill system-unknown";
@@ -77,13 +71,10 @@ const processInput = () => {
         return;
     }
 
-    // Show loading state
     showLoading();
 
-    // Use requestIdleCallback for better performance on heavy operations
     const processHeavy = () => {
         try {
-            // Detect GDS system
             const systemDetection = detectSystem(raw);
             if (els.detectedSystemPill) {
                 els.detectedSystemPill.textContent = systemDetection.label;
@@ -95,19 +86,13 @@ const processInput = () => {
             }
             
             const events = parseLog(raw);
-            
-            // Analyze booking changes
             const analysis = analyzeBookingChanges(events);
-            
-            // Complete loading bar
             if (els.loadingBar) {
                 const fill = els.loadingBar.querySelector(".loading-bar-fill");
                 if (fill) {
                     fill.style.width = "100%";
                 }
             }
-            
-            // Render with summary and change details
             renderTimeline(els.timeline, {
                 events: analysis.events,
                 summary: analysis.summary,
@@ -116,8 +101,6 @@ const processInput = () => {
             
             const count = analysis.events.length;
             const changeCount = analysis.changes.length;
-            
-            // Hide loading bar and show hint if no events
             setTimeout(() => {
                 if (els.loadingBar) els.loadingBar.style.display = "none";
                 if (els.outputHint && count === 0) {
@@ -133,12 +116,10 @@ const processInput = () => {
                     : `<span class="status-dot" style="background:var(--success-green);"></span><span>Analyzed ${count} events</span>`;
             }
         } catch (e) {
-            // Better error handling without console.error in production
             const errorMessage = e.message || "Unknown error occurred";
             if (els.status) {
                 els.status.innerHTML = `<span class="status-dot" style="background:var(--error-red);"></span><span style="color:var(--error-red);">⚠️ Error: ${errorMessage}</span>`;
             }
-            // Hide loading bar on error
             if (els.loadingBar) els.loadingBar.style.display = "none";
             if (els.outputHint) els.outputHint.style.display = "flex";
             if (els.timeline) {
@@ -154,7 +135,6 @@ const processInput = () => {
         }
     };
 
-    // Use requestIdleCallback if available, otherwise setTimeout
     if (window.requestIdleCallback) {
         requestIdleCallback(processHeavy, { timeout: 1000 });
     } else {
@@ -162,7 +142,6 @@ const processInput = () => {
     }
 };
 
-// Auto-analyze on input, paste, or typing
 if (els.input) {
     let debounceTimer;
     els.input.addEventListener("input", () => {
@@ -181,9 +160,7 @@ if (els.clear) els.clear.addEventListener("click", () => {
     processInput(); 
 });
 
-// Tab switching
 if (els.tabDecoder && els.tabExcessBaggage) {
-    // Ensure buttons are clickable
     els.tabDecoder.style.pointerEvents = "auto";
     els.tabDecoder.style.cursor = "pointer";
     els.tabDecoder.style.position = "relative";
@@ -216,19 +193,12 @@ if (els.tabDecoder && els.tabExcessBaggage) {
         if (els.decoderSection) els.decoderSection.style.display = "none";
         if (els.decoderOutput) els.decoderOutput.style.display = "none";
         if (els.excessBaggageSection) els.excessBaggageSection.style.display = "block";
-        
-        // Hide hero section when excess baggage is active
-        
-        // Lazy load excess baggage calculator
         if (els.excessBaggageContainer && els.excessBaggageContainer.children.length === 0) {
-            // Show loading state
             els.excessBaggageContainer.innerHTML = `
                 <div class="empty-state">
                     <div class="loading-spinner"></div>
                     <h3>Loading Calculator...</h3>
                 </div>`;
-            
-            // Load calculator asynchronously
             if (window.requestIdleCallback) {
                 requestIdleCallback(() => {
                     renderExcessBaggageCalculator(els.excessBaggageContainer);
@@ -241,16 +211,13 @@ if (els.tabDecoder && els.tabExcessBaggage) {
         }
     });
 } else {
-    // Silent error handling - tabs will work if elements exist
     if (els.tabDecoder && !els.tabExcessBaggage) {
-        // Only show error if one tab exists but not the other (configuration issue)
         if (els.status) {
             els.status.textContent = "⚠️ Navigation configuration issue";
         }
     }
 }
 
-// Populate supported systems list
 if (els.systemsList) {
     const systems = getKnownSystems();
     const systemsText = systems.map(s => s.label).join(", ");
