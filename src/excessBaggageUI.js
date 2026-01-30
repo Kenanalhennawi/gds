@@ -475,12 +475,13 @@ export function renderExcessBaggageCalculator(container) {
                 }
                 
                 dropdown.innerHTML = '';
+                const esc = (s) => (s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'));
                 results.forEach(airport => {
                     const item = document.createElement('div');
                     item.style.cssText = 'padding:10px 12px; cursor:pointer; border-bottom:1px solid rgba(255,255,255,0.05); transition:background 0.2s;';
                     item.innerHTML = `
-                        <div style="font-weight:700; color:var(--text-main); font-size:13px;">${airport.code} - ${airport.name}</div>
-                        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${airport.city}, ${airport.country}</div>
+                        <div style="font-weight:700; color:var(--text-main); font-size:13px;">${esc(airport.code)} - ${esc(airport.name)}</div>
+                        <div style="font-size:11px; color:var(--text-muted); margin-top:2px;">${esc(airport.city)}, ${esc(airport.country)}</div>
                     `;
                     
                     item.addEventListener('mouseenter', () => {
