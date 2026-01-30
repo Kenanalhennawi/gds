@@ -4,6 +4,13 @@ import { analyzeBookingChanges } from "./analyzer.js";
 import { renderExcessBaggageCalculator } from "./excessBaggageUI.js";
 import { detectSystem, getKnownSystems } from "./systemDetector.js";
 
+// Register service worker for cache (works over HTTP/HTTPS only)
+if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+}
+
 const els = {
     input: document.getElementById("gdsInput"),
     timeline: document.getElementById("timeline"),
