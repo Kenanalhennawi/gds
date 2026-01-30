@@ -306,6 +306,54 @@ const INDIA_CMB_FZ_QA = [
 ];
 
 // =============================================================================
+// Q&A PAIRS – Other sections (Go-Show, Sports, Reporting, Transfer, Extra Legroom, Reference)
+// Covers fields, labels, and options in each tab so nothing is missing.
+// =============================================================================
+
+const OTHER_SECTIONS_QA = [
+    // --- Go-Show section ---
+    {
+        keywords: ['go show origin', 'goshow origin', 'origin airport go show', 'go show class', 'class economy business', 'go show economy', 'go show business', 'adult infant go show', 'go show result', 'goshow result'],
+        answer: `**Go-Show Fares section:**\n\n**Tab:** **Go-Show Fares**\n**Fields:** 1) **Origin Airport** – search by code, city, or country. 2) **Class** – Economy or Business.\n**Action:** Click **Calculate**.\n**Result:** One-way fare by origin; **Adult** and **Infant** fares shown for the selected class. Use for show-up-at-airport (standby) fares.`
+    },
+    // --- Sports Equipment section ---
+    {
+        keywords: ['sports equipment type', 'equipment type', 'speq spex', 'standard oversized', 'sports section', 'sports result', 'sports currency'],
+        answer: `**Sports Equipment section:**\n\n**Tab:** **Sports Equipment**\n**Fields:** 1) **Currency** – e.g. AED, USD. 2) **Equipment Type** – **SPEQ** (Standard) or **SPEX** (Oversized).\n**Action:** Click **Calculate**.\n**Result:** Rate for the selected currency and type. SPEQ = standard sports item; SPEX = oversized.`
+    },
+    // --- Reporting Fees section ---
+    {
+        keywords: ['reporting fee type', 'fee type', 'lrtp ertp', 'late early reporting', 'reporting section', 'reporting result', 'reporting currency'],
+        answer: `**Reporting Fees section:**\n\n**Tab:** **Reporting Fees**\n**Fields:** 1) **Currency** – e.g. AED, USD. 2) **Fee Type** – **LRTP** (Late Reporting) or **ERTP** (Early Reporting).\n**Action:** Click **Calculate**.\n**Result:** Fee for the selected currency and type. LRTP = Late Reporting; ERTP = Early Reporting.`
+    },
+    // --- Transfer Baggage section ---
+    {
+        keywords: ['transfer location', 'transfer section', 'location dxb', 'location outstation', 'gha', 'gha fee', 'dxb or outstation', 'transfer result', 'where transfer'],
+        answer: `**Transfer Baggage section:**\n\n**Tab:** **Transfer Baggage**\n**Field:** **Location** – **DXB** (Dubai) or **Outstation**.\n**Result:** • **DXB:** AED 50 + **GHA fee** AED 50. • **Outstation:** USD 30 + GHA fee as applicable. SSR code **TRBF**. GHA = Ground Handling Agent fee.`
+    },
+    // --- Extra Legroom section ---
+    {
+        keywords: ['extra legroom section', 'extralegroom', 'xlgr section', 'legroom currency', 'legroom result', 'airport on board legroom', 'xlgr airport', 'xlgr on board'],
+        answer: `**Extra Legroom (XLGR) section:**\n\n**Tab:** **Extra Legroom**\n**Field:** **Currency** – e.g. AED, USD, EUR.\n**Action:** Select currency (rate may display automatically or click **Calculate**).\n**Result:** **Airport rate** (at check-in) and **On Board rate** (when purchased on board); **Currency exchange** to USD shown where available.`
+    },
+    // --- Reference section ---
+    {
+        keywords: ['reference section', 'reference content', 'interline table', 'journey condition', 'which carrier table', 'aircraft table', 'a/c type', 'ac type', 'capacity xlgr', 'xlgr rows', 'page 26', 'reference tab content', 'regional classification list', 'ek oal text', 'ua ac text'],
+        answer: `**Reference section:**\n\n**Tab:** **Reference**\n**Content:**\n• **Interline Excess Baggage – Which Carrier's Rates Apply:** Table with **Journey** and **Condition** (e.g. FZ–EK → EK rates).\n• **Customer disclaimer** and FS/SUP note.\n• **Aircraft Type & Extra Legroom (XLGR) Seats:** Table with **A/C Type**, **Cabin**, **Capacity**, **XLGR Rows** (document Page 26).\n• **EK/OAL Excess Baggage** text.\n• **UA/AC Excess Baggage** text.\n• **Regional Classification (EK/OAL)** – full country list by region.`
+    },
+    // --- Excess Baggage section (fields) ---
+    {
+        keywords: ['excess section', 'excess origin', 'excess destination', 'excess airline', 'select airline', 'origin destination excess', 'excess currency'],
+        answer: `**Excess Baggage section:**\n\n**Tab:** **Excess Baggage**\n**Fields:** 1) **Origin** – airport code. 2) **Destination** – airport code. 3) **Airline** – FZ, EK, OAL, UA, or AC. 4) **Currency** – or leave default (destination/origin currency).\n**Action:** Click **Calculate**.\n**Result:** Per-kg or flat rate, zone(s), any route exception (CMB–MLE, India note, LCA–MLA), or disclaimer.`
+    },
+    // --- Upgrade section (fields) ---
+    {
+        keywords: ['upgrade section', 'upgrade origin', 'upgrade currency', 'upgrade result', 'origin airport upgrade'],
+        answer: `**Upgrade to Business section:**\n\n**Tab:** **Upgrade to Business**\n**Fields:** 1) **Origin Airport** – search by code, city, or country. 2) **Currency** – e.g. AED, USD, SAR.\n**Action:** Click **Calculate**.\n**Result:** At-airport rate, on-board rate, infant rate (when available), zone; exception rate and label if origin has an exception (KWI, BAH, MCT, Saudi, India, etc.).`
+    }
+];
+
+// =============================================================================
 // Q&A PAIRS – Infant, How to calculate, Greetings, Thanks
 // =============================================================================
 
@@ -628,6 +676,7 @@ export const QA_PAIRS = [
     ...UPGRADE_QA,
     ...OTHER_SERVICES_QA,
     ...INDIA_CMB_FZ_QA,
+    ...OTHER_SECTIONS_QA,
     ...GENERAL_QA,
     ...FULL_POSSIBILITIES_QA,
     ...ALL_ACTIONS_QA,
