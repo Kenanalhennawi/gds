@@ -1,8 +1,3 @@
-/**
- * Comprehensive UI for Flydubai Rate Calculator
- * Includes: Excess Baggage, Go-Show Fares, Sports Equipment, Reporting Fees, etc.
- */
-
 import { 
     calculateExcessBaggageRate, 
     getZoneForAirport, 
@@ -27,23 +22,18 @@ import { answerAgentQuestion } from "./rateAgent.js";
 import { translateAirline, translateCity } from "./translator.js";
 import { searchAirports, getAirportByCode } from "./airportSearch.js";
 
-// Helper to get country name from airport code
 function getCountryForAirport(code) {
     const airport = getAirportByCode(code);
     return airport ? airport.country : null;
 }
 
-// Global click handler for closing autocomplete dropdowns (single listener)
 let globalClickHandler = null;
 
 export function renderExcessBaggageCalculator(container) {
-    // Remove old global click handler if it exists
     if (globalClickHandler) {
         document.removeEventListener('click', globalClickHandler);
         globalClickHandler = null;
     }
-    
-    // Track all active autocomplete dropdowns
     const activeDropdowns = new Set();
     
     container.innerHTML = `
@@ -56,8 +46,6 @@ export function renderExcessBaggageCalculator(container) {
                     <p style="color:var(--text-muted); font-size:14px; line-height:1.6; margin-bottom:20px;">
                         Calculate rates for excess baggage, go-show fares, sports equipment, and other services.
                     </p>
-                    
-                    <!-- How to use (collapsible) -->
                     <div class="how-to-use-wrap" style="margin-bottom:16px;">
                         <button type="button" id="howToUseToggle" class="how-to-use-toggle" aria-expanded="false" aria-controls="howToUseContent" style="display:flex; align-items:center; gap:8px; padding:10px 14px; background:rgba(59,130,246,0.1); border:1px solid var(--glass-border); border-radius:8px; color:var(--info-blue); font-size:13px; font-weight:600; cursor:pointer; width:100%; text-align:left;">
                             <span aria-hidden="true">?</span> How to use
@@ -69,7 +57,6 @@ export function renderExcessBaggageCalculator(container) {
                             <p style="margin-bottom:0;"><strong style="color:var(--text-main);">4.</strong> Use <strong>Ask Agent</strong> for questions about rates and rules.</p>
                         </div>
                     </div>
-                    <!-- Service Tabs -->
                     <div class="service-tabs-container service-tabs-scroll" role="tablist" aria-label="Rate calculator services" style="display:flex; gap:10px; margin-bottom:20px; border-bottom:2px solid var(--glass-border); padding-bottom:2px; overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch;">
                         <button class="service-tab active" data-service="excess" role="tab" aria-selected="true" aria-controls="excessSection" id="tabExcess" style="padding:10px 20px; background:rgba(59,130,246,0.25); border:none; border-bottom:2px solid var(--primary-blue); color:var(--primary-blue); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Excess Baggage
@@ -99,8 +86,6 @@ export function renderExcessBaggageCalculator(container) {
                             Ask Agent
                         </button>
                     </div>
-                    
-                    <!-- Excess Baggage Section -->
                     <div id="excessSection" class="service-section" role="tabpanel" aria-labelledby="tabExcess" aria-hidden="false">
                         <div class="excess-form-grid" style="gap:15px; margin-bottom:20px;">
                             <div style="position:relative;">
@@ -164,8 +149,6 @@ export function renderExcessBaggageCalculator(container) {
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Go-Show Section -->
                     <div id="goshowSection" class="service-section" role="tabpanel" aria-labelledby="tabGoshow" aria-hidden="true" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                             <div style="position:relative;">
@@ -196,8 +179,6 @@ export function renderExcessBaggageCalculator(container) {
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Sports Equipment Section -->
                     <div id="sportsSection" class="service-section" role="tabpanel" aria-labelledby="tabSports" aria-hidden="true" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                             <div>
@@ -227,8 +208,6 @@ export function renderExcessBaggageCalculator(container) {
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Reporting Section -->
                     <div id="reportingSection" class="service-section" role="tabpanel" aria-labelledby="tabReporting" aria-hidden="true" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                             <div>
@@ -258,8 +237,6 @@ export function renderExcessBaggageCalculator(container) {
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Transfer Section -->
                     <div id="transferSection" class="service-section" role="tabpanel" aria-labelledby="tabTransfer" aria-hidden="true" style="display:none;">
                         <div style="margin-bottom:20px;">
                             <label style="display:block; font-weight:600; margin-bottom:8px; color:var(--text-main);">
@@ -275,8 +252,6 @@ export function renderExcessBaggageCalculator(container) {
                             </select>
                         </div>
                     </div>
-                    
-                    <!-- Upgrade Section -->
                     <div id="upgradeSection" class="service-section" role="tabpanel" aria-labelledby="tabUpgrade" aria-hidden="true" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
                             <div style="position:relative;">
@@ -305,8 +280,6 @@ export function renderExcessBaggageCalculator(container) {
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Extra Legroom Section -->
                     <div id="extralegroomSection" class="service-section" role="tabpanel" aria-labelledby="tabExtralegroom" aria-hidden="true" style="display:none;">
                         <div style="display:grid; grid-template-columns:1fr; gap:15px; margin-bottom:20px;">
                             <div>
@@ -323,13 +296,9 @@ export function renderExcessBaggageCalculator(container) {
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Reference Section (document reference data) -->
                     <div id="referenceSection" class="service-section" role="tabpanel" aria-labelledby="tabReference" aria-hidden="true" style="display:none;">
                         <div id="referenceContent"></div>
                     </div>
-                    
-                    <!-- Ask Agent Section -->
                     <div id="agentSection" class="service-section" role="tabpanel" aria-labelledby="tabAgent" aria-hidden="true" style="display:none;">
                         <p style="color:var(--text-muted); font-size:14px; line-height:1.6; margin-bottom:16px;">
                             Ask anything about excess baggage, interline rates, upgrade, go-show, extra legroom, regional classification, or document rules. The agent answers from the official reference (GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES).
@@ -371,18 +340,13 @@ export function renderExcessBaggageCalculator(container) {
             </div>
         </div>
     `;
-    
-    // Pre-populate currency dropdowns immediately - single pass for maximum performance
     const currencies = getAllCurrencies();
     const currencyOptionsHTML = currencies.map(curr => `<option value="${curr}">${curr}</option>`).join('');
-    
-    // Populate all currency selects in one batch operation
     let currencySelect = container.querySelector('#currencySelect');
     const sportsCurrency = container.querySelector('#sportsCurrency');
     const reportingCurrency = container.querySelector('#reportingCurrency');
     const upgradeSelect = container.querySelector('#upgradeCurrency');
     
-    // Set innerHTML directly (fastest DOM operation)
     if (currencySelect) {
         currencySelect.innerHTML = '<option value="AUTO">Auto (by destination)</option>' + currencyOptionsHTML;
     }
@@ -392,8 +356,6 @@ export function renderExcessBaggageCalculator(container) {
     if (reportingCurrency) {
         reportingCurrency.innerHTML = '<option value="AED">AED</option>' + currencyOptionsHTML;
     }
-    
-    // Initialize upgrade currencies
     const upgradeCurrencies = ['AED', 'PKR', 'BHD', 'BYN', 'CHF', 'CZK', 'EGP', 'EUR', 'HUF', 'INR', 'JOD', 'KWD', 'KZT', 'LBP', 'LKR', 'MYR', 'NPR', 'OMR', 'PLN', 'QAR', 'RUB', 'SAR', 'TJS', 'THB', 'USD', 'UZS', 'IRR'];
     if (upgradeSelect) {
         upgradeSelect.innerHTML = upgradeCurrencies.map(curr => `<option value="${curr}">${curr}</option>`).join('');
@@ -403,8 +365,6 @@ export function renderExcessBaggageCalculator(container) {
         const xlgrCurrencies = getExtraLegroomCurrencies();
         extralegroomCurrencySelect.innerHTML = xlgrCurrencies.map(curr => `<option value="${curr}">${curr}</option>`).join('');
     }
-    
-    // Restore last-used excess baggage (origin, destination, airline, currency)
     try {
         const last = localStorage.getItem('gds_excess_last');
         if (last && originInput && destInput && airlineSelect && currencySelect) {
@@ -415,8 +375,6 @@ export function renderExcessBaggageCalculator(container) {
             if (data.currency && (data.currency === 'AUTO' || [...currencySelect.options].some(o => o.value === data.currency))) currencySelect.value = data.currency;
         }
     } catch (_) {}
-    
-    // How to use toggle
     const howToUseToggle = container.querySelector('#howToUseToggle');
     const howToUseContent = container.querySelector('#howToUseContent');
     if (howToUseToggle && howToUseContent) {
@@ -426,16 +384,12 @@ export function renderExcessBaggageCalculator(container) {
             howToUseToggle.setAttribute('aria-expanded', !isOpen);
         });
     }
-    
-    // Tab switching
     const tabs = container.querySelectorAll('.service-tab');
     const sections = container.querySelectorAll('.service-section');
     
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             const service = tab.dataset.service;
-            
-            // Update tabs (aria)
             tabs.forEach(t => {
                 t.classList.remove('active');
                 t.style.background = 'transparent';
@@ -449,8 +403,6 @@ export function renderExcessBaggageCalculator(container) {
             tab.style.color = 'var(--primary-blue)';
             tab.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.2)';
             tab.setAttribute('aria-selected', 'true');
-            
-            // Update sections (aria-hidden)
             sections.forEach(s => {
                 s.style.display = 'none';
                 s.setAttribute('aria-hidden', 'true');
@@ -477,8 +429,6 @@ export function renderExcessBaggageCalculator(container) {
             }
         });
     });
-    
-    // Input handlers (currencySelect already declared above)
     const originInput = container.querySelector('#originInput');
     const destInput = container.querySelector('#destinationInput');
     const airlineSelect = container.querySelector('#airlineSelect');
@@ -489,8 +439,6 @@ export function renderExcessBaggageCalculator(container) {
     const destInfo = container.querySelector('#destinationInfo');
     const originAutocomplete = container.querySelector('#originAutocomplete');
     const destAutocomplete = container.querySelector('#destinationAutocomplete');
-    
-    // Debounce function for performance
     function debounce(func, wait) {
         let timeout;
         return function executedFunction(...args) {
@@ -502,13 +450,9 @@ export function renderExcessBaggageCalculator(container) {
             timeout = setTimeout(later, wait);
         };
     }
-    
-    // Create autocomplete handler
     function createAutocompleteHandler(input, dropdown, infoDiv, onSelect) {
         let debounceTimer;
         let selectedAirport = null;
-        
-        // Add this dropdown to active set
         activeDropdowns.add({ input, dropdown });
         
         input.addEventListener('input', () => {
@@ -555,12 +499,9 @@ export function renderExcessBaggageCalculator(container) {
                     
                     dropdown.appendChild(item);
                 });
-                
                 dropdown.style.display = 'block';
             }, 200);
         });
-        
-        // Handle Enter key
         input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -571,10 +512,7 @@ export function renderExcessBaggageCalculator(container) {
             }
         });
     }
-    
-    // Single global click handler for all autocomplete dropdowns
     globalClickHandler = (e) => {
-        // Don't interfere with header navigation buttons or their children
         const target = e.target;
         if (target && (
             target.id === 'tabDecoder' || 
@@ -583,48 +521,34 @@ export function renderExcessBaggageCalculator(container) {
             target.closest('#tabExcessBaggage') ||
             target.closest('.header-tabs')
         )) {
-            return; // Allow header button clicks to work
+            return;
         }
-        
-        // Close all active dropdowns if click is outside
         activeDropdowns.forEach(({ input, dropdown }) => {
             if (!input.contains(target) && !dropdown.contains(target)) {
                 dropdown.style.display = 'none';
             }
         });
     };
-    
-    // Add single global listener
     document.addEventListener('click', globalClickHandler);
-    
-    // Setup autocomplete for origin
     createAutocompleteHandler(originInput, originAutocomplete, originInfo, (airport) => {
         const zone = getZoneForAirport(airport.code);
         originInfo.textContent = `${airport.city}, ${airport.country}${zone ? ` - Zone ${zone}` : ''}`;
-        
-        // Auto-select currency based on origin or destination
         if (currencySelect && currencySelect.value === 'AUTO') {
             const destValue = destInput ? destInput.value.trim() : null;
             const currency = getCurrencyForOriginOrDestination(airport.code, destValue);
             currencySelect.value = currency;
         }
     });
-    
-    // Setup autocomplete for destination
     createAutocompleteHandler(destInput, destAutocomplete, destInfo, (airport) => {
         const zone = getZoneForAirport(airport.code);
         const destCurrency = getCurrencyForDestination(airport.code);
         destInfo.textContent = `${airport.city}, ${airport.country}${zone ? ` - Zone ${zone}` : ''} (${destCurrency})`;
-        
-        // Auto-select currency based on origin or destination (prefers origin)
         if (currencySelect && currencySelect.value === 'AUTO') {
             const originValue = originInput ? originInput.value.trim() : null;
             const currency = getCurrencyForOriginOrDestination(originValue, airport.code);
             currencySelect.value = currency;
         }
     });
-    
-    // Swap origin ↔ destination
     const swapOriginDestBtn = container.querySelector('#swapOriginDestBtn');
     if (swapOriginDestBtn && originInput && destInput) {
         swapOriginDestBtn.addEventListener('click', () => {
@@ -640,22 +564,16 @@ export function renderExcessBaggageCalculator(container) {
             }
         });
     }
-    
-    // Setup autocomplete for go-show origin
     const goshowOrigin = container.querySelector('#goshowOrigin');
     const goshowAutocomplete = container.querySelector('#goshowAutocomplete');
     if (goshowOrigin && goshowAutocomplete) {
         createAutocompleteHandler(goshowOrigin, goshowAutocomplete, null, null);
     }
-    
-    // Setup autocomplete for upgrade origin
     const upgradeOrigin = container.querySelector('#upgradeOrigin');
     const upgradeAutocomplete = container.querySelector('#upgradeAutocomplete');
     if (upgradeOrigin && upgradeAutocomplete) {
         createAutocompleteHandler(upgradeOrigin, upgradeAutocomplete, null, null);
     }
-    
-    // Ask Agent handler
     const agentQuestionInput = container.querySelector('#agentQuestionInput');
     const agentAskBtn = container.querySelector('#agentAskBtn');
     const agentResponseArea = container.querySelector('#agentResponseArea');
@@ -734,16 +652,12 @@ export function renderExcessBaggageCalculator(container) {
         }
     }
     
-    // Clear button handler
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
-            // Clear all inputs
             originInput.value = '';
             destInput.value = '';
             if (goshowOrigin) goshowOrigin.value = '';
             if (upgradeOrigin) upgradeOrigin.value = '';
-            
-            // Reset selects
             if (airlineSelect) airlineSelect.value = 'FZ';
             if (currencySelect) currencySelect.value = 'AUTO';
             if (container.querySelector('#goshowClass')) container.querySelector('#goshowClass').value = 'ECONOMY';
@@ -760,23 +674,15 @@ export function renderExcessBaggageCalculator(container) {
                 agentResponseAreaEl.textContent = 'Your answer will appear here after you ask.';
                 agentResponseAreaEl.style.color = 'var(--text-muted)';
             }
-            
-            // Clear info displays
             originInfo.textContent = '';
             destInfo.textContent = '';
-            
-            // Hide autocomplete dropdowns
             originAutocomplete.style.display = 'none';
             destAutocomplete.style.display = 'none';
             if (goshowAutocomplete) goshowAutocomplete.style.display = 'none';
             if (upgradeAutocomplete) upgradeAutocomplete.style.display = 'none';
-            
-            // Hide results
             resultDiv.style.display = 'none';
         });
     }
-    
-    // Calculate button (with loading state and Ctrl+Enter)
     function doCalculate() {
         const activeTab = container.querySelector('.service-tab.active');
         const service = activeTab ? activeTab.dataset.service : 'excess';
@@ -793,18 +699,13 @@ export function renderExcessBaggageCalculator(container) {
             let result;
             
             if (service === 'excess') {
-                // Extract airport code from input (might be full text or just code)
                 let origin = originInput.value.trim().toUpperCase();
                 let destination = destInput.value.trim().toUpperCase();
-                
-                // Try to extract code if it's a longer string
                 const originMatch = origin.match(/\b([A-Z]{3})\b/);
                 const destMatch = destination.match(/\b([A-Z]{3})\b/);
                 
                 if (originMatch) origin = originMatch[1];
                 if (destMatch) destination = destMatch[1];
-                
-                // If still not 3 chars, try to get from airport data
                 if (origin.length !== 3) {
                     const airport = getAirportByCode(origin) || searchAirports(origin, 1)[0];
                     if (airport) origin = airport.code;
@@ -896,8 +797,6 @@ export function renderExcessBaggageCalculator(container) {
     }
     
     btn.addEventListener('click', doCalculate);
-    
-    // Ctrl+Enter / Cmd+Enter to calculate (when calculator visible and not in agent/reference)
     container.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
             const activeTab = container.querySelector('.service-tab.active');
@@ -1133,8 +1032,6 @@ function displayExcessBaggageResult(result) {
     const destAirport = getAirportByCode(result.destination);
     const originCountry = originAirport ? originAirport.country : null;
     const destCountry = destAirport ? destAirport.country : null;
-    
-    // For EK/OAL, show region; for FZ, show country or zone
     const originDisplay = (result.airline === 'EK' || result.airline === 'OAL') && result.originRegion 
         ? result.originRegion 
         : (originCountry || (result.originZone ? `Zone ${result.originZone}` : ''));
