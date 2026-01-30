@@ -488,7 +488,70 @@ const NUMBERS_QA = [
 ];
 
 // =============================================================================
-// COMBINE ALL QA PAIRS (order matters: more specific first; EXPANDED_QA last)
+// ALL POSSIBILITIES FOR ALL ACTIONS – exhaustive keywords per action
+// So any phrasing (calculate, get rate, how much, price, cost, etc.) maps to the right tab.
+// =============================================================================
+
+const ALL_ACTIONS_QA = [
+    // ----- EXCESS BAGGAGE -----
+    {
+        keywords: ['excess baggage', 'excess bag', 'extra baggage', 'extra bag', 'overweight baggage', 'additional baggage', 'excess luggage', 'baggage rate', 'baggage cost', 'baggage fee', 'baggage charge', 'baggage price', 'excess rate', 'excess cost', 'excess fee', 'excess charge', 'excess price', 'calculate excess', 'get excess rate', 'excess baggage rate', 'excess baggage cost', 'excess baggage fee', 'excess baggage price', 'how much excess', 'excess baggage fz', 'excess baggage ek', 'excess baggage ua', 'excess baggage ac', 'excess baggage oal', 'per kg excess', 'per kilogram excess', 'excess by zone', 'excess by region', 'excess origin destination', 'excess from to'],
+        answer: `**Action: Excess Baggage**\n\n**Tab:** **Excess Baggage**\n**Steps:** 1) Enter **origin** and **destination** (airport codes). 2) Select **airline**: FZ (Flydubai – per kg by zone), EK (Emirates – per kg USD by region), OAL (same as EK), UA (flat $75/$100/$200), AC (same as UA). 3) Select **currency** (or leave default). 4) Click **Calculate**.\n\n**Possibilities:** FZ = 8 zones, per kg; EK/OAL = per kg USD + per piece from Africa/Americas/Canada; UA/AC = flat fees. Route exceptions: CMB–MLE, MLE–CMB, India note, LCA–MLA $15/kg (EK/OAL).`
+    },
+    // ----- UPGRADE TO BUSINESS -----
+    {
+        keywords: ['upgrade to business', 'upgrade business', 'business upgrade', 'upgrade at airport', 'upgrade on board', 'upgrade onboard', 'upgrade rate', 'upgrade cost', 'upgrade fee', 'upgrade price', 'upgrade charge', 'calculate upgrade', 'get upgrade rate', 'how much upgrade', 'upgrade by zone', 'upgrade by currency', 'upgrade infant', 'upgrade exception', 'upgrade kwi', 'upgrade bah', 'upgrade mct', 'upgrade saudi', 'upgrade india', 'upgrade zone 1', 'upgrade zone 2', 'upgrade zone 3', 'business class upgrade', 'upgrading to business'],
+        answer: `**Action: Upgrade to Business**\n\n**Tab:** **Upgrade to Business**\n**Steps:** 1) Enter **origin** airport code. 2) Select **currency** (AED, USD, SAR, etc.). 3) Click **Calculate**.\n\n**Possibilities:** At-airport rate by zone (1–3) and currency; on-board rate (often higher); infant rate when available. **Exceptions:** KWI (AED 660, KWD 55), BAH (AED 535, BHD 55), MCT (AED 715, OMR 75), Saudi (AED 1175, SAR 1200), India (AED 1315, INR 30640), BGW, TLV, KTM, CMB–MLE, MLE–CMB. Pakistan on-board AED: 1500/2400/2700.`
+    },
+    // ----- GO-SHOW FARES -----
+    {
+        keywords: ['go show', 'goshow', 'go-show fare', 'go show fare', 'go show rate', 'go show cost', 'go show price', 'go show fee', 'go-show rate', 'goshow rate', 'calculate go show', 'get go show', 'how much go show', 'standby fare', 'standby rate', 'economy fare', 'business fare', 'one way fare', 'fare by origin', 'adult fare', 'infant fare', 'go show economy', 'go show business', 'go show adult', 'go show infant'],
+        answer: `**Action: Go-Show Fares**\n\n**Tab:** **Go-Show Fares**\n**Steps:** 1) Enter **origin** airport code. 2) Select **class**: Economy or Business. 3) Click **Calculate**.\n\n**Possibilities:** One-way fare by origin; Adult and Infant fares shown. Use for standby / show-up-at-airport fares.`
+    },
+    // ----- EXTRA LEGROOM (XLGR) -----
+    {
+        keywords: ['extra legroom', 'xlgr', 'legroom', 'legroom seat', 'extra legroom rate', 'extra legroom cost', 'extra legroom fee', 'extra legroom price', 'xlgr rate', 'xlgr cost', 'xlgr fee', 'calculate legroom', 'get legroom rate', 'how much legroom', 'legroom airport', 'legroom on board', 'legroom onboard', 'legroom by currency', 'stretch seat', 'more legroom'],
+        answer: `**Action: Extra Legroom (XLGR)**\n\n**Tab:** **Extra Legroom**\n**Steps:** 1) Select **currency** (AED, USD, EUR, etc.). 2) Click **Calculate** (or view rates).\n\n**Possibilities:** **Airport rate** (at check-in) and **On Board rate** (purchased on board); currency exchange to USD shown where available.`
+    },
+    // ----- SPORTS EQUIPMENT -----
+    {
+        keywords: ['sports equipment', 'sport equipment', 'speq', 'spex', 'sports rate', 'sports cost', 'sports fee', 'sports price', 'calculate sports', 'get sports rate', 'how much sports', 'golf bag', 'ski equipment', 'oversized sports', 'standard sports', 'speq rate', 'spex rate'],
+        answer: `**Action: Sports Equipment**\n\n**Tab:** **Sports Equipment**\n**Steps:** 1) Select **currency**. 2) Select **type**: SPEQ (Standard) or SPEX (Oversized). 3) Click **Calculate**.\n\n**Possibilities:** Rate by currency and type. SPEQ = standard sports item; SPEX = oversized.`
+    },
+    // ----- REPORTING FEES -----
+    {
+        keywords: ['reporting fee', 'reporting fees', 'late reporting', 'early reporting', 'lrtp', 'ertp', 'lrtp rate', 'ertp rate', 'late report', 'early report', 'calculate reporting', 'get reporting fee', 'how much reporting', 'reporting cost', 'reporting price', 'late report fee', 'early report fee'],
+        answer: `**Action: Reporting Fees**\n\n**Tab:** **Reporting Fees**\n**Steps:** 1) Select **currency**. 2) Select **type**: LRTP (Late Reporting) or ERTP (Early Reporting). 3) Click **Calculate**.\n\n**Possibilities:** Fee by currency. LRTP = Late Reporting; ERTP = Early Reporting.`
+    },
+    // ----- TRANSFER BAGGAGE -----
+    {
+        keywords: ['transfer baggage', 'transfer bag', 'trbf', 'transfer fee', 'transfer rate', 'transfer cost', 'transfer price', 'calculate transfer', 'get transfer fee', 'how much transfer', 'dxb transfer', 'outstation transfer', 'transfer at dxb', 'transfer outstation', 'baggage transfer', 'ssr trbf'],
+        answer: `**Action: Transfer Baggage (TRBF)**\n\n**Tab:** **Transfer Baggage**\n**Steps:** Open tab to see rate (or enter origin if applicable).\n\n**Possibilities:** **At DXB:** AED 50 + GHA fee AED 50. **Outstation:** USD 30 + GHA fee as applicable. SSR code TRBF.`
+    },
+    // ----- INTERLINE (which carrier / which rate) -----
+    {
+        keywords: ['interline', 'which carrier', 'which rate', 'whose rate', 'which airline', 'carrier rate', 'rate apply', 'interline rate', 'interline excess', 'fz ek rate', 'fz ac rate', 'fz ua rate', 'fz oal rate', 'transatlantic carrier', 'which carrier apply'],
+        answer: `**Action: Interline – Which carrier's rate applies**\n\n**Rule:** FZ–EK → **EK**. FZ–EK–AC (EK transatlantic) → **EK**. FZ–OAL → **EK**. FZ–AC (AC transatlantic) → **AC**. FZ–UA (UA transatlantic) → **UA**.\n\n**Tab:** **Excess Baggage** – then select airline **EK**, **OAL**, **AC**, or **UA** according to the rule above. **Reference** tab has full interline table.`
+    },
+    // ----- REFERENCE / DOCUMENT -----
+    {
+        keywords: ['reference', 'reference tab', 'document', 'document version', 'full reference', 'interline table', 'regional list', 'disclaimer', 'fs sup', 'aircraft xlgr', 'aircraft table', 'regional classification', 'reference document', 'official document', 'rate document', '2025.112', 'outstation document'],
+        answer: `**Action: Reference / Document**\n\n**Tab:** **Reference**\n\n**Possibilities:** Interline table (which carrier's rates apply), customer disclaimer, FS/SUP note, Aircraft & XLGR seats table, EK/OAL excess text, UA/AC text, full regional classification (countries by region). Document: GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES Version 2025.112(A) Outstation, Effective 17 May 2025.`
+    },
+    // ----- CALCULATE / GET RATE (generic) -----
+    {
+        keywords: ['calculate', 'get rate', 'get cost', 'get price', 'get fee', 'find rate', 'find cost', 'check rate', 'look up rate', 'calculate rate', 'how much', 'how to calculate', 'how to get rate', 'where to calculate', 'where to get rate', 'rate calculator', 'price calculator', 'cost calculator'],
+        answer: `**Action: Calculate / Get a rate**\n\n**Possibilities by need:**\n• **Excess baggage** → **Excess Baggage** tab (origin, destination, airline, currency).\n• **Upgrade to Business** → **Upgrade to Business** tab (origin, currency).\n• **Go-Show fare** → **Go-Show Fares** tab (origin, class).\n• **Extra Legroom** → **Extra Legroom** tab (currency).\n• **Sports equipment** → **Sports Equipment** tab (currency, type).\n• **Reporting fee** → **Reporting Fees** tab (currency, LRTP/ERTP).\n• **Transfer baggage** → **Transfer Baggage** tab.\n\nEnter the required fields and click **Calculate**.`
+    },
+    // ----- TABS / WHAT CAN I DO -----
+    {
+        keywords: ['what can i do', 'what can i calculate', 'which tab', 'what tab', 'tabs', 'all tabs', 'list of tabs', 'available actions', 'available tabs', 'menu', 'options', 'services', 'what services', 'rate calculator tabs'],
+        answer: `**All actions / All tabs:**\n\n1. **Excess Baggage** – FZ, EK, OAL, UA, AC; origin, destination, currency.\n2. **Go-Show Fares** – Economy/Business by origin; adult/infant.\n3. **Sports Equipment** – SPEQ/SPEX by currency.\n4. **Reporting Fees** – LRTP/ERTP by currency.\n5. **Transfer Baggage** – TRBF; DXB or outstation.\n6. **Upgrade to Business** – at airport / on board; origin, currency.\n7. **Extra Legroom** – XLGR; airport/on board by currency.\n8. **Reference** – interline table, disclaimer, regions, aircraft XLGR.\n9. **Ask Agent** – ask in words (this tab).\n\nUse the tab that matches your need, fill fields, click **Calculate**.`
+    }
+];
+
+// =============================================================================
+// COMBINE ALL QA PAIRS (order matters: more specific first; ALL_ACTIONS_QA early)
 // Add new QA arrays above and spread them here to scale beyond 1000+ lines.
 // =============================================================================
 
@@ -503,6 +566,7 @@ export const QA_PAIRS = [
     ...OTHER_SERVICES_QA,
     ...INDIA_CMB_FZ_QA,
     ...GENERAL_QA,
+    ...ALL_ACTIONS_QA,
     ...PHRASING_QA,
     ...EXPANDED_QA,
     ...CATCH_ALL_QA,
