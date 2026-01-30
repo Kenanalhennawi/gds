@@ -116,7 +116,9 @@ const processInput = () => {
                     : `<span class="status-dot" style="background:var(--success-green);"></span><span>Analyzed ${count} events</span>`;
             }
         } catch (e) {
-            const errorMessage = e.message || "Unknown error occurred";
+            const rawMsg = e.message || "Unknown error occurred";
+            const errorMessage = String(rawMsg)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
             if (els.status) {
                 els.status.innerHTML = `<span class="status-dot" style="background:var(--error-red);"></span><span style="color:var(--error-red);">⚠️ Error: ${errorMessage}</span>`;
             }
