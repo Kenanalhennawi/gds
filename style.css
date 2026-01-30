@@ -1627,6 +1627,90 @@ body {
     background: linear-gradient(180deg, var(--primary-blue-light), var(--primary-orange-light));
 }
 
+/* ========== EXCESS BAGGAGE RESPONSIVE ========== */
+.excess-form-grid {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr 1fr 1fr;
+    gap: 15px;
+}
+@media (max-width: 1000px) {
+    .excess-form-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+    .excess-form-grid .swap-btn {
+        grid-column: 1 / -1;
+        justify-self: center;
+        margin-bottom: 4px;
+    }
+}
+@media (max-width: 600px) {
+    .excess-form-grid {
+        grid-template-columns: 1fr;
+    }
+    .excess-form-grid .swap-btn {
+        grid-column: 1;
+    }
+}
+
+.service-tabs-scroll {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    min-height: 44px;
+    padding-bottom: 4px;
+}
+.service-tabs-scroll .service-tab {
+    flex-shrink: 0;
+}
+
+/* How to use toggle */
+.how-to-use-toggle:focus-visible,
+.swap-btn:focus-visible {
+    outline: 2px solid var(--primary-blue);
+    outline-offset: 2px;
+}
+
+/* ========== REDUCED MOTION ========== */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ========== PRINT ========== */
+@media print {
+    .app-background,
+    .app-overlay,
+    .hero-particles,
+    .app-header,
+    .app-footer,
+    .service-tabs-container,
+    .service-tabs-scroll,
+    .excess-form-grid,
+    .how-to-use-wrap,
+    #calculateBtn,
+    #clearBtn,
+    .glass-panel:not(.rate-result-panel) {
+        display: none !important;
+    }
+    body {
+        background: #fff;
+        color: #111;
+    }
+    .rate-result-panel,
+    .rate-result-panel * {
+        visibility: visible !important;
+    }
+    #rateResult {
+        display: block !important;
+        position: static !important;
+    }
+}
+
 /* ========== RESPONSIVE ========== */
 @media (max-width: 1400px) {
     .hero-title {
