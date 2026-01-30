@@ -1,19 +1,14 @@
-/**
- * Airport Search Utility
- * Provides autocomplete functionality for airport search by IATA code, city, or country
- */
+
 
 import { translateCity } from "./translator.js";
 
-// Airport data with country information
 const AIRPORT_DATA = {
-    // UAE (United Arab Emirates)
+
     'DXB': { code: 'DXB', city: 'Dubai', country: 'United Arab Emirates', name: 'Dubai (Intl)' },
     'DWC': { code: 'DWC', city: 'Dubai', country: 'United Arab Emirates', name: 'Dubai (World Central)' },
     'AUH': { code: 'AUH', city: 'Abu Dhabi', country: 'United Arab Emirates', name: 'Abu Dhabi' },
     'SHJ': { code: 'SHJ', city: 'Sharjah', country: 'United Arab Emirates', name: 'Sharjah' },
-    
-    // Saudi Arabia
+
     'RUH': { code: 'RUH', city: 'Riyadh', country: 'Saudi Arabia', name: 'Riyadh' },
     'JED': { code: 'JED', city: 'Jeddah', country: 'Saudi Arabia', name: 'Jeddah' },
     'DMM': { code: 'DMM', city: 'Dammam', country: 'Saudi Arabia', name: 'Dammam' },
@@ -32,41 +27,32 @@ const AIRPORT_DATA = {
     'NUM': { code: 'NUM', city: 'Neom', country: 'Saudi Arabia', name: 'Neom' },
     'RSI': { code: 'RSI', city: 'Ras Tanura', country: 'Saudi Arabia', name: 'Ras Tanura' },
     'ULH': { code: 'ULH', city: 'Al Ula', country: 'Saudi Arabia', name: 'Al Ula' },
-    
-    // Qatar
+
     'DOH': { code: 'DOH', city: 'Doha', country: 'Qatar', name: 'Doha' },
-    
-    // Kuwait
+
     'KWI': { code: 'KWI', city: 'Kuwait', country: 'Kuwait', name: 'Kuwait' },
-    
-    // Bahrain
+
     'BAH': { code: 'BAH', city: 'Bahrain', country: 'Bahrain', name: 'Bahrain' },
-    
-    // Oman
+
     'MCT': { code: 'MCT', city: 'Muscat', country: 'Oman', name: 'Muscat' },
     'SLL': { code: 'SLL', city: 'Salalah', country: 'Oman', name: 'Salalah' },
     'OHS': { code: 'OHS', city: 'Sohar', country: 'Oman', name: 'Sohar' },
-    
-    // Jordan
+
     'AMM': { code: 'AMM', city: 'Amman', country: 'Jordan', name: 'Amman' },
     'AQJ': { code: 'AQJ', city: 'Aqaba', country: 'Jordan', name: 'Aqaba' },
-    
-    // Lebanon
+
     'BEY': { code: 'BEY', city: 'Beirut', country: 'Lebanon', name: 'Beirut' },
-    
-    // Syria
+
     'DAM': { code: 'DAM', city: 'Damascus', country: 'Syria', name: 'Damascus' },
     'ALP': { code: 'ALP', city: 'Aleppo', country: 'Syria', name: 'Aleppo' },
     'LTK': { code: 'LTK', city: 'Latakia', country: 'Syria', name: 'Latakia' },
-    
-    // Iraq
+
     'BGW': { code: 'BGW', city: 'Baghdad', country: 'Iraq', name: 'Baghdad' },
     'BSR': { code: 'BSR', city: 'Basra', country: 'Iraq', name: 'Basra' },
     'EBL': { code: 'EBL', city: 'Erbil', country: 'Iraq', name: 'Erbil' },
     'ISU': { code: 'ISU', city: 'Sulaymaniyah', country: 'Iraq', name: 'Sulaymaniyah' },
     'NJF': { code: 'NJF', city: 'Najaf', country: 'Iraq', name: 'Najaf' },
-    
-    // Iran
+
     'IKA': { code: 'IKA', city: 'Tehran', country: 'Iran', name: 'Tehran (Imam Khomeini)' },
     'THR': { code: 'THR', city: 'Tehran', country: 'Iran', name: 'Tehran (Mehrabad)' },
     'MHD': { code: 'MHD', city: 'Mashhad', country: 'Iran', name: 'Mashhad' },
@@ -81,15 +67,12 @@ const AIRPORT_DATA = {
     'AWZ': { code: 'AWZ', city: 'Ahwaz', country: 'Iran', name: 'Ahwaz' },
     'HDM': { code: 'HDM', city: 'Hamadan', country: 'Iran', name: 'Hamadan' },
     'BND': { code: 'BND', city: 'Bandar Abbas', country: 'Iran', name: 'Bandar Abbas' },
-    
-    // Yemen
+
     'ADE': { code: 'ADE', city: 'Aden', country: 'Yemen', name: 'Aden' },
     'SAH': { code: 'SAH', city: 'Sanaa', country: 'Yemen', name: 'Sanaa' },
-    
-    // Israel
+
     'TLV': { code: 'TLV', city: 'Tel Aviv', country: 'Israel', name: 'Tel Aviv' },
-    
-    // Egypt
+
     'CAI': { code: 'CAI', city: 'Cairo', country: 'Egypt', name: 'Cairo' },
     'HBE': { code: 'HBE', city: 'Alexandria', country: 'Egypt', name: 'Alexandria' },
     'SSH': { code: 'SSH', city: 'Sharm El Sheikh', country: 'Egypt', name: 'Sharm El Sheikh' },
@@ -98,8 +81,7 @@ const AIRPORT_DATA = {
     'SPX': { code: 'SPX', city: 'Sphinx', country: 'Egypt', name: 'Sphinx' },
     'DBB': { code: 'DBB', city: 'Dahab', country: 'Egypt', name: 'Dahab' },
     'HMB': { code: 'HMB', city: 'Sohag', country: 'Egypt', name: 'Sohag' },
-    
-    // India
+
     'DEL': { code: 'DEL', city: 'Delhi', country: 'India', name: 'Delhi' },
     'BOM': { code: 'BOM', city: 'Mumbai', country: 'India', name: 'Mumbai' },
     'BLR': { code: 'BLR', city: 'Bangalore', country: 'India', name: 'Bangalore' },
@@ -112,8 +94,7 @@ const AIRPORT_DATA = {
     'AMD': { code: 'AMD', city: 'Ahmedabad', country: 'India', name: 'Ahmedabad' },
     'LKO': { code: 'LKO', city: 'Lucknow', country: 'India', name: 'Lucknow' },
     'GOI': { code: 'GOI', city: 'Goa', country: 'India', name: 'Goa' },
-    
-    // Pakistan
+
     'KHI': { code: 'KHI', city: 'Karachi', country: 'Pakistan', name: 'Karachi' },
     'LHE': { code: 'LHE', city: 'Lahore', country: 'Pakistan', name: 'Lahore' },
     'ISB': { code: 'ISB', city: 'Islamabad', country: 'Pakistan', name: 'Islamabad' },
@@ -122,39 +103,31 @@ const AIRPORT_DATA = {
     'MUX': { code: 'MUX', city: 'Multan', country: 'Pakistan', name: 'Multan' },
     'LYP': { code: 'LYP', city: 'Faisalabad', country: 'Pakistan', name: 'Faisalabad' },
     'UET': { code: 'UET', city: 'Quetta', country: 'Pakistan', name: 'Quetta' },
-    
-    // Bangladesh
+
     'DAC': { code: 'DAC', city: 'Dhaka', country: 'Bangladesh', name: 'Dhaka' },
     'CGP': { code: 'CGP', city: 'Chittagong', country: 'Bangladesh', name: 'Chittagong' },
-    
-    // Nepal
+
     'KTM': { code: 'KTM', city: 'Kathmandu', country: 'Nepal', name: 'Kathmandu' },
     'BWA': { code: 'BWA', city: 'Bhairahawa', country: 'Nepal', name: 'Bhairahawa' },
-    
-    // Sri Lanka
+
     'CMB': { code: 'CMB', city: 'Colombo', country: 'Sri Lanka', name: 'Colombo' },
-    
-    // Afghanistan
+
     'KBL': { code: 'KBL', city: 'Kabul', country: 'Afghanistan', name: 'Kabul' },
-    
-    // Thailand
+
     'BKK': { code: 'BKK', city: 'Bangkok', country: 'Thailand', name: 'Bangkok (Suvarnabhumi)' },
     'DMK': { code: 'DMK', city: 'Bangkok', country: 'Thailand', name: 'Bangkok (Don Mueang)' },
     'HKT': { code: 'HKT', city: 'Phuket', country: 'Thailand', name: 'Phuket' },
     'CNX': { code: 'CNX', city: 'Chiang Mai', country: 'Thailand', name: 'Chiang Mai' },
     'KBV': { code: 'KBV', city: 'Krabi', country: 'Thailand', name: 'Krabi' },
     'UTP': { code: 'UTP', city: 'Pattaya', country: 'Thailand', name: 'Pattaya' },
-    
-    // Malaysia
+
     'KUL': { code: 'KUL', city: 'Kuala Lumpur', country: 'Malaysia', name: 'Kuala Lumpur' },
     'LGK': { code: 'LGK', city: 'Langkawi', country: 'Malaysia', name: 'Langkawi' },
     'PEN': { code: 'PEN', city: 'Penang', country: 'Malaysia', name: 'Penang' },
-    
-    // Maldives
+
     'MLE': { code: 'MLE', city: 'Male', country: 'Maldives', name: 'Male' },
     'GAN': { code: 'GAN', city: 'Gan', country: 'Maldives', name: 'Gan' },
-    
-    // Central Asia
+
     'TAS': { code: 'TAS', city: 'Tashkent', country: 'Uzbekistan', name: 'Tashkent' },
     'ALA': { code: 'ALA', city: 'Almaty', country: 'Kazakhstan', name: 'Almaty' },
     'NQZ': { code: 'NQZ', city: 'Astana', country: 'Kazakhstan', name: 'Astana' },
@@ -170,8 +143,7 @@ const AIRPORT_DATA = {
     'TBS': { code: 'TBS', city: 'Tbilisi', country: 'Georgia', name: 'Tbilisi' },
     'BUS': { code: 'BUS', city: 'Batumi', country: 'Georgia', name: 'Batumi' },
     'GRV': { code: 'GRV', city: 'Grozny', country: 'Russia', name: 'Grozny' },
-    
-    // Europe
+
     'LHR': { code: 'LHR', city: 'London', country: 'United Kingdom', name: 'London (Heathrow)' },
     'LGW': { code: 'LGW', city: 'London', country: 'United Kingdom', name: 'London (Gatwick)' },
     'STN': { code: 'STN', city: 'London', country: 'United Kingdom', name: 'London (Stansted)' },
@@ -253,8 +225,7 @@ const AIRPORT_DATA = {
     'IEV': { code: 'IEV', city: 'Kyiv', country: 'Ukraine', name: 'Kyiv (Zhuliany)' },
     'ODS': { code: 'ODS', city: 'Odessa', country: 'Ukraine', name: 'Odessa' },
     'MSQ': { code: 'MSQ', city: 'Minsk', country: 'Belarus', name: 'Minsk' },
-    
-    // Africa
+
     'ADD': { code: 'ADD', city: 'Addis Ababa', country: 'Ethiopia', name: 'Addis Ababa' },
     'JIB': { code: 'JIB', city: 'Djibouti', country: 'Djibouti', name: 'Djibouti' },
     'ASM': { code: 'ASM', city: 'Asmara', country: 'Eritrea', name: 'Asmara' },
@@ -272,12 +243,10 @@ const AIRPORT_DATA = {
     'PZU': { code: 'PZU', city: 'Port Sudan', country: 'Sudan', name: 'Port Sudan' },
     'HGA': { code: 'HGA', city: 'Hargeisa', country: 'Somalia', name: 'Hargeisa' },
     'MGQ': { code: 'MGQ', city: 'Mogadishu', country: 'Somalia', name: 'Mogadishu' },
-    
-    // Yemen
+
     'ADE': { code: 'ADE', city: 'Aden', country: 'Yemen', name: 'Aden' },
     'SAH': { code: 'SAH', city: 'Sanaa', country: 'Yemen', name: 'Sanaa' },
-    
-    // Additional airports from PDF
+
     'HRI': { code: 'HRI', city: 'Hambantota', country: 'Sri Lanka', name: 'Hambantota' },
     'KDH': { code: 'KDH', city: 'Kandahar', country: 'Afghanistan', name: 'Kandahar' },
     'GOJ': { code: 'GOJ', city: 'Nizhny Novgorod', country: 'Russia', name: 'Nizhny Novgorod' },
@@ -291,8 +260,7 @@ const AIRPORT_DATA = {
     'ZYL': { code: 'ZYL', city: 'Sylhet', country: 'Bangladesh', name: 'Sylhet' },
     'DOK': { code: 'DOK', city: 'Donetsk', country: 'Ukraine', name: 'Donetsk' },
     'KIV': { code: 'KIV', city: 'Chisinau', country: 'Moldova', name: 'Chisinau' },
-    
-    // Americas
+
     'YYZ': { code: 'YYZ', city: 'Toronto', country: 'Canada', name: 'Toronto' },
     'YVR': { code: 'YVR', city: 'Vancouver', country: 'Canada', name: 'Vancouver' },
     'YUL': { code: 'YUL', city: 'Montreal', country: 'Canada', name: 'Montreal' },
@@ -305,8 +273,7 @@ const AIRPORT_DATA = {
     'BOG': { code: 'BOG', city: 'Bogota', country: 'Colombia', name: 'Bogota' },
     'EZE': { code: 'EZE', city: 'Buenos Aires', country: 'Argentina', name: 'Buenos Aires' },
     'SCL': { code: 'SCL', city: 'Santiago', country: 'Chile', name: 'Santiago' },
-    
-    // Asia Pacific
+
     'SIN': { code: 'SIN', city: 'Singapore', country: 'Singapore', name: 'Singapore' },
     'KUL': { code: 'KUL', city: 'Kuala Lumpur', country: 'Malaysia', name: 'Kuala Lumpur' },
     'CGK': { code: 'CGK', city: 'Jakarta', country: 'Indonesia', name: 'Jakarta' },
@@ -322,16 +289,13 @@ const AIRPORT_DATA = {
     'AKL': { code: 'AKL', city: 'Auckland', country: 'New Zealand', name: 'Auckland' }
 };
 
-// Create searchable airport list
 const AIRPORT_LIST = Object.values(AIRPORT_DATA);
 
-// Pre-computed search index for performance - built once
 let searchIndex = null;
 
 function buildSearchIndex() {
     if (searchIndex) return searchIndex;
-    
-    // Build index once and cache it
+
     const index = [];
     for (const airport of AIRPORT_LIST) {
         index.push({
@@ -343,23 +307,20 @@ function buildSearchIndex() {
     return searchIndex;
 }
 
-// Search airports by query (code, city, or country) - Optimized
 export function searchAirports(query, limit = 10) {
     if (!query || query.length < 1) return [];
     
     const searchTerm = query.toUpperCase();
     const index = buildSearchIndex();
     const results = [];
-    
-    // First pass: exact code matches
+
     for (const item of index) {
         if (item.airport.code.startsWith(searchTerm)) {
             results.push(item.airport);
             if (results.length >= limit) return results;
         }
     }
-    
-    // Second pass: other matches
+
     for (const item of index) {
         if (results.length >= limit) break;
         if (results.includes(item.airport)) continue;
@@ -368,8 +329,7 @@ export function searchAirports(query, limit = 10) {
             results.push(item.airport);
         }
     }
-    
-    // Sort: code matches first, then by relevance
+
     results.sort((a, b) => {
         const aCodeMatch = a.code.startsWith(searchTerm);
         const bCodeMatch = b.code.startsWith(searchTerm);
@@ -387,12 +347,10 @@ export function searchAirports(query, limit = 10) {
     return results.slice(0, limit);
 }
 
-// Get airport by code
 export function getAirportByCode(code) {
     return AIRPORT_DATA[code.toUpperCase()] || null;
 }
 
-// Get all airport codes
 export function getAllAirportCodes() {
     return Object.keys(AIRPORT_DATA);
 }
