@@ -311,6 +311,15 @@ const INDIA_CMB_FZ_QA = [
 // =============================================================================
 
 const OTHER_SECTIONS_QA = [
+    // --- Other sections / Other tabs – full list ---
+    {
+        keywords: ['other sections', 'other tabs', 'what other tabs', 'what other sections', 'remaining tabs', 'remaining sections', 'more tabs', 'more sections', 'rest of tabs', 'all sections', 'all tabs', 'list all tabs', 'list all sections', 'complete list tabs', 'complete list sections', 'every tab', 'every section', 'tabs list', 'sections list'],
+        answer: `**All sections / All tabs in the Rate Calculator:**\n\n1. **Excess Baggage** – FZ, EK, OAL, UA, AC; origin, destination, airline, currency. Per-kg or flat fees.\n2. **Go-Show Fares** – One-way Economy/Business by origin; adult and infant.\n3. **Sports Equipment** – SPEQ (Standard) / SPEX (Oversized) by currency.\n4. **Reporting Fees** – LRTP (Late) / ERTP (Early) by currency.\n5. **Transfer Baggage** – DXB or Outstation; TRBF; GHA fee.\n6. **Upgrade to Business** – At airport / on board / infant; origin, currency.\n7. **Extra Legroom (XLGR)** – Airport and On Board rate by currency.\n8. **Reference** – Interline table, disclaimer, Aircraft & XLGR table, EK/OAL and UA/AC text, regional classification.\n9. **Ask Agent** – Ask in words (this tab).\n\nUse the tab that matches your need; fill fields and click **Calculate** where applicable.`
+    },
+    {
+        keywords: ['which tab for', 'which section for', 'tab for excess', 'tab for upgrade', 'tab for go show', 'tab for sports', 'tab for reporting', 'tab for transfer', 'tab for legroom', 'tab for reference', 'section for excess', 'section for upgrade'],
+        answer: `**Which tab for what:**\n\n• **Excess baggage** → **Excess Baggage** tab\n• **Upgrade to Business** → **Upgrade to Business** tab\n• **Go-Show fare** → **Go-Show Fares** tab\n• **Sports equipment** (SPEQ/SPEX) → **Sports Equipment** tab\n• **Reporting fee** (LRTP/ERTP) → **Reporting Fees** tab\n• **Transfer baggage** (TRBF) → **Transfer Baggage** tab\n• **Extra legroom** (XLGR) → **Extra Legroom** tab\n• **Interline table, disclaimer, aircraft, regions** → **Reference** tab\n• **Ask in words** → **Ask Agent** tab (this one)`
+    },
     // --- Go-Show section ---
     {
         keywords: ['go show origin', 'goshow origin', 'origin airport go show', 'go show class', 'class economy business', 'go show economy', 'go show business', 'adult infant go show', 'go show result', 'goshow result'],
