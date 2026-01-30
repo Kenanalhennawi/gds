@@ -39,7 +39,19 @@ export const SYNONYMS = {
     'mct': ['muscat', 'mct', 'oman'],
     'bom': ['mumbai', 'bom'],
     'del': ['delhi', 'del'],
-    'amd': ['ahmedabad', 'amd']
+    'amd': ['ahmedabad', 'amd'],
+    'what': ['what', 'which', 'explain', 'meaning'],
+    'how': ['how', 'way', 'method', 'steps'],
+    'can': ['can', 'could', 'able', 'possible'],
+    'tell': ['tell', 'show', 'give', 'find', 'get', 'check', 'look up'],
+    'need': ['need', 'want', 'looking for', 'searching'],
+    'rate': ['rate', 'price', 'cost', 'fee', 'charge', 'amount'],
+    'excess bag': ['excess bag', 'excess baggage', 'extra bag', 'overweight'],
+    'bussiness': ['business', 'bussiness', 'upgrading'],
+    'ruh': ['riyadh', 'ruh'], 'jed': ['jeddah', 'jed'], 'dmm': ['dammam', 'dmm'],
+    'maa': ['chennai', 'maa'], 'hyd': ['hyderabad', 'hyd'], 'blr': ['bangalore', 'blr'],
+    'doh': ['doha', 'doh'], 'ist': ['istanbul', 'ist'], 'bkk': ['bangkok', 'bkk'],
+    'svo': ['moscow', 'svo'], 'led': ['st petersburg', 'led'], 'prg': ['prague', 'prg']
 };
 
 // =============================================================================
@@ -354,6 +366,107 @@ const EXPANDED_QA = [
 ];
 
 // =============================================================================
+// Q&A PAIRS – Question phrasings (what is, how do I, can you, tell me, etc.)
+// =============================================================================
+
+const PHRASING_QA = [
+    { keywords: ['what is excess', 'what is extra baggage', 'what is excess baggage'], answer: `**Excess baggage** is baggage above your free allowance. Rates depend on airline: **FZ** uses 8 zones and per-kg; **EK/OAL** use per-kg USD by region and per-piece from Africa/Americas/Canada; **UA/AC** use flat fees ($75 / $100 / $200). Use **Excess Baggage** tab.` },
+    { keywords: ['what is interline', 'what does interline mean'], answer: `**Interline** = journey on more than one airline (e.g. Flydubai + Emirates). For excess baggage, **which carrier's rate** applies: FZ–EK and FZ–OAL → EK; FZ–AC (AC transatlantic) → AC; FZ–UA (UA transatlantic) → UA. Use **Excess Baggage** tab and select the correct airline.` },
+    { keywords: ['what is go show', 'what is go-show', 'what is goshow'], answer: `**Go-Show** = one-way fare when showing up at airport (Economy or Business). Adult and infant fares by origin. Use **Go-Show Fares** tab, enter origin and class, click Calculate.` },
+    { keywords: ['what is upgrade', 'what is business upgrade'], answer: `**Upgrade to Business** = paying to move from Economy to Business. Rate by origin zone (1–3) and currency. Exceptions for KWI, BAH, MCT, Saudi, India, BGW, TLV, KTM, CMB–MLE, MLE–CMB. Use **Upgrade to Business** tab.` },
+    { keywords: ['what is extra legroom', 'what is xlgr', 'what is legroom'], answer: `**Extra Legroom (XLGR)** = paid seat with more legroom. Airport rate and On Board rate in many currencies. Use **Extra Legroom** tab and select currency.` },
+    { keywords: ['what is trbf', 'what is transfer baggage', 'what is transfer fee'], answer: `**Transfer Baggage (TRBF):** DXB AED 50 + GHA AED 50; Outstation USD 30 + GHA. Use **Transfer Baggage** tab.` },
+    { keywords: ['what is speq', 'what is spex', 'what is sports equipment'], answer: `**Sports equipment:** SPEQ (standard) or SPEX (oversized). Rate by currency. Use **Sports Equipment** tab.` },
+    { keywords: ['what is lrtp', 'what is ertp', 'what is late reporting', 'what is early reporting'], answer: `**LRTP** = Late Reporting fee. **ERTP** = Early Reporting fee. Both by currency. Use **Reporting Fees** tab.` },
+    { keywords: ['how do i get', 'how do i calculate', 'how do i find', 'how to get rate', 'how to find rate'], answer: `**How to get a rate:** 1) Open the tab for your need (Excess Baggage, Upgrade, Go-Show, Extra Legroom, etc.). 2) Enter origin/destination/airline/currency as required. 3) Click **Calculate**. Result and any exception or disclaimer will show.` },
+    { keywords: ['how much is', 'how much does', 'how much for', 'how much excess', 'how much upgrade'], answer: `Rates depend on route, airline, and currency. Use the right tab: **Excess Baggage** (origin, destination, airline, currency), **Upgrade to Business** (origin, currency), **Go-Show** (origin, class), **Extra Legroom** (currency), etc. Click **Calculate** to see the exact amount.` },
+    { keywords: ['can you tell me', 'can you show me', 'can you give me', 'can you find', 'tell me about', 'show me rate', 'give me rate'], answer: `Use the **tabs** above: **Excess Baggage**, **Upgrade to Business**, **Go-Show Fares**, **Extra Legroom**, **Sports Equipment**, **Reporting Fees**, **Transfer Baggage**. Enter the required fields and click **Calculate** to get the rate. You can also ask me in words (e.g. "interline rates", "upgrade from Kuwait").` },
+    { keywords: ['i need rate', 'i want rate', 'i need to know', 'i want to know', 'looking for rate', 'need excess', 'want upgrade'], answer: `Choose the tab that matches: **Excess Baggage**, **Upgrade to Business**, **Go-Show**, **Extra Legroom**, etc. Enter the details and click **Calculate**. Or ask in words (e.g. "excess baggage EK", "upgrade from Dubai").` },
+    { keywords: ['rate for excess', 'rate for upgrade', 'rate for baggage', 'cost of excess', 'cost of upgrade', 'price for baggage', 'fee for excess', 'charge for upgrade'], answer: `Rates are in the calculator. **Excess Baggage** tab: enter origin, destination, airline, currency. **Upgrade to Business** tab: enter origin, currency. **Go-Show**: origin, class. Click **Calculate** for the exact rate.` },
+    { keywords: ['does fz have', 'does flydubai have', 'does emirates have', 'does ua have', 'does ac have'], answer: `**FZ (Flydubai):** Excess baggage (8 zones, per kg), upgrade, go-show, extra legroom, sports, reporting, transfer. **EK (Emirates):** Excess baggage (per kg/per piece by region) applies on FZ–EK interline. **UA/AC:** Flat excess bag fees ($75/$100/$200). Use the **Excess Baggage** or other tabs and select the airline.` },
+    { keywords: ['is there exception', 'are there exceptions', 'any exception', 'exception for'], answer: `Yes. **Excess baggage:** CMB–MLE, MLE–CMB, India (INR 900 note), Larnaca–Malta $15/kg (EK/OAL). **Upgrade:** KWI, BAH, MCT, Saudi, India, BGW, TLV, KTM, CMB–MLE, MLE–CMB; Pakistan AED on-board 1500/2400/2700. Use the tabs to see when an exception applies.` },
+    { keywords: ['where do i find', 'where can i find', 'where to find rate', 'where is rate'], answer: `**In this app:** Use the tab that matches (Excess Baggage, Upgrade, Go-Show, Extra Legroom, etc.), enter the details, click **Calculate**. **Reference** tab has interline rules, regional lists, disclaimer. **Ask Agent** (this tab) answers questions in words.` },
+    { keywords: ['when does', 'when do i', 'when to pay', 'when to buy'], answer: `**At airport** (check-in) or **on board** for upgrade and extra legroom; rates may differ. Excess baggage is typically paid at check-in. For exact rate at departure, check with **airport team**; quoted rates are approximate.` },
+    { keywords: ['why ek rate', 'why ac rate', 'why ua rate', 'why different rate'], answer: `On **interline** journeys, the rate depends on **which carrier** operates the long-haul leg. FZ–EK and FZ–OAL use **EK rates**; FZ–AC (AC transatlantic) uses **AC rates**; FZ–UA (UA transatlantic) uses **UA rates**. Use **Excess Baggage** tab and select the correct airline.` },
+    { keywords: ['which airline', 'which carrier', 'which rate apply', 'which tab'], answer: `**Which airline's rate:** FZ–EK and FZ–OAL → **EK**. FZ–AC (AC transatlantic) → **AC**. FZ–UA (UA transatlantic) → **UA**. Use **Excess Baggage** tab and select EK, OAL, AC, or UA. **Which tab:** Excess Baggage, Upgrade to Business, Go-Show Fares, Extra Legroom, Sports Equipment, Reporting Fees, Transfer Baggage, Reference, Ask Agent.` },
+    { keywords: ['difference between', 'difference of', 'at airport vs on board'], answer: `**At airport vs on board:** **Upgrade** and **Extra Legroom** have different rates at check-in (at airport) vs when bought on board; on-board is often higher. Use **Upgrade to Business** or **Extra Legroom** tab to see both.` },
+    { keywords: ['at airport', 'on board', 'onboard', 'check in'], answer: `**At airport** = at check-in. **On board** = during flight. Upgrade and Extra Legroom have separate at-airport and on-board rates. Use **Upgrade to Business** or **Extra Legroom** tab.` },
+    { keywords: ['dubai', 'dxb', 'dwc'], answer: `**Dubai (DXB/DWC):** Zone 1 for FZ excess. Upgrade zone 1. Transfer baggage at DXB: AED 50 + GHA 50. Use **Excess Baggage**, **Upgrade**, or **Transfer Baggage** tab.` },
+    { keywords: ['mumbai', 'bom', 'delhi', 'del', 'chennai', 'maa'], answer: `**India airports (BOM, DEL, MAA, etc.):** FZ excess – India note (INR 900 without pre-purchase). **Upgrade** exception from all India: AED 1315, INR 30640. Use **Excess Baggage** or **Upgrade** tab with that origin.` },
+    { keywords: ['colombo', 'cmb', 'maldives', 'mle', 'male'], answer: `**CMB (Colombo/Sri Lanka) – MLE (Maldives):** FZ excess exception (e.g. LKR 3025 CMB–MLE, USD 10 MLE–CMB). Upgrade exceptions AED 745/AED 920. Use **Excess Baggage** or **Upgrade** tab.` },
+    { keywords: ['riyadh', 'ruh', 'jeddah', 'jed', 'dammam', 'dmm', 'doha', 'doh'], answer: `**Saudi (RUH, JED, DMM, etc.):** Upgrade exception from all KSA – AED 1175, SAR 1200. **Doha (DOH):** Upgrade zone 1. Use **Upgrade to Business** tab with that origin.` },
+];
+
+// =============================================================================
+// Q&A PAIRS – Single/few keyword catch-all (baggage, upgrade, interline, etc.)
+// =============================================================================
+
+const CATCH_ALL_QA = [
+    { keywords: ['baggage'], answer: `**Baggage:** For **excess/extra baggage** use **Excess Baggage** tab (FZ, EK, OAL, UA, AC). For **free allowance** (UA/AC: 23 kg Economy, 32 kg Business) ask "free allowance" or "UA AC rates". For **transfer baggage** use **Transfer Baggage** tab (TRBF).` },
+    { keywords: ['upgrade'], answer: `**Upgrade to Business:** Rate by origin zone and currency. Exceptions: KWI, BAH, MCT, Saudi, India, BGW, TLV, KTM, CMB–MLE, MLE–CMB. Use **Upgrade to Business** tab, enter origin and currency, click Calculate.` },
+    { keywords: ['interline'], answer: `**Interline:** FZ–EK and FZ–OAL → **EK rates**. FZ–AC (AC transatlantic) → **AC rates**. FZ–UA (UA transatlantic) → **UA rates**. Use **Excess Baggage** tab and select EK, OAL, AC, or UA.` },
+    { keywords: ['emirates'], answer: `**Emirates (EK):** On FZ–EK interline, **EK excess baggage rates** apply (per kg USD by region, per piece from Africa/Americas/Canada). Use **Excess Baggage** tab, airline **EK**.` },
+    { keywords: ['flydubai'], answer: `**Flydubai (FZ):** Excess baggage (8 zones, per kg), upgrade, go-show, extra legroom, sports, reporting, transfer. Use **Excess Baggage** (airline FZ), **Upgrade to Business**, **Go-Show Fares**, or other tabs.` },
+    { keywords: ['excess'], answer: `**Excess baggage:** FZ (8 zones, per kg), EK/OAL (per kg USD + per piece from Africa/Americas/Canada), UA/AC (flat $75/$100/$200). Use **Excess Baggage** tab, choose airline, enter origin/destination and currency.` },
+    { keywords: ['business'], answer: `**Business:** **Upgrade to Business** (at airport / on board) – use **Upgrade to Business** tab. **Business fare** (Go-Show) – use **Go-Show Fares** tab, class Business.` },
+    { keywords: ['go show'], answer: `**Go-Show Fares:** One-way Economy or Business by origin. Adult and infant. Use **Go-Show Fares** tab, enter origin and class, click Calculate.` },
+    { keywords: ['legroom'], answer: `**Extra Legroom (XLGR):** Airport and On Board rates in many currencies. Use **Extra Legroom** tab and select currency.` },
+    { keywords: ['sports'], answer: `**Sports equipment:** SPEQ (standard) or SPEX (oversized). Rate by currency. Use **Sports Equipment** tab.` },
+    { keywords: ['reporting'], answer: `**Late/Early Reporting:** LRTP and ERTP fees by currency. Use **Reporting Fees** tab.` },
+    { keywords: ['transfer'], answer: `**Transfer Baggage (TRBF):** DXB AED 50 + GHA 50; Outstation USD 30 + GHA. Use **Transfer Baggage** tab.` },
+    { keywords: ['disclaimer'], answer: `**Disclaimer:** ${EXCESS_BAGGAGE_DISCLAIMER} If rate is missing for a destination, refer to **FS/SUP in charge**.` },
+    { keywords: ['zone'], answer: `**FZ excess – 8 zones:** 1 UAE, 2 Gulf, 3 KSA, 4 ME, 5 Africa, 6 Sub-Continent, 7 SEA, 8 Europe/CIS. **Upgrade – 3 zones** by origin. Use **Excess Baggage** or **Upgrade** tab to see zone for an airport.` },
+    { keywords: ['region'], answer: `**Regional classification** (EK/OAL): Middle East, South Asia, Africa, Europe, Far East, Americas, ANZ. Full list in **Reference** tab. Use **Excess Baggage** with EK or OAL for per-kg rates by region.` },
+    { keywords: ['currency'], answer: `Rates in many **currencies** (AED, USD, EUR, GBP, SAR, INR, PKR, etc.). FZ excess and Extra Legroom: select currency in the tab. EK/OAL per-kg: USD (CAD for Canada per-piece). Use the tabs and choose currency where offered.` },
+    { keywords: ['india'], answer: `**India:** **Excess (FZ):** Note when no pre-purchased baggage – INR 900 + taxes up to 20 kg. **Upgrade:** Exception AED 1315, INR 30640 from all India points. Use **Excess Baggage** or **Upgrade** tab with India origin.` },
+    { keywords: ['saudi'], answer: `**Saudi (KSA):** **Upgrade** exception from all KSA points: AED 1175, SAR 1200. Use **Upgrade to Business** tab with Saudi origin (e.g. RUH, JED, DMM).` },
+    { keywords: ['kuwait'], answer: `**Kuwait (KWI):** **Upgrade** exception AED 660, KWD 55 (at airport). Use **Upgrade to Business** tab, origin KWI.` },
+    { keywords: ['malta'], answer: `**Malta (MLA):** With **Larnaca (LCA)** – **$15 USD per kg** for EK/OAL excess baggage. Use **Excess Baggage** tab, EK or OAL, origin LCA destination MLA (or vice versa).` },
+    { keywords: ['larnaca'], answer: `**Larnaca (LCA) – Malta (MLA):** $15 USD per kg for EK and OAL excess baggage. Use **Excess Baggage** tab, airline EK or OAL, route LCA–MLA.` },
+    { keywords: ['united'], answer: `**United (UA):** Free 23/32 kg, 1st excess $75, 2nd $100, 3+ $200, oversize/overweight $200. Applies when UA is Transatlantic carrier on FZ–UA. Use **Excess Baggage** tab, airline **UA**.` },
+    { keywords: ['air canada'], answer: `**Air Canada (AC):** Same as UA – 23/32 kg free, 1st $75, 2nd $100, 3+ $200. Applies when AC is Transatlantic on FZ–AC. Use **Excess Baggage** tab, airline **AC**.` },
+    { keywords: ['other airlines'], answer: `**Other Airlines (OAL):** Same **EK** excess baggage rates (per kg and per piece). Use **Excess Baggage** tab, airline **OAL**.` },
+    { keywords: ['document'], answer: `**Document:** GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES Version **2025.112(A)** Outstation. Issue 13 May 2025, Effective 17 May 2025. Full text and tables in **Reference** tab.` },
+    { keywords: ['reference'], answer: `**Reference tab:** Interline table, customer disclaimer, FS/SUP note, Aircraft & XLGR table, EK/OAL and UA/AC text, full regional classification. Open the **Reference** tab in the calculator.` },
+    { keywords: ['fs sup'], answer: `If **rate is missing** for a destination, refer to **FS/SUP in charge**. Rates are approximate; for exact rate, check with **airport team at departure**.` },
+    { keywords: ['missing'], answer: `If rate is **missing** for a destination: refer to **FS/SUP in charge**. Communicate to customer that rates are approximate; exact rate at **airport team at time of departure**.` },
+    { keywords: ['ek'], answer: `**EK (Emirates):** On FZ–EK interline, **EK excess baggage rates** apply (per kg USD by region, per piece from Africa/Americas/Canada). Use **Excess Baggage** tab, airline **EK**.` },
+    { keywords: ['fz'], answer: `**FZ (Flydubai):** Excess baggage (8 zones), upgrade, go-show, extra legroom, sports, reporting, transfer. Use **Excess Baggage** (airline FZ), **Upgrade to Business**, **Go-Show Fares**, or other tabs.` },
+    { keywords: ['ua'], answer: `**UA (United):** Free 23/32 kg, 1st $75, 2nd $100, 3+ $200. Applies when UA is Transatlantic on FZ–UA. Use **Excess Baggage** tab, airline **UA**.` },
+    { keywords: ['ac'], answer: `**AC (Air Canada):** Same as UA – 23/32 kg free, 1st $75, 2nd $100, 3+ $200. Applies when AC is Transatlantic on FZ–AC. Use **Excess Baggage** tab, airline **AC**.` },
+    { keywords: ['oal'], answer: `**OAL (Other Airlines):** Same **EK** excess baggage rates. Use **Excess Baggage** tab, airline **OAL**.` },
+    { keywords: ['rate'], answer: `**Rates** are in the calculator. Use **Excess Baggage** (origin, destination, airline, currency), **Upgrade to Business** (origin, currency), **Go-Show** (origin, class), **Extra Legroom** (currency), etc. Click **Calculate** for the exact rate.` },
+    { keywords: ['cost'], answer: `**Cost/rate** depends on service. Use **Excess Baggage**, **Upgrade to Business**, **Go-Show Fares**, **Extra Legroom**, **Sports Equipment**, **Reporting Fees**, or **Transfer Baggage** tab; enter details and click **Calculate**.` },
+    { keywords: ['fee'], answer: `**Fees:** Excess baggage (per kg or flat), upgrade, extra legroom, sports, reporting (LRTP/ERTP), transfer (TRBF). Use the tab that matches and click **Calculate**.` },
+    { keywords: ['allowance'], answer: `**Free baggage allowance:** **UA/AC** – Economy 0–23 kg, Business 0–32 kg. FZ/EK/OAL: excess rates apply above included allowance; use **Excess Baggage** tab.` },
+    { keywords: ['exception'], answer: `**Exceptions:** Excess – CMB–MLE, MLE–CMB, India (INR 900), LCA–MLA $15/kg (EK/OAL). Upgrade – KWI, BAH, MCT, Saudi, India, BGW, TLV, KTM, CMB–MLE, MLE–CMB; Pakistan on-board AED. Use tabs to see when they apply.` },
+];
+
+// =============================================================================
+// Q&A PAIRS – Numbers (75, 100, 200, 23, 32, 15, etc.)
+// =============================================================================
+
+const NUMBERS_QA = [
+    { keywords: ['75', '75 usd', '75 dollar', 'first bag 75'], answer: `**$75 USD:** First excess bag for **UA** and **AC** (after free 23 kg Economy / 32 kg Business). Use **Excess Baggage** tab, airline UA or AC.` },
+    { keywords: ['100', '100 usd', '100 dollar', 'second bag 100'], answer: `**$100 USD:** Second excess bag for **UA** and **AC**. Use **Excess Baggage** tab, airline UA or AC.` },
+    { keywords: ['200', '200 usd', '200 dollar', 'third bag 200', 'oversize 200', 'overweight 200'], answer: `**$200 USD:** Third (and more) excess bag, and **oversize** or **overweight** bag for **UA** and **AC**. Use **Excess Baggage** tab, airline UA or AC.` },
+    { keywords: ['23 kg', '23 kilo', '23 kilogram'], answer: `**23 kg:** **UA/AC** free baggage allowance in **Economy**. Excess above that: 1st $75, 2nd $100, 3+ $200. Use **Excess Baggage** tab, UA or AC.` },
+    { keywords: ['32 kg', '32 kilo', '32 kilogram'], answer: `**32 kg:** **UA/AC** free baggage allowance in **Business**. Excess above that: 1st $75, 2nd $100, 3+ $200. Use **Excess Baggage** tab, UA or AC.` },
+    { keywords: ['15 per kg', '15 usd per kg', '15 dollar per kg', 'lca mla 15'], answer: `**$15 USD per kg:** **Larnaca (LCA) – Malta (MLA)** excess baggage for **EK** and **OAL**. Other EK/OAL per-kg rates vary by region ($15–50). Use **Excess Baggage** tab, EK or OAL.` },
+    { keywords: ['1300', '2100', '2500', 'zone 1 1300', 'zone 2 2100', 'zone 3 2500'], answer: `**Upgrade to Business (at airport, AED):** Zone 1 AED 1300, Zone 2 AED 2100, Zone 3 AED 2500. Exceptions apply for KWI, BAH, MCT, Saudi, India, etc. Use **Upgrade to Business** tab.` },
+    { keywords: ['1400', '2100', '2300', 'on board aed'], answer: `**Upgrade on board (AED):** Zone 1 AED 1400, Zone 2 AED 2100, Zone 3 AED 2300. Exception: from Pakistan (PKR) airport in AED use 1500/2400/2700. Use **Upgrade to Business** tab.` },
+    { keywords: ['660', '535', '715', 'kwi 660', 'bah 535', 'mct 715'], answer: `**Gulf upgrade exceptions (at airport):** Kuwait (KWI) AED 660 / KWD 55; Bahrain (BAH) AED 535 / BHD 55; Muscat (MCT) AED 715 / OMR 75. Use **Upgrade to Business** tab.` },
+    { keywords: ['1175', '1200', 'saudi 1175', 'sar 1200'], answer: `**Saudi upgrade exception:** From all KSA points – AED 1175, SAR 1200 (at airport). Use **Upgrade to Business** tab with Saudi origin.` },
+    { keywords: ['1315', '30640', 'india 1315', 'inr 30640'], answer: `**India upgrade exception:** From all India points – AED 1315, INR 30640 (at airport). Use **Upgrade to Business** tab with India origin.` },
+    { keywords: ['3025', 'cmb mle 3025', 'lkr 3025'], answer: `**CMB–MLE (Sri Lanka–Maldives) FZ excess:** Route exception LKR 3025 per kg. Use **Excess Baggage** tab, airline FZ, route CMB–MLE.` },
+    { keywords: ['60080', '745', 'cmb mle upgrade'], answer: `**CMB–MLE upgrade exception:** Sri Lanka–Maldives AED 745, LKR 60080 (at airport). Use **Upgrade to Business** tab with CMB or MLE origin.` },
+    { keywords: ['920', '250', 'mle cmb'], answer: `**MLE–CMB (Maldives–Sri Lanka):** FZ excess exception USD 10; **Upgrade** exception AED 920, USD 250. Use **Excess Baggage** or **Upgrade** tab.` },
+    { keywords: ['900', 'inr 900', 'india 900'], answer: `**India (FZ, no pre-purchased baggage):** INR 900 plus taxes for baggage up to 20 kg. Excess above 20 kg at normal rates. Shown in **Excess Baggage** when route involves India.` },
+    { keywords: ['50 aed', '50 usd', 'transfer 50', 'dxb 50'], answer: `**Transfer Baggage:** At **DXB** AED 50 + GHA AED 50. **Outstation** USD 30 + GHA. Use **Transfer Baggage** tab.` },
+    { keywords: ['8 zone', 'eight zone', '8 zones'], answer: `**FZ excess baggage – 8 zones:** 1 UAE, 2 Gulf, 3 KSA, 4 ME, 5 Africa, 6 Sub-Continent, 7 SEA, 8 Europe/CIS. Rate = origin zone × destination zone. Use **Excess Baggage** tab, airline FZ.` },
+];
+
+// =============================================================================
 // COMBINE ALL QA PAIRS (order matters: more specific first; EXPANDED_QA last)
 // Add new QA arrays above and spread them here to scale beyond 1000+ lines.
 // =============================================================================
@@ -368,5 +481,8 @@ export const QA_PAIRS = [
     ...OTHER_SERVICES_QA,
     ...INDIA_CMB_FZ_QA,
     ...GENERAL_QA,
-    ...EXPANDED_QA
+    ...PHRASING_QA,
+    ...EXPANDED_QA,
+    ...CATCH_ALL_QA,
+    ...NUMBERS_QA
 ];
