@@ -1,12 +1,5 @@
-/**
- * Q&A Agent for Flydubai Rate Calculator
- * Logic only: query normalization and keyword matching.
- * All Q&A data and synonyms live in rateAgentData.js so content can scale to 1000+ lines.
- */
-
 import { QA_PAIRS, SYNONYMS } from "./rateAgentData.js";
 
-/** Normalize and expand query with synonyms for better matching */
 function normalizeQuery(q) {
     let normalized = q.toLowerCase().trim();
     normalized = normalized.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ');
@@ -22,11 +15,6 @@ function normalizeQuery(q) {
     return normalized + ' ' + [...expanded].join(' ');
 }
 
-/**
- * Answer a question using keyword matching (with synonym expansion) and return best answer.
- * @param {string} query - User question (any language)
- * @returns {string} - Answer text (markdown-style for line breaks)
- */
 export function answerAgentQuestion(query) {
     const raw = (query || '').trim();
     if (!raw) {
