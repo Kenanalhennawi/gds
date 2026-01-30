@@ -57,5 +57,5 @@ export function answerAgentQuestion(query) {
         return bestMatch.answer;
     }
 
-    return `I didn't find a direct answer for that. Here's useful information:\n\n**Interline:** FZ–EK and FZ–OAL use EK rates; FZ–AC uses AC rates; FZ–UA uses UA rates.\n\n**Rates:** Use the tabs above to calculate exact rates (Excess Baggage, Upgrade, Go-Show, Extra Legroom, etc.).\n\n**Try asking about:** "interline", "excess baggage EK", "Larnaca Malta", "upgrade", "disclaimer", "India", "Saudi", "UA AC rates", "per piece", or "document version".\n\nOpen the **Reference** tab for full interline rules, regional classification, and document details.`;
+    return `I didn't find a direct answer for that. Here's useful information:\n\n**Interline:** FZ–EK and FZ–OAL use EK rates; FZ–AC uses AC rates; FZ–UA uses UA rates.\n\n**Rates:** Use the tabs above to calculate exact rates (Excess Baggage, Upgrade, Go-Show, Extra Legroom, Sports, Reporting, Transfer).\n\n**Try asking about:** "what is excess baggage", "how do I get upgrade rate", "interline", "excess baggage EK", "Larnaca Malta", "upgrade from Kuwait", "disclaimer", "India", "Saudi", "UA AC rates", "per piece", "75 100 200", "document version", "which tab", or just "baggage", "upgrade", "emirates".\n\nOpen the **Reference** tab for full interline rules, regional classification, and document details.`;
 }
