@@ -22,22 +22,54 @@ export function answerAgentQuestion(query) {
     }
 
     const q = raw.toLowerCase();
+    const qNorm = q.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
     const qExpanded = normalizeQuery(q);
+    const qWords = new Set(qNorm.split(/\s+/).filter(Boolean));
+    const qExpandedNorm = qExpanded.replace(/\s+/g, ' ').trim();
+    const qExpandedWords = new Set(qExpandedNorm.split(/\s+/).filter(Boolean));
+
+    function queryMatchesKeyword(textNorm, wordsSet, kw) {
+        if (kw.includes(' ')) {
+            return textNorm.includes(kw);
+        }
+        return wordsSet.has(kw);
+    }
 
     let bestMatch = null;
     let bestScore = 0;
 
     for (const pair of QA_PAIRS) {
+        let hasMatchInQuery = false;
         let score = 0;
         for (const kw of pair.keywords) {
-            if (qExpanded.includes(kw) || q.includes(kw)) {
+            if (queryMatchesKeyword(qNorm, qWords, kw)) {
+                hasMatchInQuery = true;
+                score += kw.length + 2;
+            } else if (queryMatchesKeyword(qExpandedNorm, qExpandedWords, kw)) {
                 score += kw.length;
-                if (q.includes(kw)) score += 2;
             }
         }
-        if (score > bestScore) {
+        if (hasMatchInQuery && score > bestScore) {
             bestScore = score;
             bestMatch = pair;
+        }
+    }
+
+    if (!bestMatch) {
+        for (const pair of QA_PAIRS) {
+            let score = 0;
+            for (const kw of pair.keywords) {
+                const inExpanded = queryMatchesKeyword(qExpandedNorm, qExpandedWords, kw);
+                const inQuery = queryMatchesKeyword(qNorm, qWords, kw);
+                if (inExpanded || inQuery) {
+                    score += kw.length;
+                    if (inQuery) score += 2;
+                }
+            }
+            if (score > bestScore) {
+                bestScore = score;
+                bestMatch = pair;
+            }
         }
     }
 
