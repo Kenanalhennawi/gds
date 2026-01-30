@@ -1,12 +1,5 @@
-/**
- * Comprehensive Flydubai Rate Calculator
- * Includes: Excess Baggage, Go-Show Fares, Upgrades, Sports Equipment, etc.
- */
-
 import { translateAirline, translateCity } from "./translator.js";
 
-// Zone mapping for airports – Excess Baggage (from PDF pages 13–14)
-// Zone 1: UAE | Zone 2: Gulf (Kuwait, Bahrain, Oman) | Zone 3: KSA | Zone 4: Middle East | Zone 5: Africa | Zone 6: Sub-Continent | Zone 7: SEA | Zone 8: Europe/CIS
 const ZONE_MAPPING = {
     'DXB': 1, 'DWC': 1,
     'KWI': 2, 'BAH': 2, 'MCT': 2, 'SLL': 2, 'OHS': 2,
@@ -19,7 +12,6 @@ const ZONE_MAPPING = {
     'ADE': 4, 'AWZ': 4, 'BND': 7, 'DOH': 2, 'ESB': 8, 'FIH': 5, 'DOK': 5, 'GBB': 8, 'HDM': 4, 'HRK': 8, 'SAH': 4, 'SVO': 8, 'TGD': 8, 'XWC': 8, 'ZYL': 6, 'GOI': 6, 'GOJ': 8, 'KGL': 5, 'MBX': 8, 'KDH': 6
 };
 
-// Currency mapping by destination (from PDF page 23)
 const CURRENCY_MAPPING = {
     'AED': ['DXB', 'KRT', 'PZU'],
     'BHD': ['BAH'],
@@ -47,13 +39,11 @@ const CURRENCY_MAPPING = {
     'UZS': ['TAS']
 };
 
-// Get zone for airport
 export function getZoneForAirport(airport) {
     if (!airport) return null;
     return ZONE_MAPPING[airport.toUpperCase()] || null;
 }
 
-// Get currency for destination
 export function getCurrencyForDestination(destination) {
     if (!destination) return 'USD';
     const dest = destination.toUpperCase();
@@ -62,26 +52,24 @@ export function getCurrencyForDestination(destination) {
             return currency;
         }
     }
-    return 'USD'; // Default
+    return 'USD';
 }
 
-// Get currency for origin or destination (prefers origin, falls back to destination)
 export function getCurrencyForOriginOrDestination(origin, destination) {
-    // First try origin
+
     if (origin) {
         const originCurrency = getCurrencyForDestination(origin);
         if (originCurrency !== 'USD' || !destination) {
             return originCurrency;
         }
     }
-    // Fall back to destination
+
     if (destination) {
         return getCurrencyForDestination(destination);
     }
-    return 'USD'; // Default
+    return 'USD';
 }
 
-// Get all available currencies - cached for performance
 let CURRENCIES_CACHE = null;
 export function getAllCurrencies() {
     if (CURRENCIES_CACHE === null) {
@@ -90,7 +78,6 @@ export function getAllCurrencies() {
     return CURRENCIES_CACHE;
 }
 
-// Get zone name
 export function getZoneName(zone) {
     const names = {
         1: 'UAE',
@@ -105,7 +92,6 @@ export function getZoneName(zone) {
     return names[zone] || `Zone ${zone}`;
 }
 
-// Excess Baggage Rates Table (from PDF pages 15-22)
 const EXCESS_BAGGAGE_RATES = {
     'AED': {
         1: { 1: 0, 2: 40, 3: 40, 4: 60, 5: 40, 6: 40, 7: 60, 8: 80 },
@@ -349,7 +335,6 @@ const EXCESS_BAGGAGE_RATES = {
     }
 };
 
-// Upgrade to Business Rates (from PDF page 11-12)
 const UPGRADE_RATES = {
     'ZONE1': {
         'AED': 1300, 'PKR': 99845,
@@ -374,22 +359,19 @@ const UPGRADE_RATES = {
     }
 };
 
-// Upgrade Zone Mapping (from PDF page 11)
 const UPGRADE_ZONE_MAPPING = {
     1: ['AWZ', 'AQI', 'BAH', 'BND', 'BSR', 'DMM', 'DOH', 'DWC', 'DXB', 'ELQ', 'HAS', 'HOF', 'IFN', 'KER', 'KHI', 'KIH', 'KWI', 'LRR', 'MCT', 'OHS', 'RUH', 'SLL', 'SYZ'],
     2: ['ADE', 'AHB', 'AJF', 'AMD', 'AMM', 'AQJ', 'BEY', 'BGW', 'BOM', 'BLR', 'BUS', 'BUZ', 'CCJ', 'CCU', 'COK', 'DEL', 'EAM', 'EBL', 'EVN', 'GBB', 'GIZ', 'GSM', 'GYD', 'HDM', 'HRI', 'HYD', 'IKA', 'ISB', 'ISU', 'JED', 'JIB', 'KBL', 'KDH', 'LKO', 'LHE', 'LYP', 'MAA', 'MED', 'MHD', 'MRV', 'MUX', 'NJF', 'NUM', 'RSI', 'SAH', 'SKT', 'TBS', 'TBZ', 'TIF', 'TRV', 'TUU', 'UET', 'ULH', 'YNB'],
     3: ['ADB', 'ADD', 'AER', 'ALA', 'ASB', 'ASM', 'AYT', 'BEG', 'BGY', 'BJM', 'BJV', 'BKK', 'BSL', 'BUD', 'BTS', 'BWA', 'CAG', 'CLJ', 'CMB', 'CTA', 'CIT', 'CFU', 'CGP', 'DAC', 'DAR', 'DBB', 'DBV', 'DYU', 'EBB', 'ESB', 'DOK', 'FIH', 'FRU', 'GAN', 'GOI', 'GOJ', 'GRV', 'HBE', 'HGA', 'HMB', 'HRI', 'HEL', 'HRK', 'IEV', 'IST', 'JMK', 'JRO', 'JTR', 'KBP', 'KBV', 'KGL', 'JUB', 'KIV', 'KRR', 'KRK', 'KRT', 'KTM', 'KUF', 'KUT', 'KZN', 'LED', 'LGK', 'LJU', 'MBA', 'MBX', 'MCX', 'MGQ', 'MLA', 'MLE', 'MSQ', 'NAP', 'NMA', 'NQZ', 'OLB', 'OSS', 'OTP', 'OVB', 'ODS', 'PEE', 'PEN', 'PEW', 'POZ', 'PRG', 'PSA', 'PZU', 'RIX', 'RGN', 'ROV', 'SJJ', 'SKG', 'SKP', 'SAW', 'SKD', 'SOF', 'SPX', 'SSH', 'SVO', 'SVX', 'SZG', 'TAS', 'TIA', 'TIV', 'TLL', 'TLV', 'TGD', 'TZX', 'UTP', 'UFA', 'VNO', 'VKO', 'VOG', 'WAW', 'XWC', 'ZIA', 'ZNZ', 'ZYL', 'ZAG']
 };
 
-// Upgrade to Business – On Board rates (from PDF page 13)
 const UPGRADE_ON_BOARD_RATES = {
     'AED': { 1: 1400, 2: 2100, 3: 2300 },
     'PKR': { 1: 115205, 2: 184330, 3: 207375 }
 };
-// Exception: when paying in AED from PKR airport (Pakistan), On Board AED is 1500/2400/2700 (not 1400/2100/2300)
+
 const UPGRADE_ON_BOARD_AED_PKR = { 1: 1500, 2: 2400, 3: 2700 };
 
-// Infant Upgrade to Business – at airport (from PDF page 11; same currencies as adult)
 const UPGRADE_INFANT_RATES = {
     'ZONE1': {
         'AED': 33, 'PKR': 2496, 'BHD': 3, 'BYN': 27, 'CHF': 7, 'CZK': 189, 'EGP': 415, 'EUR': 8, 'HUF': 3052,
@@ -408,20 +390,17 @@ const UPGRADE_INFANT_RATES = {
     }
 };
 
-// Infant Upgrade to Business – On Board (from PDF page 11)
 const UPGRADE_ON_BOARD_INFANT_RATES = {
     'AED': { 1: 35, 2: 53, 3: 58 },
     'PKR': { 1: 28801, 2: 46083, 3: 51844 }
 };
 
-// Excess baggage route exceptions (from PDF page 22)
 const EXCESS_BAGGAGE_EXCEPTIONS = {
     'CMB-MLE': { currency: 'LKR', amount: 3025 },
     'MLE-CMB': { currency: 'USD', amount: 10 },
     'INDIA_NO_PREPURCHASE': { note: 'Without pre-purchased baggage: INR 900 plus taxes for baggage up to 20 kg. Excess above 20 kg at normal rates.' }
 };
 
-// Upgrade to Business – exceptions by route/market (from PDF page 12)
 const UPGRADE_EXCEPTIONS = {
     'SAUDI': { from: 'All KSA points', AED: 1175, SAR: 1200 },
     'INDIA': { from: 'All India points', AED: 1315, INR: 30640 },
@@ -435,7 +414,6 @@ const UPGRADE_EXCEPTIONS = {
     'MCT': { from: 'Muscat (MCT)', AED: 715, OMR: 75 }
 };
 
-// Get upgrade zone for airport
 function getUpgradeZone(airport) {
     const code = airport.toUpperCase();
     for (const [zone, airports] of Object.entries(UPGRADE_ZONE_MAPPING)) {
@@ -446,7 +424,6 @@ function getUpgradeZone(airport) {
     return null;
 }
 
-// Get Upgrade to Business rate (adult/child) – applies UPGRADE_EXCEPTIONS when applicable
 export function getUpgradeRate(origin, currency) {
     const code = origin.toUpperCase();
     const zone = getUpgradeZone(origin);
@@ -455,8 +432,7 @@ export function getUpgradeRate(origin, currency) {
             error: `Upgrade rate not available for ${origin}`
         };
     }
-    
-    // Check airport-specific exception (KWI, BAH, MCT, BGW, TLV, KTM)
+
     const airportEx = UPGRADE_EXCEPTIONS[code];
     if (airportEx && airportEx[currency] != null) {
         const infantRates = UPGRADE_INFANT_RATES[`ZONE${zone}`];
@@ -472,7 +448,7 @@ export function getUpgradeRate(origin, currency) {
             exceptionFrom: airportEx.from
         };
     }
-    // Check Saudi (all KSA points)
+
     if (KSA_AIRPORT_CODES.includes(code) && UPGRADE_EXCEPTIONS.SAUDI && UPGRADE_EXCEPTIONS.SAUDI[currency] != null) {
         const zoneKey = `ZONE${zone}`;
         const infantRates = UPGRADE_INFANT_RATES[zoneKey];
@@ -488,7 +464,7 @@ export function getUpgradeRate(origin, currency) {
             exceptionFrom: UPGRADE_EXCEPTIONS.SAUDI.from
         };
     }
-    // Check India (all India points)
+
     if (INDIA_AIRPORT_CODES.includes(code) && UPGRADE_EXCEPTIONS.INDIA && UPGRADE_EXCEPTIONS.INDIA[currency] != null) {
         const zoneKey = `ZONE${zone}`;
         const infantRates = UPGRADE_INFANT_RATES[zoneKey];
@@ -527,7 +503,6 @@ export function getUpgradeRate(origin, currency) {
     };
 }
 
-// Get Infant Upgrade to Business rate (at airport)
 export function getUpgradeInfantRate(origin, currency) {
     const zone = getUpgradeZone(origin);
     if (!zone) return { error: `Infant upgrade rate not available for ${origin}` };
@@ -537,7 +512,6 @@ export function getUpgradeInfantRate(origin, currency) {
     return { origin: origin.toUpperCase(), zone: parseInt(zone), currency, rate, description: 'Infant upgrade to Business (at airport)' };
 }
 
-// Get Upgrade to Business – On Board rate (from PDF page 13)
 export function getUpgradeOnBoardRate(origin, currency) {
     const zone = getUpgradeZone(origin);
     if (!zone) {
@@ -545,7 +519,7 @@ export function getUpgradeOnBoardRate(origin, currency) {
     }
     const infantRates = UPGRADE_ON_BOARD_INFANT_RATES[currency];
     const infantRate = infantRates && infantRates[zone];
-    // Exception: AED from PKR airport uses 1500/2400/2700 (Page 13)
+
     if (currency === 'AED' && getCurrencyForDestination(origin) === 'PKR') {
         const rate = UPGRADE_ON_BOARD_AED_PKR[zone];
         if (rate != null) {
@@ -573,7 +547,6 @@ export function getUpgradeOnBoardRate(origin, currency) {
     };
 }
 
-// Go-Show Fares (from PDF pages 2-10)
 const GOSHOW_FARES = {
     'ECONOMY': {
         'ADD': { currency: 'USD', adult: 705, infant: 20 },
@@ -854,7 +827,6 @@ const GOSHOW_FARES = {
     }
 };
 
-// Sports Equipment Rates (from PDF page 30-31)
 const SPORTS_EQUIPMENT_RATES = {
     'AED': { SPEQ: 150, SPEX: 270 },
     'AZN': { SPEQ: 70, SPEX: 125 },
@@ -891,7 +863,6 @@ const SPORTS_EQUIPMENT_RATES = {
     'YER': { SPEQ: 10005, SPEX: 18010 }
 };
 
-// Late/Early Reporting Rates (from PDF page 31-32)
 const REPORTING_RATES = {
     'AED': { LRTP: 200, ERTP: 100 },
     'AZN': { LRTP: 95, ERTP: 45 },
@@ -928,13 +899,11 @@ const REPORTING_RATES = {
     'KWD': { LRTP: 15, ERTP: 10 }
 };
 
-// Transfer Baggage Fee (from PDF page 32)
 const TRANSFER_BAGGAGE_FEE = {
     'DXB': { currency: 'AED', amount: 50, ghaFee: 50 },
     'OUTSTATION': { currency: 'USD', amount: 30, ghaFee: 'As applicable' }
 };
 
-// Aircraft type and Extra Legroom (XLGR) seat rows – reference (from PDF page 26)
 export const AIRCRAFT_XLGR_REFERENCE = [
     { type: '737-800NG', cabin: 'Y', capacity: 189, xlgrRows: '1ABC, 2DEF, 15 & 16' },
     { type: '737-8', cabin: 'Y', capacity: 189, xlgrRows: '1ABC, 2DEF, 15 & 16' },
@@ -943,7 +912,6 @@ export const AIRCRAFT_XLGR_REFERENCE = [
     { type: '737 MAX 9', cabin: 'Y', capacity: 210, xlgrRows: '1ABC, 2DEF, 16 & 17' }
 ];
 
-// Interline journey rules – which carrier's rates apply (Page 4 / document)
 export const INTERLINE_JOURNEY_RULES = [
     { journey: 'FZ – EK', condition: 'EK rates will apply' },
     { journey: 'FZ – EK – AC (EK is the Transatlantic carrier)', condition: 'EK rates will apply' },
@@ -952,10 +920,8 @@ export const INTERLINE_JOURNEY_RULES = [
     { journey: 'FZ – UA (UA is the Transatlantic carrier)', condition: 'UA rates will apply' }
 ];
 
-// Customer disclaimer for excess baggage (to be communicated when providing rates)
 export const EXCESS_BAGGAGE_DISCLAIMER = 'Please note that the excess baggage rates quoted are approximate. For the exact rate, please check with the airport team at the time of departure.';
 
-// Reference text: EK/OAL Excess Baggage and UA/AC rules (Page 4 and document)
 export const REFERENCE_TEXTS = {
     INTERLINE_RULES: `Interline excess baggage – which carrier's rates apply: FZ–EK → EK rates; FZ–EK–AC (EK transatlantic) → EK rates; FZ–OAL → EK rates; FZ–AC (AC transatlantic) → AC rates; FZ–UA (UA transatlantic) → UA rates. Document contains EK, AC and UA rates for all regions. If a rate is missing for a destination, refer to FS/SUP in charge.`,
     EK_OAL_EXCESS: `EK (Emirates) / OAL (Other Airlines) Excess Baggage – Region-based USD per kg and USD/CAD per piece. Buying additional weight at the airport (USD per kg): Middle East/South Asia ↔ ME/SA $15, to Africa $25, to Far East $25, to Europe $25, to Australia & New Zealand $40. Far East: to ME/SA $25, to Africa $30, to Far East $15, to Europe $30, to ANZ $30. Europe: to ME/SA $25, to Africa $30, to Far East $30, to Europe $40, to ANZ $50. Australia & New Zealand: to ME/SA $40, to Africa $50, to Far East $30, to Europe $50, to ANZ $15. *$15 per kg for travel between Larnaca (LCA) and Malta (MLA). Buying additional pieces: From/to Africa, Americas, Canada (CAD) – see rate matrix.`,
@@ -963,7 +929,6 @@ export const REFERENCE_TEXTS = {
     REGIONAL_CLASSIFICATION: `Middle East: Bahrain, Iran, Iraq, Jordan, Kuwait, Lebanon, Oman, Qatar, Saudi Arabia, UAE, Israel. South Asia: Afghanistan, Bangladesh, India, Maldives, Pakistan, Sri Lanka, Nepal, Kazakhstan, Kyrgyzstan, Tajikistan, Turkmenistan. Africa: Algeria, Angola, Côte d'Ivoire, Egypt, Ethiopia, Ghana, Guinea, Kenya, Libya, Madagascar, Mauritius, Morocco, Nigeria, Senegal, Seychelles, South Africa, Sudan, Tanzania, Tunisia, Uganda, Zambia, Zimbabwe, Congo, Djibouti, Eritrea, Somalia, South Sudan. Europe: Austria, Belgium, Croatia, Cyprus, Czech Republic, Denmark, France, Germany, Greece, Hungary, Ireland, Italy, Malta, Netherlands, Norway, Poland, Portugal, Russia, Spain, Sweden, Switzerland, Türkiye, Ukraine, United Kingdom, Armenia, Azerbaijan, Bosnia, Bulgaria, Georgia, Macedonia, Montenegro, Romania, Serbia, Slovakia, Finland. Far East: Cambodia, China, Hong Kong, Indonesia, Japan, Malaysia, Myanmar, Philippines, Singapore, South Korea, Taiwan, Thailand, Vietnam. Australia and New Zealand. Americas: Argentina, Brazil, Canada, Chile, Colombia, USA.`
 };
 
-// Extra Legroom rates – Airport Rate / On Board Rate + Currency Exchange (from PDF pages 26-29)
 const EXTRA_LEGROOM_RATES = {
     'AED': { airport: 175, onBoard: 200, currencyExchange: 3.67 },
     'AFN': { airport: 3385, onBoard: 3868 },
@@ -1090,13 +1055,11 @@ const EXTRA_LEGROOM_RATES = {
     'TMT': { airport: 167, onBoard: 191 }
 };
 
-// Get excess baggage exception for a route (CMB-MLE, MLE-CMB)
 export function getExcessBaggageException(origin, destination) {
     const key = `${origin.toUpperCase()}-${destination.toUpperCase()}`;
     return EXCESS_BAGGAGE_EXCEPTIONS[key] || null;
 }
 
-// Calculate excess baggage rate
 export function calculateExcessBaggageRate(origin, destination, airline, currency = null) {
     const originZone = getZoneForAirport(origin);
     const destZone = getZoneForAirport(destination);
@@ -1110,10 +1073,9 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
             destZone
         };
     }
-    
-    // Handle FZ rates
+
     if (airline === 'FZ') {
-        // Route exceptions (CMB-MLE, MLE-CMB)
+
         const exception = getExcessBaggageException(origin, destination);
         if (exception && exception.amount != null) {
             return {
@@ -1160,8 +1122,7 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
             indiaNote: indiaNote || undefined
         };
     }
-    
-    // Handle EK rates
+
     if (airline === 'EK') {
         const o = origin.toUpperCase();
         const d = destination.toUpperCase();
@@ -1216,8 +1177,7 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
             carrierName: translateAirline('EK')
         };
     }
-    
-    // Handle AC/UA rates
+
     if (airline === 'AC' || airline === 'UA') {
         return {
             airline,
@@ -1238,8 +1198,7 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
             carrierName: translateAirline(airline)
         };
     }
-    
-    // Handle OAL (Other Airlines) - use EK/OAL rates
+
     if (airline === 'OAL') {
         const o = origin.toUpperCase();
         const d = destination.toUpperCase();
@@ -1303,7 +1262,6 @@ export function calculateExcessBaggageRate(origin, destination, airline, currenc
     };
 }
 
-// Get Go-Show fare
 export function getGoShowFare(origin, classType = 'ECONOMY', currency = null) {
     const originCode = origin.toUpperCase();
     const fare = GOSHOW_FARES[classType] && GOSHOW_FARES[classType][originCode];
@@ -1328,7 +1286,6 @@ export function getGoShowFare(origin, classType = 'ECONOMY', currency = null) {
     };
 }
 
-// Get Sports Equipment rate
 export function getSportsEquipmentRate(currency, type = 'SPEQ') {
     const rates = SPORTS_EQUIPMENT_RATES[currency];
     if (!rates) {
@@ -1345,7 +1302,6 @@ export function getSportsEquipmentRate(currency, type = 'SPEQ') {
     };
 }
 
-// Get Late/Early Reporting rate
 export function getReportingRate(currency, type = 'LRTP') {
     const rates = REPORTING_RATES[currency];
     if (!rates) {
@@ -1362,7 +1318,6 @@ export function getReportingRate(currency, type = 'LRTP') {
     };
 }
 
-// Get Transfer Baggage Fee
 export function getTransferBaggageFee(location) {
     const loc = location.toUpperCase();
     if (loc === 'DXB') {
@@ -1371,7 +1326,6 @@ export function getTransferBaggageFee(location) {
     return TRANSFER_BAGGAGE_FEE.OUTSTATION;
 }
 
-// Get Extra Legroom rate (from PDF pages 26-29)
 export function getExtraLegroomRate(currency) {
     const rates = EXTRA_LEGROOM_RATES[currency];
     if (!rates) {
@@ -1392,9 +1346,8 @@ export function getExtraLegroomCurrencies() {
     return Object.keys(EXTRA_LEGROOM_RATES).sort();
 }
 
-// EK Excess Rates
-// EK/OAL Excess Baggage Rates (Except UA & AC)
-// Zone Classification for EK/OAL
+
+
 const EK_OAL_ZONE_MAPPING = {
     'ME': ['BAH', 'IKA', 'BGW', 'AMM', 'KWI', 'BEY', 'MCT', 'DOH', 'RUH', 'DXB', 'TLV'],
     'WAIO': ['KBL', 'DAC', 'AMD', 'MLE', 'KHI', 'CMB', 'KTM', 'ALA', 'FRU', 'DYU', 'ASB', 'ISB', 'DEL', 'BOM', 'BLR', 'HYD', 'MAA', 'COK', 'CCJ', 'TRV', 'CCU', 'LKO'],
@@ -1405,41 +1358,33 @@ const EK_OAL_ZONE_MAPPING = {
     'AMERICAS': ['ARG', 'BRA', 'CHL', 'CAN', 'USA', 'MEX']
 };
 
-// Map airport to EK/OAL region
 function getEKRegionForAirport(airport) {
     const code = airport.toUpperCase();
-    
-    // Middle East
+
     if (['BAH', 'IKA', 'THR', 'BGW', 'BSR', 'EBL', 'ISU', 'NJF', 'AMM', 'AQJ', 'KWI', 'BEY', 'MCT', 'OHS', 'SLL', 'DOH', 'RUH', 'JED', 'DMM', 'MED', 'AHB', 'ELQ', 'TIF', 'TUU', 'HAS', 'YNB', 'AJF', 'EAM', 'GIZ', 'HOF', 'NUM', 'RSI', 'ULH', 'DXB', 'DWC', 'AUH', 'SHJ', 'TLV'].includes(code)) {
         return 'ME';
     }
-    
-    // WAIO (West Asia, India, Others)
+
     if (['KBL', 'KDH', 'DAC', 'CGP', 'ZYL', 'AMD', 'BOM', 'BLR', 'CCU', 'CCJ', 'COK', 'DEL', 'HYD', 'LKO', 'MAA', 'TRV', 'GOI', 'MLE', 'GAN', 'KHI', 'ISB', 'LHE', 'PEW', 'SKT', 'MUX', 'LYP', 'UET', 'CMB', 'HRI', 'KTM', 'BWA', 'ALA', 'NQZ', 'CIT', 'TSE', 'FRU', 'OSS', 'DYU', 'ASB', 'NMA', 'SKD', 'TAS'].includes(code)) {
         return 'WAIO';
     }
-    
-    // Africa
+
     if (['CAI', 'HBE', 'SSH', 'LXR', 'HRG', 'SPX', 'DBB', 'HMB', 'ADD', 'ASM', 'JIB', 'NBO', 'MBA', 'DAR', 'JRO', 'ZNZ', 'EBB', 'KGL', 'BJM', 'FIH', 'JUB', 'KRT', 'PZU', 'HGA', 'MGQ', 'LOS', 'ABV', 'ACC', 'DKR', 'CMN', 'TUN', 'ALG', 'TIP', 'JNB', 'CPT'].includes(code)) {
         return 'AFRICA';
     }
-    
-    // Europe
+
     if (['LHR', 'LGW', 'STN', 'LTN', 'MAN', 'CDG', 'ORY', 'NCE', 'FRA', 'MUC', 'AMS', 'BRU', 'ZRH', 'BSL', 'VIE', 'SZG', 'FCO', 'MXP', 'MAD', 'BCN', 'IST', 'SAW', 'AYT', 'ADB', 'ESB', 'TZX', 'BJV', 'SVO', 'DME', 'VKO', 'LED', 'AER', 'KUF', 'KZN', 'MCX', 'MRV', 'OVB', 'UFA', 'VOG', 'SVX', 'KRR', 'ROV', 'PEE', 'ZIA', 'WAW', 'KRK', 'POZ', 'PRG', 'BUD', 'OTP', 'CLJ', 'SOF', 'BEG', 'ZAG', 'DBV', 'SJJ', 'TIA', 'SKP', 'LJU', 'ATH', 'SKG', 'JMK', 'JTR', 'CFU', 'VNO', 'RIX', 'TLL', 'HEL', 'CTA', 'NAP', 'PSA', 'BGY', 'OLB', 'CAG', 'MLA', 'LCA', 'TIV', 'BTS', 'KBP', 'IEV', 'ODS', 'MSQ'].includes(code)) {
         return 'EUROPE';
     }
-    
-    // Far East
+
     if (['BKK', 'DMK', 'HKT', 'CNX', 'KBV', 'UTP', 'KUL', 'LGK', 'PEN', 'SIN', 'CGK', 'DPS', 'MNL', 'HKG', 'PEK', 'PKX', 'PVG', 'SHA', 'CAN', 'CTU', 'SZX', 'NRT', 'HND', 'KIX', 'ICN', 'TPE', 'SGN', 'HAN', 'PNH'].includes(code)) {
         return 'FAREAST';
     }
-    
-    // ANZ (Australia/New Zealand)
+
     if (['SYD', 'MEL', 'BNE', 'PER', 'AKL'].includes(code)) {
         return 'ANZ';
     }
-    
-    // Americas
+
     if (['YYZ', 'YVR', 'YUL', 'YYC', 'JFK', 'EWR', 'LGA', 'BOS', 'IAD', 'DCA', 'ATL', 'MCO', 'MIA', 'FLL', 'ORD', 'DFW', 'IAH', 'DEN', 'LAX', 'SFO', 'SEA', 'LAS', 'MEX', 'CUN', 'BOG', 'EZE', 'SCL', 'LIM', 'GRU', 'GIG'].includes(code)) {
         return 'AMERICAS';
     }
@@ -1447,8 +1392,7 @@ function getEKRegionForAirport(airport) {
     return null;
 }
 
-// EK/OAL Excess Baggage Rates per KG (USD) – Page 4: Middle East/South Asia, Africa, Far East, Europe, Australia & New Zealand
-// *$15 per kg for travel between Larnaca (LCA) and Malta (MLA) – applied in calculateExcessBaggageRate
+
 const EK_OAL_EXCESS_RATES_PER_KG = {
     'ME': {
         'ME': 15,
@@ -1515,16 +1459,12 @@ const EK_OAL_EXCESS_RATES_PER_KG = {
     }
 };
 
-// Canadian airport codes – for EK/OAL per-piece (CAD)
 const CANADA_AIRPORT_CODES = ['YYZ', 'YVR', 'YUL', 'YYC', 'YOW', 'YHZ', 'YEG'];
 
-// India airport codes (FZ zone 6) – for India excess baggage note and upgrade exception
 const INDIA_AIRPORT_CODES = ['AMD', 'BOM', 'BLR', 'CCJ', 'CCU', 'COK', 'DEL', 'HYD', 'LKO', 'MAA', 'TRV', 'GOI'];
 
-// KSA (Saudi Arabia) airport codes – for upgrade exception "All KSA points"
 const KSA_AIRPORT_CODES = ['AHB', 'AQI', 'AJF', 'DMM', 'ELQ', 'EAM', 'GIZ', 'HAS', 'HOF', 'JED', 'NUM', 'MED', 'RUH', 'RSI', 'TUU', 'TIF', 'ULH', 'YNB'];
 
-// EK/OAL Excess Baggage Rates per Piece (USD / CAD for Canada)
 const EK_OAL_EXCESS_RATES_PER_PIECE = {
     'AFRICA': {
         'ME': 200,
