@@ -1,4 +1,3 @@
-/* GDS Decoder – Service Worker cache for static assets */
 const CACHE_NAME = 'gds-decoder-v1';
 const ASSETS = [
     '/',
