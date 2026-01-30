@@ -57,32 +57,32 @@ export function renderExcessBaggageCalculator(container) {
                             <p style="margin-bottom:0;"><strong style="color:var(--text-main);">4.</strong> Use <strong>Ask Agent</strong> for questions about rates and rules.</p>
                         </div>
                     </div>
-                    <div class="service-tabs-container service-tabs-scroll" role="tablist" aria-label="Rate calculator services" style="display:flex; gap:10px; margin-bottom:20px; border-bottom:2px solid var(--glass-border); padding-bottom:2px; overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch;">
-                        <button class="service-tab active" data-service="excess" role="tab" aria-selected="true" aria-controls="excessSection" id="tabExcess" style="padding:10px 20px; background:rgba(59,130,246,0.25); border:none; border-bottom:2px solid var(--primary-blue); color:var(--primary-blue); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                    <div class="service-tabs-container service-tabs-scroll" role="tablist" aria-label="Rate calculator services" style="display:flex; gap:10px; margin-bottom:20px; overflow-x:auto; flex-wrap:nowrap; -webkit-overflow-scrolling:touch;">
+                        <button class="service-tab active" data-service="excess" role="tab" aria-selected="true" aria-controls="excessSection" id="tabExcess">
                             Excess Baggage
                         </button>
-                        <button class="service-tab" data-service="goshow" role="tab" aria-selected="false" aria-controls="goshowSection" id="tabGoshow" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" data-service="goshow" role="tab" aria-selected="false" aria-controls="goshowSection" id="tabGoshow">
                             Go-Show Fares
                         </button>
-                        <button class="service-tab" id="tabSports" data-service="sports" role="tab" aria-selected="false" aria-controls="sportsSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabSports" data-service="sports" role="tab" aria-selected="false" aria-controls="sportsSection">
                             Sports Equipment
                         </button>
-                        <button class="service-tab" id="tabReporting" data-service="reporting" role="tab" aria-selected="false" aria-controls="reportingSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabReporting" data-service="reporting" role="tab" aria-selected="false" aria-controls="reportingSection">
                             Reporting Fees
                         </button>
-                        <button class="service-tab" id="tabTransfer" data-service="transfer" role="tab" aria-selected="false" aria-controls="transferSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabTransfer" data-service="transfer" role="tab" aria-selected="false" aria-controls="transferSection">
                             Transfer Baggage
                         </button>
-                        <button class="service-tab" id="tabUpgrade" data-service="upgrade" role="tab" aria-selected="false" aria-controls="upgradeSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabUpgrade" data-service="upgrade" role="tab" aria-selected="false" aria-controls="upgradeSection">
                             Upgrade to Business
                         </button>
-                        <button class="service-tab" id="tabExtralegroom" data-service="extralegroom" role="tab" aria-selected="false" aria-controls="extralegroomSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabExtralegroom" data-service="extralegroom" role="tab" aria-selected="false" aria-controls="extralegroomSection">
                             Extra Legroom
                         </button>
-                        <button class="service-tab" id="tabReference" data-service="reference" role="tab" aria-selected="false" aria-controls="referenceSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabReference" data-service="reference" role="tab" aria-selected="false" aria-controls="referenceSection">
                             Reference
                         </button>
-                        <button class="service-tab" id="tabAgent" data-service="agent" role="tab" aria-selected="false" aria-controls="agentSection" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                        <button class="service-tab" id="tabAgent" data-service="agent" role="tab" aria-selected="false" aria-controls="agentSection">
                             Ask Agent
                         </button>
                     </div>
@@ -392,16 +392,13 @@ export function renderExcessBaggageCalculator(container) {
             const service = tab.dataset.service;
             tabs.forEach(t => {
                 t.classList.remove('active');
-                t.style.background = 'transparent';
-                t.style.borderBottom = 'none';
-                t.style.color = 'var(--text-muted)';
+                t.style.background = '';
+                t.style.borderBottom = '';
+                t.style.color = '';
+                t.style.boxShadow = '';
                 t.setAttribute('aria-selected', 'false');
             });
             tab.classList.add('active');
-            tab.style.background = 'rgba(59,130,246,0.25)';
-            tab.style.borderBottom = '2px solid var(--primary-blue)';
-            tab.style.color = 'var(--primary-blue)';
-            tab.style.boxShadow = '0 4px 12px rgba(59, 130, 246, 0.2)';
             tab.setAttribute('aria-selected', 'true');
             sections.forEach(s => {
                 s.style.display = 'none';
