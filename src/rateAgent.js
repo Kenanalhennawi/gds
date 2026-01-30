@@ -1,13 +1,63 @@
 import { QA_PAIRS, SYNONYMS } from "./rateAgentData.js";
-import { calculateExcessBaggageRate, getZoneForAirport, getZoneName, getUpgradeRate, getGoShowFare } from "./excessBaggage.js";
+import { calculateExcessBaggageRate, getZoneForAirport, getZoneName, getUpgradeRate, getGoShowFare, getEKRegionForAirport, getCurrencyForDestination } from "./excessBaggage.js";
 import { getAirportByCode } from "./airportSearch.js";
 
 function parseRouteQuery(qNorm) {
     const codes = (qNorm.match(/\b[a-z]{3}\b/g) || []).map(c => c.toUpperCase());
-    if (codes.length >= 2 && codes[0] !== codes[1]) {
+    const unique = [...new Set(codes)];
+    if (unique.length >= 2 && codes[0] !== codes[1]) {
         return { origin: codes[0], destination: codes[1] };
     }
     return null;
+}
+
+function isKnownAirport(code) {
+    return getAirportByCode(code) || getZoneForAirport(code) != null || getEKRegionForAirport(code) != null;
+}
+
+function parseSingleAirportQuery(qNorm) {
+    const codes = (qNorm.match(/\b[a-z]{3}\b/g) || []).map(c => c.toUpperCase());
+    const unique = [...new Set(codes)].filter(isKnownAirport);
+    if (unique.length === 1) return unique[0];
+    return null;
+}
+
+function formatSingleAirportAnswer(code) {
+    const city = getAirportByCode(code)?.city || code;
+    const lines = [];
+    lines.push(`**${code} (${city})**\n`);
+
+    const zone = getZoneForAirport(code);
+    if (zone != null) {
+        lines.push(`**FZ zone:** ${zone} (${getZoneName(zone)}). Use **Excess Baggage** tab for route rate.`);
+    } else {
+        lines.push(`**FZ zone:** Not in FZ zone table; use **Excess Baggage** tab or refer to FS/SUP for FZ-only routes.`);
+    }
+
+    const region = getEKRegionForAirport(code);
+    if (region) {
+        lines.push(`\n**EK/OAL region:** ${region}. Use **Excess Baggage** tab (carrier EK) for per‑kg and per‑piece.`);
+    }
+
+    const currency = getCurrencyForDestination(code);
+    lines.push(`\n**Currency:** ${currency} (for this destination).`);
+
+    const upgradeResult = getUpgradeRate(code, 'AED');
+    if (upgradeResult && !upgradeResult.error) {
+        lines.push(`\n**Upgrade from ${code}:** Zone ${upgradeResult.zone}. Use **Upgrade to Business** tab.`);
+    }
+
+    const goShowEco = getGoShowFare(code, 'ECONOMY', null);
+    const goShowBus = getGoShowFare(code, 'BUSINESS', null);
+    if (!goShowEco.error || !goShowBus.error) {
+        const parts = [];
+        if (!goShowEco.error) parts.push(`Economy ${goShowEco.adult} ${goShowEco.currency || ''}`);
+        if (!goShowBus.error) parts.push(`Business ${goShowBus.adult} ${goShowBus.currency || ''}`);
+        if (parts.length) lines.push(`\n**Go-Show from ${code}:** ${parts.join('; ')}. Use **Go-Show Fares** tab.`);
+    }
+
+    lines.push(`\n**Full route:** For a rate between two cities, ask e.g. **"${code} to DXB"** or **"DXB to ${code}"**.`);
+    return lines.join('');
 }
 
 function formatRouteAnswer(origin, destination, fzResult, ekResult, upgradeResult, goShowResult) {
@@ -97,6 +147,11 @@ export function answerAgentQuestion(query) {
         }
     }
 
+    const singleCode = parseSingleAirportQuery(qNorm);
+    if (singleCode) {
+        return formatSingleAirportAnswer(singleCode);
+    }
+
     const qExpanded = normalizeQuery(q);
     const qWords = new Set(qNorm.split(/\s+/).filter(Boolean));
     const qExpandedNorm = qExpanded.replace(/\s+/g, ' ').trim();
@@ -151,5 +206,6 @@ export function answerAgentQuestion(query) {
         return bestMatch.answer;
     }
 
-    return `I didn't find a direct answer for that. Here's useful information:\n\n**Interline:** FZ–EK and FZ–OAL use EK rates; FZ–AC uses AC rates; FZ–UA uses UA rates.\n\n**Rates:** Use the tabs above to calculate exact rates (Excess Baggage, Upgrade, Go-Show, Extra Legroom, Sports, Reporting, Transfer).\n\n**Try asking about:** "what is excess baggage", "how do I get upgrade rate", "interline", "excess baggage EK", "Larnaca Malta", "upgrade from Kuwait", "disclaimer", "India", "Saudi", "UA AC rates", "per piece", "75 100 200", "document version", "which tab", or just "baggage", "upgrade", "emirates".\n\nOpen the **Reference** tab for full interline rules, regional classification, and document details.`;
+    const quoted = raw ? `**"${raw}"**` : 'that';
+    return `I didn't find a direct answer for ${quoted}. Here's useful information:\n\n**Interline:** FZ–EK and FZ–OAL use EK rates; FZ–AC uses AC rates; FZ–UA uses UA rates.\n\n**Rates:** Use the tabs above to calculate exact rates (Excess Baggage, Upgrade, Go-Show, Extra Legroom, Sports, Reporting, Transfer).\n\n**Try asking about:** "what is excess baggage", "how do I get upgrade rate", "interline", "excess baggage EK", "Larnaca Malta", "upgrade from Kuwait", "disclaimer", "India", "Saudi", "UA AC rates", "per piece", "75 100 200", "document version", "which tab", or just "baggage", "upgrade", "emirates". For one airport (e.g. CAI, SPX, SJJ), type the 3-letter code; for a route, type e.g. "CAI to DXB".\n\nOpen the **Reference** tab for full interline rules, regional classification, and document details.`;
 }
