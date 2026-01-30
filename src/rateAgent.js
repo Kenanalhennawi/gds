@@ -10,27 +10,42 @@ function parseRouteQuery(qNorm) {
     return null;
 }
 
-function formatRouteAnswer(origin, destination, fzResult, upgradeResult) {
+function formatRouteAnswer(origin, destination, fzResult, ekResult, upgradeResult) {
     const oCity = getAirportByCode(origin)?.city || origin;
     const dCity = getAirportByCode(destination)?.city || destination;
     const lines = [];
     lines.push(`**${origin} (${oCity}) to ${destination} (${dCity})**\n`);
+
     if (fzResult.error) {
-        lines.push(`FZ excess: ${fzResult.error}`);
-    } else {
+        lines.push(`**FZ excess:** ${fzResult.error}`);
+    } else if (fzResult.originZone != null && fzResult.destZone != null) {
         const oz = fzResult.originZone;
         const dz = fzResult.destZone;
         const zoneNames = `${getZoneName(oz)} × ${getZoneName(dz)}`;
         lines.push(`**FZ excess:** Zone ${oz} × Zone ${dz} (${zoneNames}). **${fzResult.rateDescription}**`);
         if (fzResult.indiaNote) lines.push(`\n${fzResult.indiaNote}`);
     }
+
+    if (ekResult) {
+        if (ekResult.error) {
+            lines.push(`\n**EK/OAL excess:** ${ekResult.error}`);
+        } else if (ekResult.originRegion && ekResult.destRegion) {
+            let ekLine = `\n**EK/OAL excess:** ${ekResult.originRegion} → ${ekResult.destRegion}. **${ekResult.rateDescription}**`;
+            if (ekResult.ratePerPiece != null) ekLine += ` Per piece: ${ekResult.ratePerPiece} ${ekResult.pieceCurrency || 'USD'}.`;
+            if (ekResult.referToFSSUP) ekLine += ' Refer to FS/SUP if rate missing.';
+            lines.push(ekLine);
+        }
+    }
+
+    lines.push(`\n**UA/AC** (FZ–UA / FZ–AC interline only): 1st bag $75, 2nd $100, 3+ $200; oversize/overweight $200 each.`);
+
     if (upgradeResult && !upgradeResult.error) {
         lines.push(`\n**Upgrade from ${origin}:** Zone ${upgradeResult.zone} (use **Upgrade to Business** tab for rate).`);
     }
     if (destination === 'DXB' || destination === 'DWC') {
         lines.push(`\n**Transfer at DXB:** AED 50 + GHA 50.`);
     }
-    lines.push(`\nUse **Excess Baggage** tab (origin ${origin}, destination ${destination}) for exact rate in your currency.`);
+    lines.push(`\nUse **Excess Baggage** tab (origin ${origin}, destination ${destination}) for exact rate and currency.`);
     return lines.join('');
 }
 
@@ -61,9 +76,12 @@ export function answerAgentQuestion(query) {
     if (route) {
         const { origin, destination } = route;
         const fzResult = calculateExcessBaggageRate(origin, destination, 'FZ', null);
+        const ekResult = calculateExcessBaggageRate(origin, destination, 'EK', null);
         const upgradeResult = getUpgradeRate(origin, 'AED');
-        if (fzResult.originZone != null || fzResult.destZone != null || (!fzResult.error && fzResult.ratePerKg != null)) {
-            return formatRouteAnswer(origin, destination, fzResult, upgradeResult);
+        const hasFZ = fzResult.originZone != null && fzResult.destZone != null;
+        const hasEK = ekResult && (ekResult.originRegion && ekResult.destRegion);
+        if (hasFZ || hasEK) {
+            return formatRouteAnswer(origin, destination, fzResult, ekResult, upgradeResult);
         }
     }
 
