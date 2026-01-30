@@ -392,6 +392,18 @@ const GENERAL_QA = [
     {
         keywords: ['thank', 'thanks', 'bye', 'good', 'appreciate'],
         answer: `You're welcome. If you have another question about rates, interline, or the document, just ask.`
+    },
+    {
+        keywords: ['clear', 'clear all', 'reset', 'clear form', 'clear result', 'clear inputs', 'start over'],
+        answer: `**Clear All:** Use the **Clear All** button (next to **Calculate**) to clear all inputs and the result in the current tab. In **Ask Agent** tab, it also clears the question and answer.`
+    },
+    {
+        keywords: ['search airport', 'find airport', 'autocomplete', 'airport search', 'search by city', 'search by code'],
+        answer: `**Search airport:** In **Excess Baggage** (origin/destination), **Go-Show Fares** (origin), and **Upgrade to Business** (origin) tabs, type in the airport field – you can search by **airport code**, **city**, or **country**. Pick from the dropdown that appears.`
+    },
+    {
+        keywords: ['what is this app', 'what is this', 'gds decoder', 'flydubai calculator', 'rate calculator app'],
+        answer: `**This app:** **Flydubai Rate Calculator** (part of GDS Decoder). It calculates rates from the **GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES** document (Version 2025.112(A) Outstation): excess baggage, go-show fares, upgrade to business, extra legroom, sports equipment, reporting fees, transfer baggage. Use the tabs to calculate; use **Ask Agent** (this tab) to ask in words.`
     }
 ];
 
