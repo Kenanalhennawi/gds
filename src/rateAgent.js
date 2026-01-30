@@ -1,4 +1,38 @@
 import { QA_PAIRS, SYNONYMS } from "./rateAgentData.js";
+import { calculateExcessBaggageRate, getZoneForAirport, getZoneName, getUpgradeRate } from "./excessBaggage.js";
+import { getAirportByCode } from "./airportSearch.js";
+
+function parseRouteQuery(qNorm) {
+    const codes = (qNorm.match(/\b[a-z]{3}\b/g) || []).map(c => c.toUpperCase());
+    if (codes.length >= 2 && codes[0] !== codes[1]) {
+        return { origin: codes[0], destination: codes[1] };
+    }
+    return null;
+}
+
+function formatRouteAnswer(origin, destination, fzResult, upgradeResult) {
+    const oCity = getAirportByCode(origin)?.city || origin;
+    const dCity = getAirportByCode(destination)?.city || destination;
+    const lines = [];
+    lines.push(`**${origin} (${oCity}) to ${destination} (${dCity})**\n`);
+    if (fzResult.error) {
+        lines.push(`FZ excess: ${fzResult.error}`);
+    } else {
+        const oz = fzResult.originZone;
+        const dz = fzResult.destZone;
+        const zoneNames = `${getZoneName(oz)} × ${getZoneName(dz)}`;
+        lines.push(`**FZ excess:** Zone ${oz} × Zone ${dz} (${zoneNames}). **${fzResult.rateDescription}**`);
+        if (fzResult.indiaNote) lines.push(`\n${fzResult.indiaNote}`);
+    }
+    if (upgradeResult && !upgradeResult.error) {
+        lines.push(`\n**Upgrade from ${origin}:** Zone ${upgradeResult.zone} (use **Upgrade to Business** tab for rate).`);
+    }
+    if (destination === 'DXB' || destination === 'DWC') {
+        lines.push(`\n**Transfer at DXB:** AED 50 + GHA 50.`);
+    }
+    lines.push(`\nUse **Excess Baggage** tab (origin ${origin}, destination ${destination}) for exact rate in your currency.`);
+    return lines.join('');
+}
 
 function normalizeQuery(q) {
     let normalized = q.toLowerCase().trim();
@@ -23,6 +57,16 @@ export function answerAgentQuestion(query) {
 
     const q = raw.toLowerCase();
     const qNorm = q.replace(/[^\w\s]/g, ' ').replace(/\s+/g, ' ').trim();
+    const route = parseRouteQuery(qNorm);
+    if (route) {
+        const { origin, destination } = route;
+        const fzResult = calculateExcessBaggageRate(origin, destination, 'FZ', null);
+        const upgradeResult = getUpgradeRate(origin, 'AED');
+        if (fzResult.originZone != null || fzResult.destZone != null || (!fzResult.error && fzResult.ratePerKg != null)) {
+            return formatRouteAnswer(origin, destination, fzResult, upgradeResult);
+        }
+    }
+
     const qExpanded = normalizeQuery(q);
     const qWords = new Set(qNorm.split(/\s+/).filter(Boolean));
     const qExpandedNorm = qExpanded.replace(/\s+/g, ' ').trim();
