@@ -23,6 +23,7 @@ import {
     INTERLINE_JOURNEY_RULES,
     EXCESS_BAGGAGE_DISCLAIMER
 } from "./excessBaggage.js";
+import { answerAgentQuestion } from "./rateAgent.js";
 import { translateAirline, translateCity } from "./translator.js";
 import { searchAirports, getAirportByCode } from "./airportSearch.js";
 
@@ -81,6 +82,9 @@ export function renderExcessBaggageCalculator(container) {
                         </button>
                         <button class="service-tab" data-service="reference" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
                             Reference
+                        </button>
+                        <button class="service-tab" data-service="agent" style="padding:10px 20px; background:transparent; border:none; color:var(--text-muted); font-weight:600; cursor:pointer; font-size:13px; border-radius:8px 8px 0 0;">
+                            Ask Agent
                         </button>
                     </div>
                     
@@ -318,6 +322,29 @@ export function renderExcessBaggageCalculator(container) {
                         <div id="referenceContent"></div>
                     </div>
                     
+                    <!-- Ask Agent Section -->
+                    <div id="agentSection" class="service-section" style="display:none;">
+                        <p style="color:var(--text-muted); font-size:14px; line-height:1.6; margin-bottom:16px;">
+                            Ask anything about excess baggage, interline rates, upgrade, go-show, extra legroom, regional classification, or document rules. The agent answers from the official reference (GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES).
+                        </p>
+                        <div style="display:flex; gap:10px; margin-bottom:16px;">
+                            <input 
+                                type="text" 
+                                id="agentQuestionInput" 
+                                placeholder="e.g. Which carrier's rate applies for FZ–EK? Larnaca Malta rate? Interline rules?"
+                                autocomplete="off"
+                                style="flex:1; padding:14px 16px; background:rgba(0,0,0,0.3); border:1px solid var(--glass-border); border-radius:8px; color:var(--text-main); font-size:14px; outline:none;"
+                            />
+                            <button id="agentAskBtn" class="btn-primary" style="padding:14px 24px; white-space:nowrap;">
+                                Ask
+                            </button>
+                        </div>
+                        <div id="agentResponseArea" style="min-height:120px; padding:16px; background:rgba(0,0,0,0.2); border-radius:8px; border:1px solid var(--glass-border); color:var(--text-muted); font-size:14px; line-height:1.6; white-space:pre-wrap;">
+                            Your answer will appear here after you ask.
+                        </div>
+                        <div id="agentHistory" style="margin-top:16px;"></div>
+                    </div>
+                    
                     <div style="display:flex; gap:10px; margin-bottom:20px;">
                         <button id="calculateBtn" class="btn-primary" style="flex:1;">
                             Calculate
@@ -398,6 +425,8 @@ export function renderExcessBaggageCalculator(container) {
                 if (service === 'reference') {
                     const refContent = container.querySelector('#referenceContent');
                     if (refContent) refContent.innerHTML = renderReferenceContent();
+                }
+                if (service === 'reference' || service === 'agent') {
                     if (buttonsRow) buttonsRow.style.display = 'none';
                     if (rateResultEl) rateResultEl.style.display = 'none';
                 } else {
@@ -568,6 +597,31 @@ export function renderExcessBaggageCalculator(container) {
         createAutocompleteHandler(upgradeOrigin, upgradeAutocomplete, null, null);
     }
     
+    // Ask Agent handler
+    const agentQuestionInput = container.querySelector('#agentQuestionInput');
+    const agentAskBtn = container.querySelector('#agentAskBtn');
+    const agentResponseArea = container.querySelector('#agentResponseArea');
+    if (agentAskBtn && agentQuestionInput && agentResponseArea) {
+        function formatAgentAnswer(text) {
+            if (!text) return '';
+            return text
+                .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--text-main);">$1</strong>')
+                .replace(/\n/g, '<br>');
+        }
+        agentAskBtn.addEventListener('click', () => {
+            const query = agentQuestionInput.value.trim();
+            const answer = answerAgentQuestion(query);
+            agentResponseArea.innerHTML = formatAgentAnswer(answer);
+            agentResponseArea.style.color = 'var(--text-main)';
+        });
+        agentQuestionInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                agentAskBtn.click();
+            }
+        });
+    }
+    
     // Clear button handler
     if (clearBtn) {
         clearBtn.addEventListener('click', () => {
@@ -588,6 +642,12 @@ export function renderExcessBaggageCalculator(container) {
             if (container.querySelector('#transferLocation')) container.querySelector('#transferLocation').value = 'DXB';
             if (container.querySelector('#upgradeCurrency')) container.querySelector('#upgradeCurrency').value = 'AED';
             if (container.querySelector('#extralegroomCurrency')) container.querySelector('#extralegroomCurrency').value = 'AED';
+            if (container.querySelector('#agentQuestionInput')) container.querySelector('#agentQuestionInput').value = '';
+            const agentResponseAreaEl = container.querySelector('#agentResponseArea');
+            if (agentResponseAreaEl) {
+                agentResponseAreaEl.textContent = 'Your answer will appear here after you ask.';
+                agentResponseAreaEl.style.color = 'var(--text-muted)';
+            }
             
             // Clear info displays
             originInfo.textContent = '';
