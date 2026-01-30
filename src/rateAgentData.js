@@ -693,7 +693,43 @@ const ALL_ACTIONS_QA = [
 ];
 
 // =============================================================================
-// COMBINE ALL QA PAIRS (order matters: more specific first; ALL_ACTIONS_QA early)
+// COMPLETE COVERAGE – airline codes, abbreviations, document, errors, step-by-step
+// So nothing else needs to be added; user does not have to ask again.
+// =============================================================================
+
+const COMPLETE_QA = [
+    // --- Airline codes ---
+    { keywords: ['what is fz', 'what is ek', 'what is ua', 'what is ac', 'what is oal', 'fz means', 'ek means', 'ua means', 'ac means', 'oal means'], answer: `**Airline codes:** **FZ** = Flydubai. **EK** = Emirates. **UA** = United Airlines. **AC** = Air Canada. **OAL** = Other Airlines (same rates as EK for excess baggage). Use **Excess Baggage** tab and select the airline that applies to your journey (see **Reference** tab for interline rules).` },
+    { keywords: ['fly dubai', 'fly dubai spelling', 'flydubai spelling'], answer: `**Flydubai** (one word) or **Fly Dubai**. Same airline – **FZ**. Use **Excess Baggage** (airline FZ), **Upgrade to Business**, **Go-Show Fares**, or other tabs.` },
+    // --- Abbreviations ---
+    { keywords: ['what is me', 'what is sa', 'what is anz', 'what is ksa', 'me means', 'sa means', 'anz means', 'ksa means'], answer: `**Abbreviations:** **ME** = Middle East. **SA** = South Asia. **ANZ** = Australia & New Zealand. **KSA** = Saudi Arabia (Kingdom of Saudi Arabia). Used in EK/OAL regional per-kg rates and FZ zone names. **Reference** tab has full regional classification.` },
+    { keywords: ['what is xlgr', 'what is trbf', 'what is speq', 'what is spex', 'what is lrtp', 'what is ertp', 'what is gha', 'what is ssr'], answer: `**Abbreviations:** **XLGR** = Extra Legroom. **TRBF** = Transfer Baggage (SSR code). **SPEQ** = Sports Equipment Standard. **SPEX** = Sports Equipment Oversized. **LRTP** = Late Reporting. **ERTP** = Early Reporting. **GHA** = Ground Handling Agent (fee at DXB/outstation). **SSR** = Special Service Request. Use the tab that matches (Extra Legroom, Transfer Baggage, Sports Equipment, Reporting Fees).` },
+    // --- Document ---
+    { keywords: ['issue date', 'effective date', 'when effective', '13 may 2025', '17 may 2025'], answer: `**Document dates:** **GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES** Version 2025.112(A) Outstation. **Issue date:** 13 May 2025. **Effective date:** 17 May 2025. **Reference** tab has full document info.` },
+    { keywords: ['outstation', 'outstation meaning', 'what is outstation', 'non dxb'], answer: `**Outstation** = any station **other than Dubai (DXB)**. The document version is "Outstation" (for non-DXB). Transfer baggage **outstation:** USD 30 + GHA fee.` },
+    { keywords: ['page 4', 'page 26', 'document page'], answer: `**Document pages:** **Page 4** – Larnaca–Malta $15/kg (EK/OAL), interline rules, disclaimer, EK/OAL per-kg matrix. **Page 26** – Aircraft Type & Extra Legroom (XLGR) seats table. **Reference** tab has the content.` },
+    // --- How to use / Where / Step by step ---
+    { keywords: ['how to use', 'how to use calculator', 'how does this work', 'where is calculate', 'where to click', 'step by step'], answer: `**How to use:** 1) Choose the **tab** for your need (Excess Baggage, Upgrade, Go-Show, etc.). 2) Fill the **fields** (origin, destination, airline, currency, etc.). 3) Click **Calculate**. 4) Read the result (and any exception or disclaimer). For **Ask Agent** (this tab), type a question and click **Ask**. **Clear All** clears inputs and result.` },
+    { keywords: ['how many tabs', 'number of tabs', 'how many sections'], answer: `**9 tabs:** 1 Excess Baggage, 2 Go-Show Fares, 3 Sports Equipment, 4 Reporting Fees, 5 Transfer Baggage, 6 Upgrade to Business, 7 Extra Legroom, 8 Reference, 9 Ask Agent (this tab).` },
+    // --- Difference / When to use ---
+    { keywords: ['difference fz ek', 'fz vs ek', 'difference ua ac', 'ua vs ac', 'when to use fz', 'when to use ek', 'when to use ua', 'when to use ac'], answer: `**FZ vs EK:** **FZ** (Flydubai) = 8 zones, per kg in selected currency; use for FZ-only routes. **EK** (Emirates) = per kg USD by region; use for FZ–EK interline. **UA vs AC:** Same flat fees ($75/$100/$200); use **UA** when UA is Transatlantic carrier (FZ–UA), **AC** when AC is Transatlantic (FZ–AC). **Reference** tab has full interline table.` },
+    // --- Error / No result / Invalid ---
+    { keywords: ['error', 'no result', 'invalid', 'wrong airport', 'airport not found', 'rate not found', 'not in list', 'result not available'], answer: `**If no result or error:** Check that **origin/destination/airline** are valid. If **rate is missing** for a destination, refer to **FS/SUP in charge**. Rates are approximate; for exact rate, check with **airport team at departure**. Use **Clear All** and try again with correct airport codes.` },
+    // --- Contact / Who ---
+    { keywords: ['who to contact', 'contact', 'who to ask', 'fs sup contact'], answer: `**If rate is missing** for a destination: refer to **FS/SUP in charge** (Flight Services / Supervisor). For exact rate at departure, check with **airport team**. Communicate to customer that rates quoted are approximate (see **Reference** tab for full disclaimer).` },
+    // --- Infant / Check-in / One way ---
+    { keywords: ['infant on lap', 'lap infant', 'check in', 'check-in', 'at check in'], answer: `**Infant on lap:** Go-Show has **infant** fare; Upgrade has **infant** rate (at airport and on board). **Check-in** = at airport (before flight). "At airport" rate = at check-in; "On board" = during flight. Use **Go-Show Fares** or **Upgrade to Business** tab – infant shown when you calculate.` },
+    { keywords: ['one way', 'one-way', 'standby', 'show up at airport'], answer: `**Go-Show** = **one-way** fare when you **show up at airport** (standby). Enter **origin** and **class** (Economy or Business) in **Go-Show Fares** tab, click **Calculate** – adult and infant fare shown.` },
+    // --- Currency ---
+    { keywords: ['default currency', 'destination currency', 'origin currency', 'which currency to use'], answer: `**Currency:** In **Excess Baggage** tab, currency can default by destination/origin (or you select). In **Upgrade**, **Sports**, **Reporting**, **Extra Legroom** – select **currency** (AED, USD, EUR, etc.). EK/OAL per-kg is **USD**; per-piece from Canada is **CAD**. FZ uses selected/destination currency.` },
+    // --- Included / Free ---
+    { keywords: ['included baggage', 'included weight', 'free weight', 'how much free'], answer: `**Free/included baggage:** **UA/AC** – Economy 0–23 kg, Business 0–32 kg (included). Above that: 1st $75, 2nd $100, 3+ $200. **FZ/EK/OAL** – excess rates apply per kg or per piece above the allowance; use **Excess Baggage** tab to see rate for your route.` },
+    // --- App / GDS Decoder ---
+    { keywords: ['gds decoder', 'enterprise edition', 'flydubai rate calculator'], answer: `**GDS Decoder** (Flydubai Rate Calculator) – rates from **GO-SHOW/UPGRADE/EXCESS BAGGAGE RATES** Version 2025.112(A) Outstation. Tabs: Excess Baggage, Go-Show Fares, Sports Equipment, Reporting Fees, Transfer Baggage, Upgrade to Business, Extra Legroom, Reference, Ask Agent. Use tabs to calculate; use **Ask Agent** (this tab) to ask in words.` },
+];
+
+// =============================================================================
+// COMBINE ALL QA PAIRS (order matters: more specific first)
 // Add new QA arrays above and spread them here to scale beyond 1000+ lines.
 // =============================================================================
 
@@ -709,6 +745,7 @@ export const QA_PAIRS = [
     ...INDIA_CMB_FZ_QA,
     ...OTHER_SECTIONS_QA,
     ...GENERAL_QA,
+    ...COMPLETE_QA,
     ...FULL_POSSIBILITIES_QA,
     ...ALL_ACTIONS_QA,
     ...PHRASING_QA,
