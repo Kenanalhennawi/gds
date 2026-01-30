@@ -1272,57 +1272,55 @@ body {
 
 .service-tabs-container {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     margin-bottom: 24px;
-    border-bottom: 2px solid rgba(100, 120, 150, 0.1);
-    padding-bottom: 4px;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .service-tab {
-    padding: 12px 24px;
+    padding: 10px 18px;
     background: transparent;
     border: none;
     color: var(--text-muted);
     font-weight: 600;
     cursor: pointer;
     font-size: 13px;
-    border-radius: 12px 12px 0 0;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 10px;
+    transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
     position: relative;
 }
 
-.service-tab::before {
+.service-tab::after {
     content: '';
     position: absolute;
-    bottom: -2px;
-    left: 0;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 0;
-    height: 2px;
-    background: linear-gradient(90deg, var(--primary-blue), var(--primary-orange));
-    transition: width 0.3s ease;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--primary-blue);
+    transition: width 0.25s ease;
 }
 
 .service-tab:hover {
-    background: rgba(59, 130, 246, 0.1) !important;
-    color: var(--primary-blue) !important;
-    transform: translateY(-2px);
+    background: rgba(59, 130, 246, 0.12);
+    color: var(--text-main);
 }
 
-.service-tab:hover::before {
-    width: 100%;
+.service-tab:hover::after {
+    width: 20%;
 }
 
 .service-tab.active {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(249, 115, 22, 0.15)) !important;
-    border-bottom: 2px solid var(--primary-orange) !important;
-    color: var(--primary-blue) !important;
-    box-shadow: 
-        0 4px 12px rgba(59, 130, 246, 0.2),
-        0 2px 6px rgba(249, 115, 22, 0.15);
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--text-main);
+    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35);
 }
 
-.service-tab.active::before {
-    width: 100%;
+.service-tab.active::after {
+    width: 60%;
 }
 
 
