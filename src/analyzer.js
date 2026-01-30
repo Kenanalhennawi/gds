@@ -1,44 +1,30 @@
-/**
- * Booking Change Analyzer
- * Analyzes GDS history events to detect and explain booking changes:
- * - Cancellations
- * - Reissues
- * - FDIS (Flight Disruption/Involuntary Schedule Changes)
- * - Segment drops/additions
- * - Status changes
- */
 
-// Helper to create a unique segment key
+
 const segmentKey = (seg) => {
     return `${seg.carrier}${seg.flight}-${seg.date}-${seg.from}${seg.to}`;
 };
 
-// Check if status indicates confirmed
 const isConfirmed = (status) => {
     const s = (status || "").substring(0, 2).toUpperCase();
-    // FIXED: Added 'LK', 'PK', 'RR' to the list so your segments are seen as Active
+
     return ['HK', 'KK', 'KL', 'SS', 'LK', 'PK', 'RR'].includes(s);
 };
 
-// Check if status indicates cancelled
 const isCancelled = (status) => {
     const s = (status || "").substring(0, 2).toUpperCase();
     return ['HX', 'XX', 'UN', 'UC', 'US', 'NO'].includes(s);
 };
 
-// Check if status indicates schedule change (FDIS)
 const isScheduleChange = (status) => {
     const s = (status || "").substring(0, 2).toUpperCase();
     return ['TK', 'DK'].includes(s);
 };
 
-// Check if status indicates change (CH = Change/Hold)
 const isChangeStatus = (status) => {
     const s = (status || "").substring(0, 2).toUpperCase();
     return ['CH', 'CS', 'UC'].includes(s);
 };
 
-// Find segment in array by key
 const findSegment = (segments, targetSeg) => {
     const key = segmentKey(targetSeg);
     return segments.find(s => segmentKey(s) === key);
@@ -58,10 +44,9 @@ export const analyzeBookingChanges = (events) => {
     }
 
     const changes = [];
-    const segmentHistory = new Map(); // Track segments across events: key -> {firstSeen, lastSeen, statusHistory}
-    
-    // First pass: build segment history
-    // (This logic is preserved as requested to track the full lifecycle of segments)
+    const segmentHistory = new Map();
+
+
     events.forEach((event, eventIndex) => {
         event.segments.forEach(seg => {
             const key = segmentKey(seg);
@@ -87,13 +72,11 @@ export const analyzeBookingChanges = (events) => {
         });
     });
 
-    // Second pass: detect changes between consecutive events
     for (let i = 1; i < events.length; i++) {
         const prevEvent = events[i - 1];
         const currEvent = events[i];
         const detectedChanges = [];
 
-        // Get all segments from both events
         const prevSegments = new Map();
         prevEvent.segments.forEach(s => {
             prevSegments.set(segmentKey(s), s);
@@ -104,7 +87,6 @@ export const analyzeBookingChanges = (events) => {
             currSegments.set(segmentKey(s), s);
         });
 
-        // 1. Detect dropped segments (in previous but not in current)
         prevSegments.forEach((seg, key) => {
             if (!currSegments.has(key)) {
                 const prevStatus = seg.status.substring(0, 2).toUpperCase();
@@ -117,7 +99,6 @@ export const analyzeBookingChanges = (events) => {
             }
         });
 
-        // 2. Detect new segments (in current but not in previous)
         currSegments.forEach((seg, key) => {
             if (!prevSegments.has(key)) {
                 const currStatus = seg.status.substring(0, 2).toUpperCase();
@@ -130,7 +111,6 @@ export const analyzeBookingChanges = (events) => {
             }
         });
 
-        // 3. Detect status changes for existing segments
         prevSegments.forEach((prevSeg, key) => {
             const currSeg = currSegments.get(key);
             if (currSeg) {
@@ -138,7 +118,7 @@ export const analyzeBookingChanges = (events) => {
                 const currStatus = currSeg.status.substring(0, 2).toUpperCase();
                 
                 if (prevStatus !== currStatus) {
-                    // Cancellation detected
+
                     if (isConfirmed(prevStatus) && isCancelled(currStatus)) {
                         detectedChanges.push({
                             type: 'segment_cancelled',
@@ -148,7 +128,7 @@ export const analyzeBookingChanges = (events) => {
                             description: `Segment ${currSeg.carrier}${currSeg.flight} (${currSeg.from} → ${currSeg.to}) was cancelled. Status changed from ${prevStatus} to ${currStatus}.`
                         });
                     }
-                    // FDIS detected (schedule change)
+
                     else if (isConfirmed(prevStatus) && isScheduleChange(currStatus)) {
                         detectedChanges.push({
                             type: 'fdis',
@@ -158,7 +138,7 @@ export const analyzeBookingChanges = (events) => {
                             description: `Flight Disruption (FDIS): Segment ${currSeg.carrier}${currSeg.flight} (${currSeg.from} → ${currSeg.to}) has a schedule change. The airline has modified the flight schedule and requires confirmation.`
                         });
                     }
-                    // Reissue detected (cancelled to confirmed, or schedule change to confirmed)
+
                     else if ((isCancelled(prevStatus) || isScheduleChange(prevStatus)) && isConfirmed(currStatus)) {
                         detectedChanges.push({
                             type: 'segment_reissued',
@@ -168,7 +148,7 @@ export const analyzeBookingChanges = (events) => {
                             description: `Segment ${currSeg.carrier}${currSeg.flight} (${currSeg.from} → ${currSeg.to}) was reissued. Status changed from ${prevStatus} to ${currStatus} (confirmed).`
                         });
                     }
-                    // Other status changes
+
                     else {
                         detectedChanges.push({
                             type: 'status_change',
@@ -182,7 +162,6 @@ export const analyzeBookingChanges = (events) => {
             }
         });
 
-        // 4. Check for booking-level cancellations (all segments cancelled)
         if (currEvent.segments.length > 0) {
             const allCancelled = currEvent.segments.every(s => isCancelled(s.status));
             const hasFDIS = currEvent.segments.some(s => isScheduleChange(s.status));
@@ -201,8 +180,7 @@ export const analyzeBookingChanges = (events) => {
                     description: "Flight Disruption (FDIS) detected: One or more segments have schedule changes that require attention."
                 });
             }
-            
-            // Detect CH (Change/Hold) status - indicates booking change
+
             if (hasChangeStatus && !detectedChanges.some(c => c.type === 'status_change' || c.type === 'fdis')) {
                 const chSegments = currEvent.segments.filter(s => isChangeStatus(s.status));
                 chSegments.forEach(seg => {
@@ -216,7 +194,6 @@ export const analyzeBookingChanges = (events) => {
             }
         }
 
-        // 5. Check messages for additional context
         currEvent.messages.forEach(msg => {
             if (msg.type === 'critical') {
                 if (msg.title.includes('Cancellation')) {
@@ -237,7 +214,6 @@ export const analyzeBookingChanges = (events) => {
         }
     }
 
-    // Generate summary
     const summary = generateSummary(events, changes, segmentHistory);
 
     return {
@@ -249,7 +225,7 @@ export const analyzeBookingChanges = (events) => {
 
 const generateSummary = (events, changes, segmentHistory) => {
     if (changes.length === 0) {
-        // Check final state
+
         const lastEvent = events[events.length - 1];
         if (lastEvent && lastEvent.segments.length > 0) {
             const allConfirmed = lastEvent.segments.every(s => isConfirmed(s.status));
@@ -284,8 +260,7 @@ const generateSummary = (events, changes, segmentHistory) => {
                 };
             }
         }
-        
-        // This handles cases where the parser found events but no segments (e.g., just remarks)
+
         return {
             status: "No Changes Detected",
             description: "No significant booking changes were detected in the history.",
@@ -293,7 +268,6 @@ const generateSummary = (events, changes, segmentHistory) => {
         };
     }
 
-    // Count change types
     const changeCounts = {
         booking_cancelled: 0,
         segment_cancelled: 0,
@@ -310,7 +284,6 @@ const generateSummary = (events, changes, segmentHistory) => {
         });
     });
 
-    // Determine primary issue
     let status = "Booking Modified";
     let description = "";
     let alertLevel = "warning";
@@ -333,7 +306,6 @@ const generateSummary = (events, changes, segmentHistory) => {
         alertLevel = "warning";
     }
 
-    // Add details
     const details = [];
     if (changeCounts.segment_cancelled > 0) {
         details.push(`${changeCounts.segment_cancelled} segment(s) cancelled`);
@@ -359,8 +331,7 @@ const generateSummary = (events, changes, segmentHistory) => {
     } else {
         description += "Various modifications were made to the booking.";
     }
-    
-    // Add helpful note
+
     if (changeCounts.fdis > 0) {
         description += " Review the timeline below for details on each change.";
     } else if (changeCounts.segment_reissued > 0) {
