@@ -6,7 +6,8 @@ import { detectSystem, getKnownSystems } from "./systemDetector.js";
 
 if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost')) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(() => {});
+        const swPath = new URL('sw.js', document.baseURI).href;
+        navigator.serviceWorker.register(swPath).catch(() => {});
     });
 }
 
