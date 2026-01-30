@@ -1,20 +1,21 @@
 const CACHE_NAME = 'gds-decoder-v1';
+const BASE = (self.location.pathname.replace(/\/sw\.js$/i, '') || '/').replace(/\/?$/, '') + '/';
 const ASSETS = [
-    '/',
-    '/index.html',
-    '/style.css',
-    '/src/main.js',
-    '/src/excessBaggage.js',
-    '/src/excessBaggageUI.js',
-    '/src/rateAgent.js',
-    '/src/rateAgentData.js',
-    '/src/parser.js',
-    '/src/analyzer.js',
-    '/src/ui.js',
-    '/src/translator.js',
-    '/src/airportSearch.js',
-    '/src/systemDetector.js',
-    '/src/data.json'
+    BASE,
+    BASE + 'index.html',
+    BASE + 'style.css',
+    BASE + 'src/main.js',
+    BASE + 'src/excessBaggage.js',
+    BASE + 'src/excessBaggageUI.js',
+    BASE + 'src/rateAgent.js',
+    BASE + 'src/rateAgentData.js',
+    BASE + 'src/parser.js',
+    BASE + 'src/analyzer.js',
+    BASE + 'src/ui.js',
+    BASE + 'src/translator.js',
+    BASE + 'src/airportSearch.js',
+    BASE + 'src/systemDetector.js',
+    BASE + 'src/data.json'
 ];
 
 self.addEventListener('install', (event) => {
