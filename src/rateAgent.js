@@ -40,7 +40,7 @@ function formatRouteAnswer(origin, destination, fzResult, ekResult, upgradeResul
     lines.push(`\n**UA/AC** (FZ–UA / FZ–AC interline only): 1st bag $75, 2nd $100, 3+ $200; oversize/overweight $200 each.`);
 
     if (upgradeResult && !upgradeResult.error) {
-        lines.push(`\n**Upgrade from ${origin}:** Zone ${upgradeResult.zone} (use **Upgrade to Business** tab for rate).`);
+        lines.push(`\n**Upgrade from ${origin}:** Zone ${upgradeResult.zone} (at airport, on board, infant – use **Upgrade to Business** tab).`);
     }
     if (goShowResult && (goShowResult.economy != null || goShowResult.business != null)) {
         const parts = [];
@@ -51,7 +51,8 @@ function formatRouteAnswer(origin, destination, fzResult, ekResult, upgradeResul
     if (destination === 'DXB' || destination === 'DWC') {
         lines.push(`\n**Transfer at DXB:** AED 50 + GHA 50.`);
     }
-    lines.push(`\nUse **Excess Baggage**, **Upgrade**, or **Go-Show Fares** tab for exact amounts and currency.`);
+    lines.push(`\n**By currency only:** **Extra Legroom**, **Sports Equipment**, **Reporting Fees** – use their tabs.`);
+    lines.push(`\n**All tabs:** Excess Baggage · Go-Show Fares · Sports Equipment · Reporting Fees · Transfer Baggage · Upgrade to Business · Extra Legroom · Reference · Ask Agent. Use the tab that matches your need for exact amounts and currency.`);
     return lines.join('');
 }
 
