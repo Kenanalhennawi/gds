@@ -8,7 +8,7 @@ const ZONE_MAPPING = {
     'JIB': 5, 'ASM': 5, 'ADD': 5, 'NBO': 5, 'MBA': 5, 'HGA': 5, 'MGQ': 5, 'JUB': 5, 'KRT': 5, 'PZU': 5, 'DAR': 5, 'JRO': 5, 'ZNZ': 5, 'EBB': 5, 'HBE': 5, 'SSH': 5, 'HMB': 5, 'SPX': 5, 'DBB': 5, 'CAI': 5, 'LXR': 5, 'HRG': 5,
     'AMD': 6, 'BOM': 6, 'BLR': 6, 'CCJ': 6, 'CCU': 6, 'COK': 6, 'DEL': 6, 'HYD': 6, 'LKO': 6, 'MAA': 6, 'TRV': 6, 'KBL': 6, 'CGP': 6, 'DAC': 6, 'KTM': 6, 'BWA': 6, 'ISB': 6, 'KHI': 6, 'MUX': 6, 'LYP': 6, 'SKT': 6, 'UET': 6, 'LHE': 6, 'PEW': 6, 'CMB': 6, 'HRI': 6, 'LGK': 6, 'PEN': 6,
     'MLE': 7, 'GAN': 7, 'RGN': 7, 'KBV': 7, 'UTP': 7,
-    'GYD': 8, 'MSQ': 8, 'BUS': 8, 'TBS': 8, 'GRV': 8, 'EVN': 8, 'ALA': 8, 'CIT': 8, 'TSE': 8, 'NQZ': 8, 'FRU': 8, 'OSS': 8, 'DYU': 8, 'ASB': 8, 'TAS': 8, 'SKD': 8, 'NMA': 8, 'SZG': 8, 'TIA': 8, 'SJJ': 8, 'SOF': 8, 'DBV': 8, 'ZAG': 8, 'PRG': 8, 'JMK': 8, 'JTR': 8, 'CFU': 8, 'TLL': 8, 'HEL': 8, 'CTA': 8, 'NAP': 8, 'PSA': 8, 'BGY': 8, 'CAG': 8, 'OLB': 8, 'RIX': 8, 'VNO': 8, 'MLA': 8, 'TIV': 8, 'SKP': 8, 'KRK': 8, 'WAW': 8, 'POZ': 8, 'OTP': 8, 'CLJ': 8, 'AER': 8, 'KUF': 8, 'KRR': 8, 'KZN': 8, 'MCX': 8, 'MRV': 8, 'OVB': 8, 'PEE': 8, 'ROV': 8, 'SVX': 8, 'UFA': 8, 'VOG': 8, 'VKO': 8, 'ZIA': 8, 'LED': 8, 'BEG': 8, 'BTS': 8, 'LJU': 8, 'BSL': 8, 'ADB': 8, 'AYT': 8, 'SAW': 8, 'IST': 8, 'BJV': 8, 'TZX': 8, 'IEV': 8, 'KBP': 8, 'ODS': 8, 'KIV': 8, 'DME': 8, 'LCA': 8, 'VOZ': 8, 'ATH': 8, 'LHR': 8, 'LGW': 8, 'STN': 8, 'LTN': 8, 'MAN': 8, 'CDG': 8, 'ORY': 8, 'NCE': 8, 'FRA': 8, 'MUC': 8, 'AMS': 8, 'BRU': 8, 'ZRH': 8, 'VIE': 8, 'FCO': 8, 'MXP': 8, 'MAD': 8, 'BCN': 8,
+    'GYD': 8, 'MSQ': 8, 'BUS': 8, 'TBS': 8, 'GRV': 8, 'EVN': 8, 'ALA': 8, 'CIT': 8, 'TSE': 8, 'NQZ': 8, 'FRU': 8, 'BSZ': 8, 'OSS': 8, 'DYU': 8, 'ASB': 8, 'TAS': 8, 'SKD': 8, 'NMA': 8, 'SZG': 8, 'TIA': 8, 'SJJ': 8, 'SOF': 8, 'DBV': 8, 'ZAG': 8, 'PRG': 8, 'JMK': 8, 'JTR': 8, 'CFU': 8, 'TLL': 8, 'HEL': 8, 'CTA': 8, 'NAP': 8, 'PSA': 8, 'BGY': 8, 'CAG': 8, 'OLB': 8, 'RIX': 8, 'VNO': 8, 'MLA': 8, 'TIV': 8, 'SKP': 8, 'KRK': 8, 'WAW': 8, 'POZ': 8, 'OTP': 8, 'CLJ': 8, 'AER': 8, 'KUF': 8, 'KRR': 8, 'KZN': 8, 'MCX': 8, 'MRV': 8, 'OVB': 8, 'PEE': 8, 'ROV': 8, 'SVX': 8, 'UFA': 8, 'VOG': 8, 'VKO': 8, 'ZIA': 8, 'LED': 8, 'BEG': 8, 'BTS': 8, 'LJU': 8, 'BSL': 8, 'ADB': 8, 'AYT': 8, 'SAW': 8, 'IST': 8, 'BJV': 8, 'TZX': 8, 'IEV': 8, 'KBP': 8, 'ODS': 8, 'KIV': 8, 'DME': 8, 'LCA': 8, 'VOZ': 8, 'ATH': 8, 'LHR': 8, 'LGW': 8, 'STN': 8, 'LTN': 8, 'MAN': 8, 'CDG': 8, 'ORY': 8, 'NCE': 8, 'FRA': 8, 'MUC': 8, 'AMS': 8, 'BRU': 8, 'ZRH': 8, 'VIE': 8, 'FCO': 8, 'MXP': 8, 'MAD': 8, 'BCN': 8,
     'ADE': 4, 'AWZ': 4, 'ALP': 4, 'LTK': 4, 'BND': 7, 'DOH': 2, 'ESB': 8, 'FIH': 5, 'DOK': 5, 'GBB': 8, 'HDM': 4, 'HRK': 8, 'SAH': 4, 'SVO': 8, 'TGD': 8, 'XWC': 8, 'ZYL': 6, 'GOI': 6, 'GOJ': 8, 'KGL': 5, 'MBX': 8, 'KDH': 6
 };
 
@@ -35,7 +35,7 @@ const CURRENCY_MAPPING = {
     'RUB': ['AER', 'DME', 'GOJ', 'GRV', 'KRR', 'KUF', 'KZN', 'LED', 'MCX', 'MRV', 'OVB', 'PEE', 'ROV', 'SVO', 'SVX', 'UFA', 'VKO', 'VOG', 'VOZ', 'ZIA'],
     'SAR': ['AHB', 'AJF', 'AQI', 'DMM', 'EAM', 'ELQ', 'GIZ', 'HAS', 'HOF', 'JED', 'NUM', 'MED', 'RUH', 'RSI', 'TIF', 'TUU', 'ULH', 'YNB'],
     'THB': ['BKK', 'DMK', 'HKT', 'CNX', 'KBV', 'UTP'],
-    'USD': ['ADB', 'ADD', 'ADE', 'ALP', 'ASB', 'ASM', 'AYT', 'AWZ', 'BGW', 'BJM', 'BJV', 'BND', 'BUS', 'BUZ', 'BSR', 'CGP', 'DAC', 'DAM', 'DAR', 'DOK', 'DYU', 'EBB', 'EBL', 'ESB', 'EVN', 'FIH', 'FRU', 'GAN', 'GBB', 'GSM', 'GYD', 'HDM', 'HGA', 'HRK', 'IEV', 'IFN', 'IKA', 'ISU', 'JIB', 'JRO', 'JUB', 'KBL', 'KBP', 'KDH', 'KER', 'KGL', 'KIH', 'KUT', 'LTK', 'LRR', 'MBA', 'MGQ', 'MHD', 'MLE', 'MSQ', 'NBO', 'NJF', 'NMA', 'ODS', 'OSS', 'RGN', 'SAH', 'SAW', 'SKD', 'SKG', 'TBS', 'TBZ', 'TGD', 'THR', 'TLV', 'TZX', 'ZNZ', 'ZYL'],
+    'USD': ['ADB', 'ADD', 'ADE', 'ALP', 'ASB', 'ASM', 'AYT', 'AWZ', 'BGW', 'BJM', 'BJV', 'BND', 'BUS', 'BUZ', 'BSR', 'CGP', 'DAC', 'DAM', 'DAR', 'DOK', 'DYU', 'EBB', 'EBL', 'ESB', 'EVN', 'FIH', 'FRU', 'BSZ', 'GAN', 'GBB', 'GSM', 'GYD', 'HDM', 'HGA', 'HRK', 'IEV', 'IFN', 'IKA', 'ISU', 'JIB', 'JRO', 'JUB', 'KBL', 'KBP', 'KDH', 'KER', 'KGL', 'KIH', 'KUT', 'LTK', 'LRR', 'MBA', 'MGQ', 'MHD', 'MLE', 'MSQ', 'NBO', 'NJF', 'NMA', 'ODS', 'OSS', 'RGN', 'SAH', 'SAW', 'SKD', 'SKG', 'TBS', 'TBZ', 'TGD', 'THR', 'TLV', 'TZX', 'ZNZ', 'ZYL'],
     'UZS': ['TAS']
 };
 
@@ -362,7 +362,7 @@ const UPGRADE_RATES = {
 const UPGRADE_ZONE_MAPPING = {
     1: ['AUH', 'AWZ', 'AQI', 'BAH', 'BND', 'BSR', 'DMM', 'DOH', 'DWC', 'DXB', 'ELQ', 'HAS', 'HOF', 'IFN', 'KER', 'KHI', 'KIH', 'KWI', 'LRR', 'MCT', 'OHS', 'RUH', 'SHJ', 'SLL', 'SYZ'],
     2: ['ADE', 'AHB', 'AJF', 'AMD', 'AMM', 'AQJ', 'BEY', 'BGW', 'DAM', 'ALP', 'LTK', 'BOM', 'BLR', 'BUS', 'BUZ', 'CCJ', 'CCU', 'COK', 'DEL', 'EAM', 'EBL', 'EVN', 'GBB', 'GIZ', 'GSM', 'GYD', 'HDM', 'HRI', 'HYD', 'IKA', 'ISB', 'ISU', 'JED', 'JIB', 'KBL', 'KDH', 'LKO', 'LHE', 'LYP', 'MAA', 'MED', 'MHD', 'MRV', 'MUX', 'NJF', 'NUM', 'RSI', 'SAH', 'SKT', 'TBS', 'TBZ', 'THR', 'TIF', 'TRV', 'TUU', 'UET', 'ULH', 'YNB'],
-    3: ['ADB', 'ADD', 'AER', 'ALA', 'AMS', 'ASB', 'ASM', 'ATH', 'AYT', 'BCN', 'BEG', 'BGY', 'BJM', 'BJV', 'BKK', 'BSL', 'BUD', 'BTS', 'BWA', 'CAG', 'CAI', 'CDG', 'CLJ', 'CMB', 'CTA', 'CIT', 'CFU', 'CGP', 'CNX', 'DAC', 'DAR', 'DBB', 'DBV', 'DME', 'DMK', 'DYU', 'EBB', 'ESB', 'DOK', 'FCO', 'FIH', 'FRA', 'FRU', 'GAN', 'GOI', 'GOJ', 'GRV', 'HBE', 'HGA', 'HRG', 'HKT', 'HMB', 'HRI', 'HEL', 'HRK', 'IEV', 'IST', 'JMK', 'JRO', 'JTR', 'KBP', 'KBV', 'KGL', 'JUB', 'KIV', 'KRR', 'KRK', 'KRT', 'KTM', 'KUF', 'KUL', 'KUT', 'KZN', 'LCA', 'LED', 'LGK', 'LGW', 'LHR', 'LJU', 'LTN', 'LXR', 'MAN', 'MBA', 'MAD', 'MBX', 'MCX', 'MGQ', 'MLA', 'MLE', 'MSQ', 'MUC', 'NAP', 'NBO', 'NCE', 'NMA', 'NQZ', 'OLB', 'ORY', 'OSS', 'OTP', 'OVB', 'ODS', 'PEE', 'PEN', 'PEW', 'POZ', 'PRG', 'PSA', 'PZU', 'RIX', 'RGN', 'ROV', 'SJJ', 'SKG', 'SKP', 'SAW', 'SKD', 'SOF', 'SPX', 'SSH', 'STN', 'SVO', 'SVX', 'SZG', 'TAS', 'TIA', 'TIV', 'TLL', 'TLV', 'TGD', 'TZX', 'UTP', 'UFA', 'VIE', 'VNO', 'VKO', 'VOG', 'VOZ', 'WAW', 'XWC', 'ZIA', 'ZNZ', 'ZYL', 'ZAG', 'ZRH', 'BRU']
+    3: ['ADB', 'ADD', 'AER', 'ALA', 'AMS', 'ASB', 'ASM', 'ATH', 'AYT', 'BCN', 'BEG', 'BGY', 'BJM', 'BJV', 'BKK', 'BSL', 'BUD', 'BTS', 'BWA', 'CAG', 'CAI', 'CDG', 'CLJ', 'CMB', 'CTA', 'CIT', 'CFU', 'CGP', 'CNX', 'DAC', 'DAR', 'DBB', 'DBV', 'DME', 'DMK', 'DYU', 'EBB', 'ESB', 'DOK', 'FCO', 'FIH', 'FRA', 'FRU', 'BSZ', 'GAN', 'GOI', 'GOJ', 'GRV', 'HBE', 'HGA', 'HRG', 'HKT', 'HMB', 'HRI', 'HEL', 'HRK', 'IEV', 'IST', 'JMK', 'JRO', 'JTR', 'KBP', 'KBV', 'KGL', 'JUB', 'KIV', 'KRR', 'KRK', 'KRT', 'KTM', 'KUF', 'KUL', 'KUT', 'KZN', 'LCA', 'LED', 'LGK', 'LGW', 'LHR', 'LJU', 'LTN', 'LXR', 'MAN', 'MBA', 'MAD', 'MBX', 'MCX', 'MGQ', 'MLA', 'MLE', 'MSQ', 'MUC', 'NAP', 'NBO', 'NCE', 'NMA', 'NQZ', 'OLB', 'ORY', 'OSS', 'OTP', 'OVB', 'ODS', 'PEE', 'PEN', 'PEW', 'POZ', 'PRG', 'PSA', 'PZU', 'RIX', 'RGN', 'ROV', 'SJJ', 'SKG', 'SKP', 'SAW', 'SKD', 'SOF', 'SPX', 'SSH', 'STN', 'SVO', 'SVX', 'SZG', 'TAS', 'TIA', 'TIV', 'TLL', 'TLV', 'TGD', 'TZX', 'UTP', 'UFA', 'VIE', 'VNO', 'VKO', 'VOG', 'VOZ', 'WAW', 'XWC', 'ZIA', 'ZNZ', 'ZYL', 'ZAG', 'ZRH', 'BRU']
 };
 
 const UPGRADE_ON_BOARD_RATES = {
@@ -602,6 +602,7 @@ const GOSHOW_FARES = {
         'FCO': { currency: 'EUR', adult: 650, infant: 20 },
         'FRA': { currency: 'EUR', adult: 640, infant: 20 },
         'FRU': { currency: 'USD', adult: 710, infant: 20 },
+        'BSZ': { currency: 'USD', adult: 710, infant: 20 },
         'GIZ': { currency: 'SAR', adult: 2565, infant: 75 },
         'GSM': { currency: 'USD', adult: 685, infant: 20 },
         'GYD': { currency: 'USD', adult: 715, infant: 20 },
@@ -762,6 +763,7 @@ const GOSHOW_FARES = {
         'ESB': { currency: 'USD', adult: 2480, infant: 250 },
         'EVN': { currency: 'USD', adult: 1040, infant: 105 },
         'FRU': { currency: 'USD', adult: 2070, infant: 205 },
+        'BSZ': { currency: 'USD', adult: 2070, infant: 205 },
         'GIZ': { currency: 'SAR', adult: 3615, infant: 355 },
         'GSM': { currency: 'USD', adult: 1175, infant: 120 },
         'GYD': { currency: 'USD', adult: 1060, infant: 105 },
@@ -1398,7 +1400,7 @@ export function getExtraLegroomCurrencies() {
 
 const EK_OAL_ZONE_MAPPING = {
     'ME': ['BAH', 'IKA', 'BGW', 'AMM', 'KWI', 'BEY', 'MCT', 'DOH', 'RUH', 'DXB', 'TLV'],
-    'WAIO': ['KBL', 'DAC', 'AMD', 'MLE', 'KHI', 'CMB', 'KTM', 'ALA', 'FRU', 'DYU', 'ASB', 'ISB', 'DEL', 'BOM', 'BLR', 'HYD', 'MAA', 'COK', 'CCJ', 'TRV', 'CCU', 'LKO'],
+    'WAIO': ['KBL', 'DAC', 'AMD', 'MLE', 'KHI', 'CMB', 'KTM', 'ALA', 'FRU', 'BSZ', 'DYU', 'ASB', 'ISB', 'DEL', 'BOM', 'BLR', 'HYD', 'MAA', 'COK', 'CCJ', 'TRV', 'CCU', 'LKO'],
     'AFRICA': ['ALG', 'AGO', 'CI', 'CAI', 'ADD', 'GHA', 'GIN', 'LBY', 'MUS', 'NGA', 'SEN', 'SYC', 'ZAF', 'KRT', 'TZA', 'TUN', 'UGA', 'ZMB', 'ZWE', 'COG', 'DJI', 'ERI', 'SOM', 'SSD'],
     'EUROPE': ['VIE', 'ESP', 'BEL', 'HRV', 'CYP', 'CZE', 'DNK', 'FRA', 'DEU', 'GRC', 'HUN', 'IRL', 'ITA', 'MLT', 'NLD', 'NOR', 'POL', 'PRT', 'RUS', 'SRB', 'SVK', 'SWE', 'CHE', 'TUR', 'UKR', 'GBR', 'ARM', 'AZE', 'BIH', 'BGR', 'GEO', 'MKD', 'MNE', 'ROU', 'FIN'],
     'FAREAST': ['CHN', 'HKG', 'IDN', 'JPN', 'MYS', 'PHL', 'SGP', 'KOR', 'TWN', 'THA', 'VNM'],
@@ -1413,7 +1415,7 @@ export function getEKRegionForAirport(airport) {
         return 'ME';
     }
 
-    if (['KBL', 'KDH', 'DAC', 'CGP', 'ZYL', 'AMD', 'BOM', 'BLR', 'CCU', 'CCJ', 'COK', 'DEL', 'HYD', 'LKO', 'MAA', 'TRV', 'GOI', 'MLE', 'GAN', 'KHI', 'ISB', 'LHE', 'PEW', 'SKT', 'MUX', 'LYP', 'UET', 'CMB', 'HRI', 'KTM', 'BWA', 'ALA', 'NQZ', 'CIT', 'TSE', 'FRU', 'OSS', 'DYU', 'ASB', 'NMA', 'SKD', 'TAS'].includes(code)) {
+    if (['KBL', 'KDH', 'DAC', 'CGP', 'ZYL', 'AMD', 'BOM', 'BLR', 'CCU', 'CCJ', 'COK', 'DEL', 'HYD', 'LKO', 'MAA', 'TRV', 'GOI', 'MLE', 'GAN', 'KHI', 'ISB', 'LHE', 'PEW', 'SKT', 'MUX', 'LYP', 'UET', 'CMB', 'HRI', 'KTM', 'BWA', 'ALA', 'NQZ', 'CIT', 'TSE', 'FRU', 'BSZ', 'OSS', 'DYU', 'ASB', 'NMA', 'SKD', 'TAS'].includes(code)) {
         return 'WAIO';
     }
 
