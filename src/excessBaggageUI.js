@@ -875,12 +875,13 @@ function renderReferenceContent() {
 }
 
 function showError(container, message) {
+    const esc = (s) => (s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'));
     container.style.display = 'block';
     container.innerHTML = `
         <div class="glass-panel" style="margin-top:20px;">
             <div style="padding:20px;">
                 <div style="padding:15px; background:rgba(248,113,113,0.1); border-radius:8px; border-left:3px solid var(--error-red); color:var(--text-main);">
-                    ${message}
+                    ${esc(message)}
                 </div>
             </div>
         </div>
