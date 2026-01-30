@@ -1,41 +1,41 @@
 import { translateAirline, translateCity } from "./translator.js";
 
 const ZONE_MAPPING = {
-    'DXB': 1, 'DWC': 1,
+    'DXB': 1, 'DWC': 1, 'AUH': 1, 'SHJ': 1,
     'KWI': 2, 'BAH': 2, 'MCT': 2, 'SLL': 2, 'OHS': 2,
     'AHB': 3, 'AQI': 3, 'AJF': 3, 'DMM': 3, 'ELQ': 3, 'EAM': 3, 'GIZ': 3, 'HAS': 3, 'HOF': 3, 'JED': 3, 'NUM': 3, 'MED': 3, 'RUH': 3, 'RSI': 3, 'TUU': 3, 'TIF': 3, 'ULH': 3, 'YNB': 3,
-    'BUZ': 4, 'GSM': 4, 'IFN': 4, 'IKA': 4, 'LRR': 4, 'MHD': 4, 'SYZ': 4, 'TBZ': 4, 'KIH': 4, 'KER': 4, 'BGW': 4, 'BSR': 4, 'EBL': 4, 'ISU': 4, 'NJF': 4, 'TLV': 4, 'AMM': 4, 'BEY': 4,
-    'JIB': 5, 'ASM': 5, 'ADD': 5, 'MBA': 5, 'HGA': 5, 'MGQ': 5, 'JUB': 5, 'KRT': 5, 'PZU': 5, 'DAR': 5, 'JRO': 5, 'ZNZ': 5, 'EBB': 5, 'HBE': 5, 'SSH': 5, 'HMB': 5, 'SPX': 5, 'DBB': 5,
+    'BUZ': 4, 'GSM': 4, 'IFN': 4, 'IKA': 4, 'THR': 4, 'LRR': 4, 'MHD': 4, 'SYZ': 4, 'TBZ': 4, 'KIH': 4, 'KER': 4, 'BGW': 4, 'BSR': 4, 'EBL': 4, 'ISU': 4, 'NJF': 4, 'TLV': 4, 'AMM': 4, 'BEY': 4, 'DAM': 4,
+    'JIB': 5, 'ASM': 5, 'ADD': 5, 'NBO': 5, 'MBA': 5, 'HGA': 5, 'MGQ': 5, 'JUB': 5, 'KRT': 5, 'PZU': 5, 'DAR': 5, 'JRO': 5, 'ZNZ': 5, 'EBB': 5, 'HBE': 5, 'SSH': 5, 'HMB': 5, 'SPX': 5, 'DBB': 5, 'CAI': 5, 'LXR': 5, 'HRG': 5,
     'AMD': 6, 'BOM': 6, 'BLR': 6, 'CCJ': 6, 'CCU': 6, 'COK': 6, 'DEL': 6, 'HYD': 6, 'LKO': 6, 'MAA': 6, 'TRV': 6, 'KBL': 6, 'CGP': 6, 'DAC': 6, 'KTM': 6, 'BWA': 6, 'ISB': 6, 'KHI': 6, 'MUX': 6, 'LYP': 6, 'SKT': 6, 'UET': 6, 'LHE': 6, 'PEW': 6, 'CMB': 6, 'HRI': 6, 'LGK': 6, 'PEN': 6,
     'MLE': 7, 'GAN': 7, 'RGN': 7, 'KBV': 7, 'UTP': 7,
-    'GYD': 8, 'MSQ': 8, 'BUS': 8, 'TBS': 8, 'GRV': 8, 'EVN': 8, 'ALA': 8, 'CIT': 8, 'TSE': 8, 'FRU': 8, 'OSS': 8, 'DYU': 8, 'ASB': 8, 'TAS': 8, 'SKD': 8, 'NMA': 8, 'SZG': 8, 'TIA': 8, 'SJJ': 8, 'SOF': 8, 'DBV': 8, 'ZAG': 8, 'PRG': 8, 'JMK': 8, 'JTR': 8, 'CFU': 8, 'TLL': 8, 'HEL': 8, 'CTA': 8, 'NAP': 8, 'PSA': 8, 'BGY': 8, 'CAG': 8, 'OLB': 8, 'RIX': 8, 'VNO': 8, 'MLA': 8, 'TIV': 8, 'SKP': 8, 'KRK': 8, 'WAW': 8, 'POZ': 8, 'OTP': 8, 'CLJ': 8, 'AER': 8, 'KUF': 8, 'KRR': 8, 'KZN': 8, 'MCX': 8, 'MRV': 8, 'OVB': 8, 'PEE': 8, 'ROV': 8, 'SVX': 8, 'UFA': 8, 'VOG': 8, 'VKO': 8, 'ZIA': 8, 'LED': 8, 'BEG': 8, 'BTS': 8, 'LJU': 8, 'BSL': 8, 'ADB': 8, 'AYT': 8, 'SAW': 8, 'IST': 8, 'BJV': 8, 'TZX': 8, 'IEV': 8, 'KBP': 8, 'ODS': 8, 'KIV': 8,
-    'ADE': 4, 'AWZ': 4, 'BND': 7, 'DOH': 2, 'ESB': 8, 'FIH': 5, 'DOK': 5, 'GBB': 8, 'HDM': 4, 'HRK': 8, 'SAH': 4, 'SVO': 8, 'TGD': 8, 'XWC': 8, 'ZYL': 6, 'GOI': 6, 'GOJ': 8, 'KGL': 5, 'MBX': 8, 'KDH': 6
+    'GYD': 8, 'MSQ': 8, 'BUS': 8, 'TBS': 8, 'GRV': 8, 'EVN': 8, 'ALA': 8, 'CIT': 8, 'TSE': 8, 'NQZ': 8, 'FRU': 8, 'OSS': 8, 'DYU': 8, 'ASB': 8, 'TAS': 8, 'SKD': 8, 'NMA': 8, 'SZG': 8, 'TIA': 8, 'SJJ': 8, 'SOF': 8, 'DBV': 8, 'ZAG': 8, 'PRG': 8, 'JMK': 8, 'JTR': 8, 'CFU': 8, 'TLL': 8, 'HEL': 8, 'CTA': 8, 'NAP': 8, 'PSA': 8, 'BGY': 8, 'CAG': 8, 'OLB': 8, 'RIX': 8, 'VNO': 8, 'MLA': 8, 'TIV': 8, 'SKP': 8, 'KRK': 8, 'WAW': 8, 'POZ': 8, 'OTP': 8, 'CLJ': 8, 'AER': 8, 'KUF': 8, 'KRR': 8, 'KZN': 8, 'MCX': 8, 'MRV': 8, 'OVB': 8, 'PEE': 8, 'ROV': 8, 'SVX': 8, 'UFA': 8, 'VOG': 8, 'VKO': 8, 'ZIA': 8, 'LED': 8, 'BEG': 8, 'BTS': 8, 'LJU': 8, 'BSL': 8, 'ADB': 8, 'AYT': 8, 'SAW': 8, 'IST': 8, 'BJV': 8, 'TZX': 8, 'IEV': 8, 'KBP': 8, 'ODS': 8, 'KIV': 8, 'DME': 8, 'LCA': 8, 'VOZ': 8, 'ATH': 8, 'LHR': 8, 'LGW': 8, 'STN': 8, 'LTN': 8, 'MAN': 8, 'CDG': 8, 'ORY': 8, 'NCE': 8, 'FRA': 8, 'MUC': 8, 'AMS': 8, 'BRU': 8, 'ZRH': 8, 'VIE': 8, 'FCO': 8, 'MXP': 8, 'MAD': 8, 'BCN': 8,
+    'ADE': 4, 'AWZ': 4, 'ALP': 4, 'LTK': 4, 'BND': 7, 'DOH': 2, 'ESB': 8, 'FIH': 5, 'DOK': 5, 'GBB': 8, 'HDM': 4, 'HRK': 8, 'SAH': 4, 'SVO': 8, 'TGD': 8, 'XWC': 8, 'ZYL': 6, 'GOI': 6, 'GOJ': 8, 'KGL': 5, 'MBX': 8, 'KDH': 6
 };
 
 const CURRENCY_MAPPING = {
     'AED': ['DXB', 'KRT', 'PZU'],
     'BHD': ['BAH'],
-    'CHF': ['BSL'],
+    'CHF': ['BSL', 'ZRH'],
     'CZK': ['PRG'],
-    'EGP': ['HBE', 'SSH', 'SPX', 'DBB'],
+    'EGP': ['CAI', 'HBE', 'SSH', 'LXR', 'HRG', 'SPX', 'DBB'],
     'ERN': ['ASM'],
-    'EUR': ['BEG', 'BGY', 'BTS', 'CAG', 'CFU', 'CLJ', 'CTA', 'DBV', 'JMK', 'JTR', 'HEL', 'LJU', 'KIV', 'MLA', 'NAP', 'OTP', 'OLB', 'PSA', 'SJJ', 'SKP', 'SOF', 'SZG', 'TIA', 'TIV', 'ZAG'],
+    'EUR': ['ATH', 'BCN', 'BEG', 'BGY', 'BTS', 'BRU', 'CAG', 'CDG', 'CFU', 'CLJ', 'CTA', 'DBV', 'FCO', 'FRA', 'JMK', 'JTR', 'HEL', 'LCA', 'LJU', 'KIV', 'MAD', 'MLA', 'MUC', 'NAP', 'NCE', 'ORY', 'OTP', 'OLB', 'PSA', 'SJJ', 'SKG', 'SKP', 'SOF', 'SZG', 'TIA', 'TIV', 'VIE', 'ZAG', 'ZRH'],
     'HUF': ['BUD'],
     'INR': ['AMD', 'BOM', 'BLR', 'CCU', 'CCJ', 'COK', 'DEL', 'HYD', 'LKO', 'MAA', 'TRV'],
     'JOD': ['AMM', 'AQJ'],
     'KWD': ['KWI'],
     'KZT': ['ALA', 'CIT', 'TSE', 'NQZ'],
     'LKR': ['CMB', 'HRI'],
-    'MYR': ['LGK', 'PEN'],
+    'MYR': ['KUL', 'LGK', 'PEN'],
     'NPR': ['KTM', 'BWA'],
     'OMR': ['MCT', 'SLL', 'OHS'],
     'PKR': ['ISB', 'KHI', 'LYP', 'MUX', 'SKT', 'UET', 'LHE', 'PEW'],
     'PLN': ['KRK', 'WAW', 'POZ'],
     'QAR': ['DOH'],
-    'RUB': ['AER', 'GOJ', 'GRV', 'KRR', 'KUF', 'KZN', 'LED', 'MCX', 'MRV', 'OVB', 'PEE', 'ROV', 'SVO', 'SVX', 'UFA', 'VKO', 'VOG', 'VOZ', 'ZIA'],
+    'RUB': ['AER', 'DME', 'GOJ', 'GRV', 'KRR', 'KUF', 'KZN', 'LED', 'MCX', 'MRV', 'OVB', 'PEE', 'ROV', 'SVO', 'SVX', 'UFA', 'VKO', 'VOG', 'VOZ', 'ZIA'],
     'SAR': ['AHB', 'AJF', 'AQI', 'DMM', 'EAM', 'ELQ', 'GIZ', 'HAS', 'HOF', 'JED', 'NUM', 'MED', 'RUH', 'RSI', 'TIF', 'TUU', 'ULH', 'YNB'],
-    'THB': ['KBV', 'UTP'],
-    'USD': ['ADB', 'ADD', 'ADE', 'ASB', 'ASM', 'AYT', 'AWZ', 'BGW', 'BJM', 'BJV', 'BND', 'BUS', 'BUZ', 'BSR', 'CGP', 'DAC', 'DAR', 'DOK', 'DYU', 'EBB', 'EBL', 'ESB', 'EVN', 'FIH', 'FRU', 'GAN', 'GBB', 'GSM', 'GYD', 'HDM', 'HGA', 'HRK', 'IEV', 'IFN', 'IKA', 'ISU', 'JIB', 'JRO', 'JUB', 'KBL', 'KBP', 'KDH', 'KER', 'KGL', 'KIH', 'KUT', 'LRR', 'MBA', 'MGQ', 'MHD', 'MLE', 'MSQ', 'NJF', 'NMA', 'ODS', 'OSS', 'RGN', 'SAH', 'SAW', 'SKD', 'SKG', 'TBS', 'TBZ', 'TGD', 'TLV', 'TZX', 'ZNZ', 'ZYL'],
+    'THB': ['BKK', 'DMK', 'HKT', 'CNX', 'KBV', 'UTP'],
+    'USD': ['ADB', 'ADD', 'ADE', 'ALP', 'ASB', 'ASM', 'AYT', 'AWZ', 'BGW', 'BJM', 'BJV', 'BND', 'BUS', 'BUZ', 'BSR', 'CGP', 'DAC', 'DAM', 'DAR', 'DOK', 'DYU', 'EBB', 'EBL', 'ESB', 'EVN', 'FIH', 'FRU', 'GAN', 'GBB', 'GSM', 'GYD', 'HDM', 'HGA', 'HRK', 'IEV', 'IFN', 'IKA', 'ISU', 'JIB', 'JRO', 'JUB', 'KBL', 'KBP', 'KDH', 'KER', 'KGL', 'KIH', 'KUT', 'LTK', 'LRR', 'MBA', 'MGQ', 'MHD', 'MLE', 'MSQ', 'NBO', 'NJF', 'NMA', 'ODS', 'OSS', 'RGN', 'SAH', 'SAW', 'SKD', 'SKG', 'TBS', 'TBZ', 'TGD', 'THR', 'TLV', 'TZX', 'ZNZ', 'ZYL'],
     'UZS': ['TAS']
 };
 
@@ -360,9 +360,9 @@ const UPGRADE_RATES = {
 };
 
 const UPGRADE_ZONE_MAPPING = {
-    1: ['AWZ', 'AQI', 'BAH', 'BND', 'BSR', 'DMM', 'DOH', 'DWC', 'DXB', 'ELQ', 'HAS', 'HOF', 'IFN', 'KER', 'KHI', 'KIH', 'KWI', 'LRR', 'MCT', 'OHS', 'RUH', 'SLL', 'SYZ'],
-    2: ['ADE', 'AHB', 'AJF', 'AMD', 'AMM', 'AQJ', 'BEY', 'BGW', 'BOM', 'BLR', 'BUS', 'BUZ', 'CCJ', 'CCU', 'COK', 'DEL', 'EAM', 'EBL', 'EVN', 'GBB', 'GIZ', 'GSM', 'GYD', 'HDM', 'HRI', 'HYD', 'IKA', 'ISB', 'ISU', 'JED', 'JIB', 'KBL', 'KDH', 'LKO', 'LHE', 'LYP', 'MAA', 'MED', 'MHD', 'MRV', 'MUX', 'NJF', 'NUM', 'RSI', 'SAH', 'SKT', 'TBS', 'TBZ', 'TIF', 'TRV', 'TUU', 'UET', 'ULH', 'YNB'],
-    3: ['ADB', 'ADD', 'AER', 'ALA', 'ASB', 'ASM', 'AYT', 'BEG', 'BGY', 'BJM', 'BJV', 'BKK', 'BSL', 'BUD', 'BTS', 'BWA', 'CAG', 'CLJ', 'CMB', 'CTA', 'CIT', 'CFU', 'CGP', 'DAC', 'DAR', 'DBB', 'DBV', 'DYU', 'EBB', 'ESB', 'DOK', 'FIH', 'FRU', 'GAN', 'GOI', 'GOJ', 'GRV', 'HBE', 'HGA', 'HMB', 'HRI', 'HEL', 'HRK', 'IEV', 'IST', 'JMK', 'JRO', 'JTR', 'KBP', 'KBV', 'KGL', 'JUB', 'KIV', 'KRR', 'KRK', 'KRT', 'KTM', 'KUF', 'KUT', 'KZN', 'LED', 'LGK', 'LJU', 'MBA', 'MBX', 'MCX', 'MGQ', 'MLA', 'MLE', 'MSQ', 'NAP', 'NMA', 'NQZ', 'OLB', 'OSS', 'OTP', 'OVB', 'ODS', 'PEE', 'PEN', 'PEW', 'POZ', 'PRG', 'PSA', 'PZU', 'RIX', 'RGN', 'ROV', 'SJJ', 'SKG', 'SKP', 'SAW', 'SKD', 'SOF', 'SPX', 'SSH', 'SVO', 'SVX', 'SZG', 'TAS', 'TIA', 'TIV', 'TLL', 'TLV', 'TGD', 'TZX', 'UTP', 'UFA', 'VNO', 'VKO', 'VOG', 'WAW', 'XWC', 'ZIA', 'ZNZ', 'ZYL', 'ZAG']
+    1: ['AUH', 'AWZ', 'AQI', 'BAH', 'BND', 'BSR', 'DMM', 'DOH', 'DWC', 'DXB', 'ELQ', 'HAS', 'HOF', 'IFN', 'KER', 'KHI', 'KIH', 'KWI', 'LRR', 'MCT', 'OHS', 'RUH', 'SHJ', 'SLL', 'SYZ'],
+    2: ['ADE', 'AHB', 'AJF', 'AMD', 'AMM', 'AQJ', 'BEY', 'BGW', 'DAM', 'ALP', 'LTK', 'BOM', 'BLR', 'BUS', 'BUZ', 'CCJ', 'CCU', 'COK', 'DEL', 'EAM', 'EBL', 'EVN', 'GBB', 'GIZ', 'GSM', 'GYD', 'HDM', 'HRI', 'HYD', 'IKA', 'ISB', 'ISU', 'JED', 'JIB', 'KBL', 'KDH', 'LKO', 'LHE', 'LYP', 'MAA', 'MED', 'MHD', 'MRV', 'MUX', 'NJF', 'NUM', 'RSI', 'SAH', 'SKT', 'TBS', 'TBZ', 'THR', 'TIF', 'TRV', 'TUU', 'UET', 'ULH', 'YNB'],
+    3: ['ADB', 'ADD', 'AER', 'ALA', 'AMS', 'ASB', 'ASM', 'ATH', 'AYT', 'BCN', 'BEG', 'BGY', 'BJM', 'BJV', 'BKK', 'BSL', 'BUD', 'BTS', 'BWA', 'CAG', 'CAI', 'CDG', 'CLJ', 'CMB', 'CTA', 'CIT', 'CFU', 'CGP', 'CNX', 'DAC', 'DAR', 'DBB', 'DBV', 'DME', 'DMK', 'DYU', 'EBB', 'ESB', 'DOK', 'FCO', 'FIH', 'FRA', 'FRU', 'GAN', 'GOI', 'GOJ', 'GRV', 'HBE', 'HGA', 'HRG', 'HKT', 'HMB', 'HRI', 'HEL', 'HRK', 'IEV', 'IST', 'JMK', 'JRO', 'JTR', 'KBP', 'KBV', 'KGL', 'JUB', 'KIV', 'KRR', 'KRK', 'KRT', 'KTM', 'KUF', 'KUL', 'KUT', 'KZN', 'LCA', 'LED', 'LGK', 'LGW', 'LHR', 'LJU', 'LTN', 'LXR', 'MAN', 'MBA', 'MAD', 'MBX', 'MCX', 'MGQ', 'MLA', 'MLE', 'MSQ', 'MUC', 'NAP', 'NBO', 'NCE', 'NMA', 'NQZ', 'OLB', 'ORY', 'OSS', 'OTP', 'OVB', 'ODS', 'PEE', 'PEN', 'PEW', 'POZ', 'PRG', 'PSA', 'PZU', 'RIX', 'RGN', 'ROV', 'SJJ', 'SKG', 'SKP', 'SAW', 'SKD', 'SOF', 'SPX', 'SSH', 'STN', 'SVO', 'SVX', 'SZG', 'TAS', 'TIA', 'TIV', 'TLL', 'TLV', 'TGD', 'TZX', 'UTP', 'UFA', 'VIE', 'VNO', 'VKO', 'VOG', 'VOZ', 'WAW', 'XWC', 'ZIA', 'ZNZ', 'ZYL', 'ZAG', 'ZRH', 'BRU']
 };
 
 const UPGRADE_ON_BOARD_RATES = {
@@ -560,15 +560,18 @@ const GOSHOW_FARES = {
         'ASB': { currency: 'USD', adult: 715, infant: 20 },
         'ASM': { currency: 'USD', adult: 705, infant: 20, alt: { ERN: { adult: 10790, infant: 300 } } },
         'BAH': { currency: 'BHD', adult: 260, infant: 10 },
+        'BCN': { currency: 'EUR', adult: 620, infant: 20 },
         'BEG': { currency: 'EUR', adult: 630, infant: 20 },
         'BEY': { currency: 'LBP', adult: 65142500, infant: 1835000 },
         'BGW': { currency: 'USD', adult: 730, infant: 20 },
         'BGY': { currency: 'EUR', adult: 615, infant: 20 },
         'BJV': { currency: 'USD', adult: 710, infant: 20 },
+        'BKK': { currency: 'THB', adult: 22380, infant: 670 },
         'BND': { currency: 'USD', adult: 685, infant: 20 },
         'BOM': { currency: 'INR', adult: 49595, infant: 1710 },
         'BSL': { currency: 'CHF', adult: 560, infant: 15 },
         'BSR': { currency: 'USD', adult: 710, infant: 20 },
+        'BRU': { currency: 'EUR', adult: 620, infant: 20 },
         'BUD': { currency: 'EUR', adult: 640, infant: 20 },
         'BUS': { currency: 'USD', adult: 710, infant: 20 },
         'BWA': { currency: 'NPR', adult: 59435, infant: 2735 },
@@ -586,6 +589,7 @@ const GOSHOW_FARES = {
         'DBB': { currency: 'USD', adult: 700, infant: 20 },
         'DBV': { currency: 'EUR', adult: 605, infant: 20 },
         'DEL': { currency: 'INR', adult: 49595, infant: 1710 },
+        'DMK': { currency: 'THB', adult: 22380, infant: 670 },
         'DMM': { currency: 'SAR', adult: 2605, infant: 75 },
         'DOH': { currency: 'QAR', adult: 2620, infant: 75 },
         'DYU': { currency: 'USD', adult: 705, infant: 20 },
@@ -595,6 +599,8 @@ const GOSHOW_FARES = {
         'ELQ': { currency: 'SAR', adult: 2565, infant: 75 },
         'ESB': { currency: 'USD', adult: 690, infant: 20 },
         'EVN': { currency: 'USD', adult: 725, infant: 20 },
+        'FCO': { currency: 'EUR', adult: 650, infant: 20 },
+        'FRA': { currency: 'EUR', adult: 640, infant: 20 },
         'FRU': { currency: 'USD', adult: 710, infant: 20 },
         'GIZ': { currency: 'SAR', adult: 2565, infant: 75 },
         'GSM': { currency: 'USD', adult: 685, infant: 20 },
@@ -619,19 +625,26 @@ const GOSHOW_FARES = {
         'KER': { currency: 'USD', adult: 685, infant: 20 },
         'KHI': { currency: 'PKR', adult: 170535, infant: 5635 },
         'KIH': { currency: 'USD', adult: 685, infant: 20 },
+        'KUL': { currency: 'MYR', adult: 3135, infant: 85 },
         'KRK': { currency: 'PLN', adult: 2570, infant: 75 },
         'KTM': { currency: 'NPR', adult: 59435, infant: 2735 },
         'KUF': { currency: 'RUB', adult: 60755, infant: 1710 },
         'KWI': { currency: 'KWD', adult: 210, infant: 5 },
         'KZN': { currency: 'RUB', adult: 59895, infant: 1710 },
         'LED': { currency: 'RUB', adult: 59470, infant: 1710 },
+        'LGW': { currency: 'USD', adult: 680, infant: 20 },
         'LGK': { currency: 'MYR', adult: 3135, infant: 85 },
+        'LHR': { currency: 'USD', adult: 680, infant: 20 },
         'LHE': { currency: 'PKR', adult: 279055, infant: 5635 },
         'LJU': { currency: 'EUR', adult: 615, infant: 20 },
         'LKO': { currency: 'INR', adult: 51730, infant: 1710 },
+        'LTN': { currency: 'USD', adult: 680, infant: 20 },
+        'LXR': { currency: 'EGP', adult: 16600, infant: 415 },
         'LRR': { currency: 'USD', adult: 685, infant: 20 },
         'LYP': { currency: 'PKR', adult: 166305, infant: 5635 },
+        'MAD': { currency: 'EUR', adult: 610, infant: 20 },
         'MBA': { currency: 'USD', adult: 745, infant: 20 },
+        'MAN': { currency: 'USD', adult: 680, infant: 20 },
         'MCT': { currency: 'OMR', adult: 265, infant: 10 },
         'MCX': { currency: 'RUB', adult: 58185, infant: 1710 },
         'MED': { currency: 'SAR', adult: 2565, infant: 75 },
@@ -642,10 +655,13 @@ const GOSHOW_FARES = {
         'MSQ': { currency: 'USD', adult: 730, infant: 20 },
         'MUX': { currency: 'PKR', adult: 169125, infant: 5635 },
         'NAP': { currency: 'EUR', adult: 625, infant: 20 },
+        'NBO': { currency: 'USD', adult: 720, infant: 20 },
+        'NCE': { currency: 'EUR', adult: 630, infant: 20 },
         'NJF': { currency: 'USD', adult: 710, infant: 20 },
         'NQZ': { currency: 'KZT', adult: 377240, infant: 10780 },
         'NUM': { currency: 'SAR', adult: 2565, infant: 75 },
         'OLB': { currency: 'EUR', adult: 650, infant: 20 },
+        'ORY': { currency: 'EUR', adult: 600, infant: 20 },
         'OTP': { currency: 'EUR', adult: 610, infant: 20 },
         'OVB': { currency: 'RUB', adult: 58185, infant: 1710 },
         'PEN': { currency: 'MYR', adult: 3135, infant: 85 },
@@ -661,8 +677,10 @@ const GOSHOW_FARES = {
         'SKD': { currency: 'USD', adult: 655, infant: 20 },
         'SKT': { currency: 'PKR', adult: 170535, infant: 5635 },
         'SLL': { currency: 'OMR', adult: 265, infant: 10 },
+        'SHJ': { currency: 'AED', adult: 500, infant: 15 },
         'SOF': { currency: 'EUR', adult: 610, infant: 20 },
         'SPX': { currency: 'USD', adult: 720, infant: 20 },
+        'STN': { currency: 'USD', adult: 680, infant: 20 },
         'SVX': { currency: 'RUB', adult: 59895, infant: 1710 },
         'SYZ': { currency: 'USD', adult: 685, infant: 20 },
         'SZG': { currency: 'EUR', adult: 665, infant: 20 },
@@ -671,6 +689,7 @@ const GOSHOW_FARES = {
         'TBZ': { currency: 'USD', adult: 685, infant: 20 },
         'TIA': { currency: 'EUR', adult: 605, infant: 20 },
         'TIF': { currency: 'SAR', adult: 2565, infant: 75 },
+        'THR': { currency: 'USD', adult: 685, infant: 20 },
         'TIV': { currency: 'EUR', adult: 605, infant: 20 },
         'TLL': { currency: 'EUR', adult: 610, infant: 20 },
         'TLV': { currency: 'USD', adult: 705, infant: 20 },
@@ -681,16 +700,20 @@ const GOSHOW_FARES = {
         'ULH': { currency: 'SAR', adult: 2565, infant: 75 },
         'UTP': { currency: 'THB', adult: 23215, infant: 670 },
         'VKO': { currency: 'RUB', adult: 61180, infant: 1710 },
+        'VIE': { currency: 'EUR', adult: 640, infant: 20 },
         'VNO': { currency: 'EUR', adult: 615, infant: 20 },
         'VOG': { currency: 'RUB', adult: 58185, infant: 1710 },
         'WAW': { currency: 'PLN', adult: 2720, infant: 75 },
         'YNB': { currency: 'SAR', adult: 2565, infant: 75 },
         'ZAG': { currency: 'EUR', adult: 620, infant: 20 },
-        'ZNZ': { currency: 'USD', adult: 730, infant: 20 }
+        'ZNZ': { currency: 'USD', adult: 730, infant: 20 },
+        'ZRH': { currency: 'CHF', adult: 560, infant: 15 }
     },
     'BUSINESS': {
         'AER': { currency: 'RUB', adult: 182260, infant: 18395 },
         'AHB': { currency: 'SAR', adult: 3615, infant: 355 },
+        'AMS': { currency: 'EUR', adult: 2310, infant: 230 },
+        'AUH': { currency: 'AED', adult: 1850, infant: 185 },
         'AJF': { currency: 'SAR', adult: 3615, infant: 355 },
         'ALA': { currency: 'KZT', adult: 662865, infant: 67365 },
         'AMD': { currency: 'INR', adult: 50875, infant: 5130 },
@@ -704,10 +727,12 @@ const GOSHOW_FARES = {
         'BGW': { currency: 'USD', adult: 1920, infant: 190 },
         'BGY': { currency: 'EUR', adult: 2195, infant: 220 },
         'BJV': { currency: 'USD', adult: 2385, infant: 240 },
+        'BKK': { currency: 'THB', adult: 44420, infant: 4510 },
         'BND': { currency: 'USD', adult: 1175, infant: 120 },
         'BOM': { currency: 'INR', adult: 51730, infant: 5130 },
         'BSL': { currency: 'CHF', adult: 2345, infant: 235 },
         'BSR': { currency: 'USD', adult: 2345, infant: 235 },
+        'BRU': { currency: 'EUR', adult: 2120, infant: 215 },
         'BUD': { currency: 'EUR', adult: 1695, infant: 170 },
         'BUS': { currency: 'USD', adult: 1880, infant: 190 },
         'BUZ': { currency: 'USD', adult: 1175, infant: 120 },
@@ -719,10 +744,14 @@ const GOSHOW_FARES = {
         'CMB': { currency: 'LKR', adult: 407115, infant: 40410 },
         'COK': { currency: 'INR', adult: 52160, infant: 5130 },
         'CTA': { currency: 'EUR', adult: 2460, infant: 245 },
+        'CAI': { currency: 'EGP', adult: 29055, infant: 726 },
+        'CDG': { currency: 'EUR', adult: 2420, infant: 245 },
+        'CNX': { currency: 'THB', adult: 44420, infant: 4510 },
         'DAR': { currency: 'USD', adult: 1700, infant: 170 },
         'DBB': { currency: 'USD', adult: 830, infant: 85 },
         'DBV': { currency: 'EUR', adult: 2120, infant: 215 },
         'DEL': { currency: 'INR', adult: 52160, infant: 5130 },
+        'DMK': { currency: 'THB', adult: 44420, infant: 4510 },
         'DMM': { currency: 'SAR', adult: 3000, infant: 300 },
         'DOH': { currency: 'QAR', adult: 5885, infant: 585 },
         'DYU': { currency: 'USD', adult: 1700, infant: 170 },
@@ -739,6 +768,8 @@ const GOSHOW_FARES = {
         'HAS': { currency: 'SAR', adult: 3615, infant: 355 },
         'HBE': { currency: 'USD', adult: 830, infant: 85 },
         'HGA': { currency: 'USD', adult: 2025, infant: 205 },
+        'HKT': { currency: 'THB', adult: 44420, infant: 4510 },
+        'HRG': { currency: 'EGP', adult: 29055, infant: 726 },
         'HOF': { currency: 'SAR', adult: 3615, infant: 355 },
         'HYD': { currency: 'INR', adult: 52160, infant: 5130 },
         'IFN': { currency: 'USD', adult: 1185, infant: 120 },
@@ -756,19 +787,26 @@ const GOSHOW_FARES = {
         'KER': { currency: 'USD', adult: 1070, infant: 105 },
         'KHI': { currency: 'PKR', adult: 328385, infant: 32415 },
         'KIH': { currency: 'USD', adult: 1165, infant: 115 },
+        'KUL': { currency: 'MYR', adult: 7845, infant: 780 },
         'KRK': { currency: 'PLN', adult: 9965, infant: 995 },
         'KTM': { currency: 'NPR', adult: 121605, infant: 12295 },
         'KUF': { currency: 'RUB', adult: 198090, infant: 19680 },
         'KWI': { currency: 'KWD', adult: 125, infant: 10 },
         'KZN': { currency: 'RUB', adult: 181830, infant: 18395 },
         'LED': { currency: 'RUB', adult: 183545, infant: 18395 },
+        'LGW': { currency: 'USD', adult: 1460, infant: 145 },
         'LGK': { currency: 'MYR', adult: 7845, infant: 780 },
+        'LHR': { currency: 'USD', adult: 1460, infant: 145 },
         'LHE': { currency: 'PKR', adult: 411535, infant: 40870 },
         'LJU': { currency: 'EUR', adult: 2310, infant: 230 },
         'LKO': { currency: 'INR', adult: 51305, infant: 5130 },
+        'LTN': { currency: 'USD', adult: 1460, infant: 145 },
+        'LXR': { currency: 'EGP', adult: 29055, infant: 726 },
         'LRR': { currency: 'USD', adult: 1175, infant: 120 },
         'LYP': { currency: 'PKR', adult: 326975, infant: 32415 },
+        'MAD': { currency: 'EUR', adult: 2195, infant: 220 },
         'MBA': { currency: 'USD', adult: 1525, infant: 155 },
+        'MAN': { currency: 'USD', adult: 1460, infant: 145 },
         'MCT': { currency: 'OMR', adult: 175, infant: 15 },
         'MCX': { currency: 'RUB', adult: 145895, infant: 14545 },
         'MED': { currency: 'SAR', adult: 3000, infant: 300 },
@@ -777,12 +815,17 @@ const GOSHOW_FARES = {
         'MLE': { currency: 'USD', adult: 1625, infant: 165 },
         'MRV': { currency: 'RUB', adult: 186965, infant: 18825 },
         'MSQ': { currency: 'USD', adult: 3640, infant: 365 },
+        'MUC': { currency: 'EUR', adult: 2460, infant: 245 },
         'MUX': { currency: 'PKR', adult: 325565, infant: 32415 },
+        'MXP': { currency: 'EUR', adult: 2310, infant: 230 },
         'NAP': { currency: 'EUR', adult: 2195, infant: 220 },
+        'NBO': { currency: 'USD', adult: 1270, infant: 125 },
+        'NCE': { currency: 'EUR', adult: 2310, infant: 230 },
         'NJF': { currency: 'USD', adult: 2030, infant: 205 },
         'NQZ': { currency: 'KZT', adult: 660170, infant: 67365 },
         'NUM': { currency: 'SAR', adult: 3615, infant: 355 },
         'OLB': { currency: 'EUR', adult: 2580, infant: 255 },
+        'ORY': { currency: 'EUR', adult: 2195, infant: 220 },
         'OTP': { currency: 'EUR', adult: 2420, infant: 245 },
         'OVB': { currency: 'RUB', adult: 145895, infant: 14545 },
         'PEN': { currency: 'MYR', adult: 7390, infant: 735 },
@@ -795,6 +838,8 @@ const GOSHOW_FARES = {
         'RUH': { currency: 'SAR', adult: 3615, infant: 355 },
         'SAW': { currency: 'USD', adult: 1460, infant: 145 },
         'SJJ': { currency: 'EUR', adult: 2155, infant: 215 },
+        'SHJ': { currency: 'AED', adult: 1850, infant: 185 },
+        'STN': { currency: 'USD', adult: 1460, infant: 145 },
         'SKD': { currency: 'USD', adult: 1860, infant: 185 },
         'SKT': { currency: 'PKR', adult: 325565, infant: 32415 },
         'SLL': { currency: 'OMR', adult: 190, infant: 20 },
@@ -808,6 +853,7 @@ const GOSHOW_FARES = {
         'TBZ': { currency: 'USD', adult: 1070, infant: 105 },
         'TIA': { currency: 'EUR', adult: 2470, infant: 250 },
         'TIF': { currency: 'SAR', adult: 3615, infant: 355 },
+        'THR': { currency: 'USD', adult: 1070, infant: 105 },
         'TIV': { currency: 'EUR', adult: 1695, infant: 170 },
         'TLL': { currency: 'EUR', adult: 1440, infant: 140 },
         'TLV': { currency: 'USD', adult: 1930, infant: 195 },
@@ -817,13 +863,15 @@ const GOSHOW_FARES = {
         'UFA': { currency: 'RUB', adult: 181830, infant: 18395 },
         'ULH': { currency: 'SAR', adult: 3615, infant: 355 },
         'UTP': { currency: 'THB', adult: 47260, infant: 4675 },
+        'VIE': { currency: 'EUR', adult: 2420, infant: 245 },
         'VKO': { currency: 'RUB', adult: 198515, infant: 19680 },
         'VNO': { currency: 'EUR', adult: 1295, infant: 130 },
         'VOG': { currency: 'RUB', adult: 160010, infant: 15830 },
         'WAW': { currency: 'PLN', adult: 9180, infant: 920 },
         'YNB': { currency: 'SAR', adult: 3615, infant: 355 },
         'ZAG': { currency: 'EUR', adult: 2310, infant: 230 },
-        'ZNZ': { currency: 'USD', adult: 1705, infant: 170 }
+        'ZNZ': { currency: 'USD', adult: 1705, infant: 170 },
+        'ZRH': { currency: 'CHF', adult: 2345, infant: 235 }
     }
 };
 
@@ -1361,7 +1409,7 @@ const EK_OAL_ZONE_MAPPING = {
 function getEKRegionForAirport(airport) {
     const code = airport.toUpperCase();
 
-    if (['BAH', 'IKA', 'THR', 'BGW', 'BSR', 'EBL', 'ISU', 'NJF', 'AMM', 'AQJ', 'KWI', 'BEY', 'MCT', 'OHS', 'SLL', 'DOH', 'RUH', 'JED', 'DMM', 'MED', 'AHB', 'ELQ', 'TIF', 'TUU', 'HAS', 'YNB', 'AJF', 'EAM', 'GIZ', 'HOF', 'NUM', 'RSI', 'ULH', 'DXB', 'DWC', 'AUH', 'SHJ', 'TLV'].includes(code)) {
+    if (['BAH', 'IKA', 'THR', 'BGW', 'BSR', 'EBL', 'ISU', 'NJF', 'AMM', 'AQJ', 'KWI', 'BEY', 'DAM', 'ALP', 'LTK', 'MCT', 'OHS', 'SLL', 'DOH', 'RUH', 'JED', 'DMM', 'MED', 'AHB', 'ELQ', 'TIF', 'TUU', 'HAS', 'YNB', 'AJF', 'EAM', 'GIZ', 'HOF', 'NUM', 'RSI', 'ULH', 'DXB', 'DWC', 'AUH', 'SHJ', 'TLV'].includes(code)) {
         return 'ME';
     }
 
@@ -1373,7 +1421,7 @@ function getEKRegionForAirport(airport) {
         return 'AFRICA';
     }
 
-    if (['LHR', 'LGW', 'STN', 'LTN', 'MAN', 'CDG', 'ORY', 'NCE', 'FRA', 'MUC', 'AMS', 'BRU', 'ZRH', 'BSL', 'VIE', 'SZG', 'FCO', 'MXP', 'MAD', 'BCN', 'IST', 'SAW', 'AYT', 'ADB', 'ESB', 'TZX', 'BJV', 'SVO', 'DME', 'VKO', 'LED', 'AER', 'KUF', 'KZN', 'MCX', 'MRV', 'OVB', 'UFA', 'VOG', 'SVX', 'KRR', 'ROV', 'PEE', 'ZIA', 'WAW', 'KRK', 'POZ', 'PRG', 'BUD', 'OTP', 'CLJ', 'SOF', 'BEG', 'ZAG', 'DBV', 'SJJ', 'TIA', 'SKP', 'LJU', 'ATH', 'SKG', 'JMK', 'JTR', 'CFU', 'VNO', 'RIX', 'TLL', 'HEL', 'CTA', 'NAP', 'PSA', 'BGY', 'OLB', 'CAG', 'MLA', 'LCA', 'TIV', 'BTS', 'KBP', 'IEV', 'ODS', 'MSQ'].includes(code)) {
+    if (['LHR', 'LGW', 'STN', 'LTN', 'MAN', 'CDG', 'ORY', 'NCE', 'FRA', 'MUC', 'AMS', 'BRU', 'ZRH', 'BSL', 'VIE', 'SZG', 'FCO', 'MXP', 'MAD', 'BCN', 'IST', 'SAW', 'AYT', 'ADB', 'ESB', 'TZX', 'BJV', 'SVO', 'DME', 'VKO', 'LED', 'AER', 'KUF', 'KZN', 'MCX', 'MRV', 'OVB', 'UFA', 'VOG', 'SVX', 'KRR', 'ROV', 'PEE', 'ZIA', 'VOZ', 'WAW', 'KRK', 'POZ', 'PRG', 'BUD', 'OTP', 'CLJ', 'SOF', 'BEG', 'ZAG', 'DBV', 'SJJ', 'TIA', 'SKP', 'LJU', 'ATH', 'SKG', 'JMK', 'JTR', 'CFU', 'VNO', 'RIX', 'TLL', 'HEL', 'CTA', 'NAP', 'PSA', 'BGY', 'OLB', 'CAG', 'MLA', 'LCA', 'TIV', 'BTS', 'KBP', 'IEV', 'ODS', 'MSQ'].includes(code)) {
         return 'EUROPE';
     }
 
