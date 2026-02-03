@@ -288,10 +288,18 @@ const generateSummary = (events, changes, segmentHistory) => {
     let description = "";
     let alertLevel = "warning";
 
-    if (changeCounts.booking_cancelled > 0) {
+    const lastEvent = events[events.length - 1];
+    const finalHasConfirmed = lastEvent && lastEvent.segments && lastEvent.segments.some(s => isConfirmed(s.status));
+    const finalAllCancelled = lastEvent && lastEvent.segments && lastEvent.segments.length > 0 && lastEvent.segments.every(s => isCancelled(s.status));
+
+    if (changeCounts.booking_cancelled > 0 && (finalAllCancelled || !finalHasConfirmed)) {
         status = "Booking Cancelled";
         description = "The booking has been cancelled. ";
         alertLevel = "critical";
+    } else if (changeCounts.booking_cancelled > 0 && finalHasConfirmed) {
+        status = "Booking Modified";
+        description = "The booking was modified: some segments were cancelled or changed, and the itinerary was rebooked. ";
+        alertLevel = "warning";
     } else if (changeCounts.fdis > 0) {
         status = "Flight Disruption (FDIS)";
         description = "Flight schedule changes detected. ";
