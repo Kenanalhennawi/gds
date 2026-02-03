@@ -165,7 +165,7 @@ export const renderTimeline = (container, data) => {
 
         let changesHtml = "";
         if (hasChanges) {
-            changesHtml = `<div class="changes-section" style="margin-top:15px; padding:15px; background:rgba(255,130,0,0.08); border-radius:8px; border-left:3px solid var(--warning-amber);">
+            changesHtml = `<div class="changes-section changes-section-first" style="margin-top:0; margin-bottom:15px; padding:15px; background:rgba(255,130,0,0.08); border-radius:8px; border-left:3px solid var(--warning-amber);">
                 <div style="font-weight:700; color:var(--warning-amber); margin-bottom:10px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
                     📋 What Happened:
                 </div>`;
@@ -201,6 +201,7 @@ export const renderTimeline = (container, data) => {
                     <span class="context-pill">${evt.envelope || 'LOG'}</span>
                 </div>
             </div>
+            ${changesHtml}
             ${contextHtml}
         `;
 
@@ -392,8 +393,6 @@ export const renderTimeline = (container, data) => {
             });
             html += `</div>`;
         }
-
-        html += changesHtml;
 
         card.innerHTML = html;
         container.appendChild(card);
