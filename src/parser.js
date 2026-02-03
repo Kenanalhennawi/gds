@@ -146,15 +146,30 @@ export const parseLog = (input) => {
         const paxes = [];
         const titles = ['MASTER', 'MSTR', 'MISS', 'MRS', 'MR', 'MS', 'DR', 'PROF', 'REV', 'HON'];
 
+        const nonPassengerPatterns = [
+            /^[A-Z]{2,3}\/[A-Z]{2,3}$/,  // EN/TNR, TNR/EK, DXB/SLL (city/airline/route)
+            /^[A-Z]\/(MG|MDG|MSTR|MISS|MRS|MR|MS|DR)$/i,  // A/MG, P/MDG (agent/title-like context)
+            /^P\/MG$/i,
+            /^[A-Z]{3}\/EK$/i,   // TNR/EK
+            /^EN\/TNR$/i,
+            /^TNR\/EK$/i,
+            /^A\/MG$/i
+        ];
+        const isLikelyNotPassenger = (raw, surname, given) => {
+            const u = raw.trim().toUpperCase();
+            if (u.match(/[A-Z]{3}[A-Z]{3}/)) return true;
+            if (nonPassengerPatterns.some(re => re.test(u))) return true;
+            return false;
+        };
 
         const regex = /(\d+)?([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?/g;
         let match;
         while ((match = regex.exec(line)) !== null) {
 
             if (match[0].match(/[A-Z]{3}[A-Z]{3}/)) continue;
-            
             let surname = match[2].trim();
             let given = match[3].trim();
+            if (isLikelyNotPassenger(match[0], surname, given)) continue;
             let title = match[4] ? match[4].trim() : "";
             
             if (!title) {
