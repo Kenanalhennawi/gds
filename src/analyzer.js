@@ -305,9 +305,15 @@ const generateSummary = (events, changes, segmentHistory) => {
         description = "Flight schedule changes detected. ";
         alertLevel = "warning";
     } else if (changeCounts.segment_cancelled > 0 || changeCounts.segment_dropped > 0) {
-        status = "Segments Cancelled/Dropped";
-        description = "One or more flight segments were cancelled or removed. ";
-        alertLevel = "critical";
+        if (finalHasConfirmed) {
+            status = "Booking Modified";
+            description = "The booking was modified: some segments were cancelled or removed, and the itinerary was rebooked. ";
+            alertLevel = "warning";
+        } else {
+            status = "Segments Cancelled/Dropped";
+            description = "One or more flight segments were cancelled or removed. ";
+            alertLevel = "critical";
+        }
     } else if (changeCounts.segment_reissued > 0) {
         status = "Booking Reissued";
         description = "The booking has been reissued with changes. ";
