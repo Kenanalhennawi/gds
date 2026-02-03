@@ -888,6 +888,15 @@ body {
     position: relative;
 }
 
+.panel-footer-input {
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.panel-footer-input .btn-clear-console {
+    flex-shrink: 0;
+}
+
 .panel-footer::before {
     content: '';
     position: absolute;
