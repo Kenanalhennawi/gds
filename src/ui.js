@@ -8,10 +8,43 @@ export const renderTimeline = (container, data) => {
     const changes = Array.isArray(data) ? null : (data.changes || []);
 
     const changesByEventIndex = new Map();
+    const allChangesFlat = [];
     if (changes) {
         changes.forEach(changeGroup => {
             changesByEventIndex.set(changeGroup.eventIndex, changeGroup.changes);
+            (changeGroup.changes || []).forEach(c => allChangesFlat.push(c));
         });
+    }
+
+    if (allChangesFlat.length > 0) {
+        const changeIcons = {
+            'booking_cancelled': '❌',
+            'segment_cancelled': '✕',
+            'segment_dropped': '🗑️',
+            'segment_added': '➕',
+            'segment_reissued': '🔄',
+            'fdis': '⚠️',
+            'status_change': '🔄'
+        };
+        const whatHappenedSection = document.createElement("div");
+        whatHappenedSection.className = "what-happened-global";
+        whatHappenedSection.innerHTML = `
+            <div class="changes-section changes-section-first" style="margin-top:0; margin-bottom:20px; padding:20px; background:rgba(255,130,0,0.08); border-radius:12px; border-left:4px solid var(--warning-amber);">
+                <div style="font-weight:700; color:var(--warning-amber); margin-bottom:14px; font-size:14px; text-transform:uppercase; letter-spacing:0.5px;">
+                    📋 What Happened
+                </div>
+                <div class="what-happened-list">
+                    ${allChangesFlat.map(change => {
+                        const icon = changeIcons[change.type] || '•';
+                        return `<div style="margin-bottom:10px; padding:10px; background:rgba(0,100,150,0.05); border-radius:6px; font-size:13px; line-height:1.5; border-left:2px solid var(--warning-amber);">
+                            <span style="margin-right:8px; font-size:16px;">${icon}</span>
+                            <span style="color:var(--text-main);">${change.description}</span>
+                        </div>`;
+                    }).join('')}
+                </div>
+            </div>
+        `;
+        container.appendChild(whatHappenedSection);
     }
 
     if (summary && events.length > 0) {
