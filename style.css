@@ -1,37 +1,42 @@
+/* Flydubai brand colors - exact from flydubai.com */
 :root {
-    --bg-dark: #0a0e1a;
-    --bg-darker: #050810;
-    --glass: rgba(15, 20, 30, 0.85);
-    --glass-light: rgba(20, 25, 35, 0.6);
-    --glass-border: rgba(100, 120, 150, 0.15);
-    --primary-blue: #3b82f6;
-    --primary-blue-light: #60a5fa;
-    --primary-blue-dark: #2563eb;
-    --primary-orange: #f97316;
-    --primary-orange-light: #fb923c;
-    --primary-orange-dark: #ea580c;
-    --accent-teal: #06b6d4;
-    --accent-cyan: #22d3ee;
-    --accent-purple: #8b7cf6;
-    --accent-pink: #d67ee8;
-    --success-green: #10b981;
-    --success-lime: #84cc16;
-    --warning-amber: #f59e0b;
-    --warning-orange: #fb923c;
-    --error-red: #ef4444;
-    --error-rose: #fb7185;
-    --info-blue: #60a5fa;
+    --flydubai-orange: #FF8200;
+    --flydubai-orange-light: #ff9a33;
+    --flydubai-orange-dark: #e67300;
+    --flydubai-orange-glow: rgba(255, 130, 0, 0.35);
+    --flydubai-blue: #006496;
+    --flydubai-blue-light: #0080c0;
+    --flydubai-blue-dark: #004d73;
+    --flydubai-blue-glow: rgba(0, 100, 150, 0.35);
+    --bg-dark: #0c1219;
+    --bg-darker: #060a0f;
+    --glass: rgba(12, 18, 28, 0.9);
+    --glass-light: rgba(18, 28, 42, 0.7);
+    --glass-border: rgba(0, 100, 150, 0.12);
+    --primary-blue: var(--flydubai-blue);
+    --primary-blue-light: var(--flydubai-blue-light);
+    --primary-blue-dark: var(--flydubai-blue-dark);
+    --primary-orange: var(--flydubai-orange);
+    --primary-orange-light: var(--flydubai-orange-light);
+    --primary-orange-dark: var(--flydubai-orange-dark);
+    --accent-teal: #0d9488;
+    --accent-cyan: #0891b2;
+    --success-green: #059669;
+    --warning-amber: #d97706;
+    --error-red: #dc2626;
+    --info-blue: var(--flydubai-blue-light);
     --text-main: #f1f5f9;
-    --text-muted: #cbd5e1;
-    --text-dim: #94a3b8;
-    --font-ui: 'Inter', sans-serif;
+    --text-muted: #94a3b8;
+    --text-dim: #64748b;
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     --font-code: 'JetBrains Mono', monospace;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.2);
     --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.3);
-    --shadow-xl: 0 16px 64px rgba(0, 0, 0, 0.4);
-    --shadow-glow-blue: 0 0 40px rgba(59, 130, 246, 0.3);
-    --shadow-glow-orange: 0 0 40px rgba(249, 115, 22, 0.3);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.35);
+    --shadow-glow-blue: 0 0 40px var(--flydubai-blue-glow);
+    --shadow-glow-orange: 0 0 40px var(--flydubai-orange-glow);
+    --neon-gold: var(--flydubai-orange);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -58,10 +63,10 @@ body {
     position: fixed;
     inset: 0;
     background: 
-        radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(249, 115, 22, 0.12) 0%, transparent 50%),
-        linear-gradient(135deg, rgba(10, 14, 26, 0.9) 0%, rgba(15, 20, 30, 0.85) 50%, rgba(10, 14, 26, 0.9) 100%);
-    backdrop-filter: blur(3px);
+        radial-gradient(circle at 20% 30%, rgba(0, 100, 150, 0.18) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 130, 0, 0.12) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(6, 10, 15, 0.92) 0%, rgba(12, 18, 28, 0.88) 50%, rgba(6, 10, 15, 0.92) 100%);
+    backdrop-filter: blur(4px);
     z-index: -1;
 }
 
@@ -70,15 +75,15 @@ body {
     inset: 0;
     z-index: 0;
     background-image: 
-        radial-gradient(2px 2px at 20% 30%, rgba(59, 130, 246, 0.3), transparent),
-        radial-gradient(2px 2px at 60% 70%, rgba(249, 115, 22, 0.2), transparent),
-        radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.1), transparent),
-        radial-gradient(1px 1px at 80% 10%, rgba(59, 130, 246, 0.2), transparent),
-        radial-gradient(2px 2px at 90% 60%, rgba(249, 115, 22, 0.15), transparent);
+        radial-gradient(2px 2px at 20% 30%, rgba(0, 100, 150, 0.35), transparent),
+        radial-gradient(2px 2px at 60% 70%, rgba(255, 130, 0, 0.25), transparent),
+        radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.08), transparent),
+        radial-gradient(1px 1px at 80% 10%, rgba(0, 100, 150, 0.2), transparent),
+        radial-gradient(2px 2px at 90% 60%, rgba(255, 130, 0, 0.18), transparent);
     background-size: 200% 200%, 150% 150%, 100% 100%, 120% 120%, 180% 180%;
     background-position: 0% 0%, 100% 0%, 50% 50%, 0% 100%, 100% 100%;
     animation: particleMove 20s ease infinite;
-    opacity: 0.6;
+    opacity: 0.7;
 }
 
 @keyframes particleMove {
@@ -95,9 +100,9 @@ body {
     position: absolute;
     inset: 0;
     background: 
-        radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(249, 115, 22, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.06) 0%, transparent 70%);
+        radial-gradient(circle at 20% 30%, rgba(0, 100, 150, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255, 130, 0, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(0, 100, 150, 0.05) 0%, transparent 70%);
     animation: gradientShift 20s ease infinite;
     z-index: -1;
 }
@@ -159,7 +164,7 @@ body {
 }
 
 .quality-mark {
-    color: var(--primary-orange);
+    color: var(--flydubai-orange);
     font-weight: 500;
     font-style: italic;
 }
@@ -173,13 +178,13 @@ body {
     padding: 20px 32px;
     flex-shrink: 0;
     flex-grow: 0;
-    background: rgba(15, 20, 30, 0.5);
+    background: rgba(12, 22, 35, 0.75);
     backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(100, 120, 150, 0.15);
-    border-radius: 24px;
+    border: 1px solid rgba(0, 100, 150, 0.2);
+    border-radius: 20px;
     box-shadow: 
         var(--shadow-xl),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset;
     position: relative;
     z-index: 10;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -189,23 +194,23 @@ body {
     content: '';
     position: absolute;
     inset: 0;
-    border-radius: 24px;
+    border-radius: 20px;
     padding: 1px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(249, 115, 22, 0.3), transparent);
+    background: linear-gradient(135deg, var(--flydubai-blue), var(--flydubai-orange), transparent 70%);
     -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     -webkit-mask-composite: xor;
     mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
     mask-composite: exclude;
-    opacity: 0.6;
+    opacity: 0.5;
     z-index: -1;
 }
 
 .app-header:hover {
-    border-color: rgba(100, 120, 150, 0.25);
+    border-color: rgba(0, 100, 150, 0.35);
     box-shadow: 
         var(--shadow-xl),
-        0 0 60px rgba(59, 130, 246, 0.15),
-        0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+        0 0 50px var(--flydubai-blue-glow),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
 }
 
 .logo { 
@@ -217,16 +222,16 @@ body {
 .logo-icon {
     width: 60px; 
     height: 60px;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
-    border-radius: 18px;
+    background: linear-gradient(135deg, var(--flydubai-blue), var(--flydubai-orange));
+    border-radius: 16px;
     display: flex; 
     align-items: center; 
     justify-content: center;
     color: #fff;
     box-shadow: 
-        0 8px 24px rgba(59, 130, 246, 0.4),
-        0 4px 12px rgba(249, 115, 22, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 8px 24px var(--flydubai-blue-glow),
+        0 4px 12px var(--flydubai-orange-glow),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
     position: relative;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
@@ -244,9 +249,9 @@ body {
 .logo-icon:hover {
     transform: scale(1.08) rotate(2deg);
     box-shadow: 
-        0 12px 32px rgba(59, 130, 246, 0.5),
-        0 6px 16px rgba(249, 115, 22, 0.4),
-        var(--shadow-glow-blue);
+        0 12px 32px var(--flydubai-blue-glow),
+        0 6px 16px var(--flydubai-orange-glow),
+        var(--shadow-glow-orange);
 }
 
 .logo-icon:hover::before {
@@ -262,11 +267,11 @@ body {
 }
 
 .logo-text h1 { 
-    font-size: 30px; 
-    font-weight: 900; 
-    letter-spacing: -1.5px; 
+    font-size: 28px; 
+    font-weight: 800; 
+    letter-spacing: -0.5px; 
     margin: 0; 
-    background: linear-gradient(135deg, var(--text-main), var(--primary-blue-light));
+    background: linear-gradient(135deg, #fff 0%, var(--flydubai-blue-light) 50%, var(--flydubai-orange) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -277,7 +282,7 @@ body {
     font-size: 11px; 
     text-transform: uppercase; 
     letter-spacing: 2.5px; 
-    color: var(--primary-blue);
+    color: var(--flydubai-orange);
     font-weight: 600;
     margin-top: 2px;
     display: block;
@@ -327,7 +332,7 @@ body {
 
 .tab-btn:hover {
     color: var(--text-main);
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(0, 100, 150, 0.15);
     transform: translateY(-1px);
 }
 
@@ -337,13 +342,13 @@ body {
 }
 
 .tab-btn.active {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(249, 115, 22, 0.15));
+    background: linear-gradient(135deg, rgba(0, 100, 150, 0.3), rgba(255, 130, 0, 0.2));
     color: var(--text-main);
     box-shadow: 
-        0 4px 12px rgba(59, 130, 246, 0.2),
-        0 2px 6px rgba(249, 115, 22, 0.15),
+        0 4px 12px var(--flydubai-blue-glow),
+        0 2px 6px var(--flydubai-orange-glow),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    border: 1px solid rgba(255, 130, 0, 0.35);
 }
 
 .tab-btn.active .tab-icon {
@@ -376,17 +381,17 @@ body {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(249, 115, 22, 0.05));
+    background: linear-gradient(135deg, rgba(0, 100, 150, 0.12), rgba(255, 130, 0, 0.08));
     opacity: 0;
     transition: opacity 0.3s ease;
 }
 
 .btn-glass:hover {
-    background: rgba(59, 130, 246, 0.15);
-    border-color: rgba(59, 130, 246, 0.4);
-    color: var(--primary-blue-light);
+    background: rgba(255, 130, 0, 0.15);
+    border-color: rgba(255, 130, 0, 0.45);
+    color: var(--flydubai-orange-light);
     transform: translateY(-2px);
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 4px 16px var(--flydubai-orange-glow);
 }
 
 .btn-glass:hover::before {
@@ -445,11 +450,11 @@ body {
     height: 3px;
     background: linear-gradient(90deg, 
         transparent, 
-        var(--primary-blue), 
-        var(--primary-orange),
+        var(--flydubai-blue), 
+        var(--flydubai-orange),
         transparent
     );
-    opacity: 0.7;
+    opacity: 0.85;
     z-index: 1;
 }
 
@@ -458,11 +463,11 @@ body {
 }
 
 .modern-panel:hover {
-    border-color: rgba(100, 120, 150, 0.3);
+    border-color: rgba(0, 100, 150, 0.3);
     box-shadow: 
         var(--shadow-xl),
-        0 0 60px rgba(59, 130, 246, 0.15),
-        0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+        0 0 50px var(--flydubai-blue-glow),
+        0 0 0 1px rgba(255, 255, 255, 0.06) inset;
     transform: translateY(-2px);
 }
 
@@ -532,13 +537,13 @@ body {
     gap: 16px;
     padding: 18px 24px;
     border-radius: 16px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(249, 115, 22, 0.1));
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, rgba(0, 100, 150, 0.18), rgba(255, 130, 0, 0.1));
+    border: 1px solid rgba(0, 100, 150, 0.35);
     backdrop-filter: blur(16px) saturate(180%);
     box-shadow: 
         0 8px 32px rgba(0, 0, 0, 0.3),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 0 40px rgba(59, 130, 246, 0.2);
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 0 40px var(--flydubai-blue-glow);
     pointer-events: none;
     animation: fadeInHint 0.6s ease-out;
 }
@@ -577,7 +582,7 @@ body {
     font-size: 14px;
     font-weight: 700;
     letter-spacing: 0.5px;
-    background: linear-gradient(135deg, var(--primary-blue-light), var(--primary-orange-light));
+    background: linear-gradient(135deg, var(--flydubai-blue-light), var(--flydubai-orange-light));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -622,17 +627,17 @@ body {
 }
 
 .system-pill.system-amadeus {
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25), rgba(59, 130, 246, 0.15));
-    border-color: rgba(59, 130, 246, 0.4);
-    color: var(--primary-blue-light);
-    box-shadow: 0 0 12px rgba(59, 130, 246, 0.2);
+    background: linear-gradient(135deg, rgba(0, 100, 150, 0.3), rgba(0, 100, 150, 0.15));
+    border-color: rgba(0, 100, 150, 0.45);
+    color: var(--flydubai-blue-light);
+    box-shadow: 0 0 12px var(--flydubai-blue-glow);
 }
 
 .system-pill.system-sabre {
-    background: linear-gradient(135deg, rgba(249, 115, 22, 0.25), rgba(249, 115, 22, 0.15));
-    border-color: rgba(249, 115, 22, 0.4);
-    color: var(--primary-orange-light);
-    box-shadow: 0 0 12px rgba(249, 115, 22, 0.2);
+    background: linear-gradient(135deg, rgba(255, 130, 0, 0.3), rgba(255, 130, 0, 0.15));
+    border-color: rgba(255, 130, 0, 0.45);
+    color: var(--flydubai-orange-light);
+    box-shadow: 0 0 12px var(--flydubai-orange-glow);
 }
 
 .system-pill.system-galileo,
@@ -714,13 +719,13 @@ body {
     z-index: 3;
     padding: 20px 24px;
     border-radius: 16px;
-    background: linear-gradient(135deg, rgba(15, 20, 30, 0.95), rgba(20, 25, 35, 0.9));
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, rgba(12, 22, 35, 0.95), rgba(18, 28, 42, 0.9));
+    border: 1px solid rgba(0, 100, 150, 0.35);
     backdrop-filter: blur(16px) saturate(180%);
     box-shadow: 
         0 8px 32px rgba(0, 0, 0, 0.4),
-        0 0 0 1px rgba(255, 255, 255, 0.05) inset,
-        0 0 60px rgba(59, 130, 246, 0.25);
+        0 0 0 1px rgba(255, 255, 255, 0.04) inset,
+        0 0 50px var(--flydubai-blue-glow);
     animation: fadeInHint 0.4s ease-out;
 }
 
@@ -738,17 +743,17 @@ body {
 .loading-bar-fill {
     height: 100%;
     background: linear-gradient(90deg, 
-        var(--primary-blue), 
-        var(--primary-orange),
-        var(--primary-blue)
+        var(--flydubai-blue), 
+        var(--flydubai-orange),
+        var(--flydubai-blue)
     );
     background-size: 200% 100%;
     border-radius: 10px;
     transition: width 0.3s ease;
     animation: loadingShimmer 2s ease-in-out infinite;
     box-shadow: 
-        0 0 20px rgba(59, 130, 246, 0.6),
-        0 0 40px rgba(249, 115, 22, 0.4);
+        0 0 20px var(--flydubai-blue-glow),
+        0 0 40px var(--flydubai-orange-glow);
 }
 
 @keyframes loadingShimmer {
@@ -776,7 +781,7 @@ body {
     content: '';
     width: 12px;
     height: 12px;
-    border: 2px solid var(--primary-blue);
+    border: 2px solid var(--flydubai-orange);
     border-top-color: transparent;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
@@ -822,7 +827,7 @@ body {
 }
 
 #gdsInput:focus {
-    color: var(--primary-blue-light);
+    color: var(--flydubai-blue-light);
 }
 
 #gdsInput::placeholder {
@@ -849,10 +854,11 @@ body {
     height: 1px;
     background: linear-gradient(90deg, 
         transparent, 
-        var(--primary-blue), 
+        var(--flydubai-blue), 
+        var(--flydubai-orange),
         transparent
     );
-    opacity: 0.5;
+    opacity: 0.6;
 }
 
 .input-status {
@@ -897,27 +903,27 @@ body {
 }
 
 .timeline-container::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+    background: linear-gradient(135deg, var(--flydubai-blue), var(--flydubai-orange));
     border-radius: 4px;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .timeline-container::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, var(--primary-blue-light), var(--primary-orange-light));
+    background: linear-gradient(135deg, var(--flydubai-blue-light), var(--flydubai-orange-light));
 }
 
 .timeline-card {
     background: var(--glass);
     border: 1px solid var(--glass-border);
-    border-radius: 20px;
+    border-radius: 18px;
     padding: 28px;
     position: relative;
     animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     backdrop-filter: blur(16px) saturate(180%);
     box-shadow: 
         var(--shadow-lg),
-        0 2px 8px rgba(59, 130, 246, 0.1),
-        0 0 0 1px rgba(59, 130, 246, 0.05) inset;
+        0 2px 8px rgba(0, 100, 150, 0.08),
+        0 0 0 1px rgba(0, 100, 150, 0.06) inset;
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
     z-index: 1;
@@ -932,8 +938,8 @@ body {
     right: 0;
     height: 3px;
     background: linear-gradient(90deg, 
-        var(--primary-blue), 
-        var(--primary-orange),
+        var(--flydubai-blue), 
+        var(--flydubai-orange),
         transparent
     );
     opacity: 0;
@@ -941,12 +947,12 @@ body {
 }
 
 .timeline-card:hover {
-    border-color: rgba(59, 130, 246, 0.5);
+    border-color: rgba(255, 130, 0, 0.4);
     box-shadow: 
         var(--shadow-xl),
-        0 4px 20px rgba(59, 130, 246, 0.3),
-        0 2px 10px rgba(249, 115, 22, 0.2),
-        0 0 0 1px rgba(59, 130, 246, 0.2) inset;
+        0 4px 20px var(--flydubai-blue-glow),
+        0 2px 10px var(--flydubai-orange-glow),
+        0 0 0 1px rgba(255, 130, 0, 0.15) inset;
     transform: translateY(-4px);
 }
 
@@ -971,19 +977,19 @@ body {
     left: 0; top: 28px; bottom: 28px;
     width: 5px;
     background: linear-gradient(180deg, 
-        var(--primary-blue), 
-        var(--primary-orange)
+        var(--flydubai-blue), 
+        var(--flydubai-orange)
     );
     border-radius: 0 6px 6px 0;
-    opacity: 0.7;
+    opacity: 0.8;
     transition: all 0.3s ease;
-    box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+    box-shadow: 0 0 12px var(--flydubai-blue-glow);
 }
 
 .timeline-card:hover::before {
     opacity: 1;
     width: 6px;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+    box-shadow: 0 0 20px var(--flydubai-orange-glow);
 }
 
 .card-header {
@@ -1015,10 +1021,10 @@ body {
     width: 12px; 
     height: 12px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+    background: linear-gradient(135deg, var(--flydubai-blue), var(--flydubai-orange));
     box-shadow: 
-        0 0 12px rgba(59, 130, 246, 0.6),
-        0 0 6px rgba(249, 115, 22, 0.4);
+        0 0 12px var(--flydubai-blue-glow),
+        0 0 6px var(--flydubai-orange-glow);
     animation: pulse 2s ease-in-out infinite;
 }
 
@@ -1039,11 +1045,11 @@ body {
 .context-pill {
     font-family: var(--font-code);
     font-size: 11px;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(249, 115, 22, 0.1));
+    background: linear-gradient(135deg, rgba(0, 100, 150, 0.25), rgba(255, 130, 0, 0.12));
     padding: 6px 12px;
     border-radius: 8px;
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    color: var(--primary-blue-light);
+    border: 1px solid rgba(0, 100, 150, 0.35);
+    color: var(--flydubai-blue-light);
     font-weight: 600;
 }
 
@@ -1080,8 +1086,8 @@ body {
     position: absolute;
     inset: 0;
     background: 
-        radial-gradient(circle at 30% 40%, rgba(59, 130, 246, 0.15) 0%, transparent 60%),
-        radial-gradient(circle at 70% 60%, rgba(249, 115, 22, 0.12) 0%, transparent 60%);
+        radial-gradient(circle at 30% 40%, rgba(0, 100, 150, 0.18) 0%, transparent 60%),
+        radial-gradient(circle at 70% 60%, rgba(255, 130, 0, 0.12) 0%, transparent 60%);
     border-radius: 24px;
     z-index: -1;
     animation: emptyGlow 4s ease infinite;
@@ -1099,11 +1105,11 @@ body {
 .empty-icon-large {
     font-size: 80px;
     margin-bottom: 32px;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+    background: linear-gradient(135deg, var(--flydubai-blue), var(--flydubai-orange));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    filter: drop-shadow(0 4px 12px rgba(59, 130, 246, 0.4));
+    filter: drop-shadow(0 4px 12px var(--flydubai-orange-glow));
     animation: float 4s ease-in-out infinite;
 }
 
@@ -1115,10 +1121,10 @@ body {
 .empty-state h3 {
     font-size: 28px;
     font-weight: 800;
-    color: var(--primary-orange);
+    color: var(--flydubai-orange);
     margin-bottom: 20px;
     letter-spacing: -0.5px;
-    text-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+    text-shadow: 0 2px 8px var(--flydubai-orange-glow);
 }
 
 .empty-state p {
@@ -1137,7 +1143,7 @@ body {
 
 .btn-hero {
     padding: 14px 32px;
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+    background: linear-gradient(135deg, var(--flydubai-blue), var(--flydubai-orange));
     border: none;
     border-radius: 12px;
     color: #fff;
@@ -1146,8 +1152,8 @@ body {
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 
-        0 4px 16px rgba(59, 130, 246, 0.4),
-        0 2px 8px rgba(249, 115, 22, 0.3);
+        0 4px 16px var(--flydubai-blue-glow),
+        0 2px 8px var(--flydubai-orange-glow);
     position: relative;
     overflow: hidden;
 }
@@ -1164,8 +1170,8 @@ body {
 .btn-hero:hover {
     transform: translateY(-3px);
     box-shadow: 
-        0 8px 24px rgba(59, 130, 246, 0.5),
-        0 4px 12px rgba(249, 115, 22, 0.4);
+        0 8px 24px var(--flydubai-blue-glow),
+        0 4px 12px var(--flydubai-orange-glow);
 }
 
 .btn-hero:hover::before {
@@ -1178,7 +1184,7 @@ body {
 
 
 .btn-primary {
-    background: linear-gradient(135deg, var(--primary-blue), var(--primary-orange));
+    background: linear-gradient(135deg, var(--flydubai-blue), var(--flydubai-orange));
     border: none;
     color: #fff;
     padding: 12px 28px;
@@ -1190,8 +1196,8 @@ body {
     letter-spacing: 1px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 
-        0 4px 16px rgba(59, 130, 246, 0.4),
-        0 2px 8px rgba(249, 115, 22, 0.3);
+        0 4px 16px var(--flydubai-blue-glow),
+        0 2px 8px var(--flydubai-orange-glow);
     position: relative;
     overflow: hidden;
 }
@@ -1208,8 +1214,8 @@ body {
 .btn-primary:hover { 
     transform: translateY(-3px); 
     box-shadow: 
-        0 8px 24px rgba(59, 130, 246, 0.5),
-        0 4px 12px rgba(249, 115, 22, 0.4);
+        0 8px 24px var(--flydubai-blue-glow),
+        0 4px 12px var(--flydubai-orange-glow);
 }
 
 .btn-primary:hover::before {
@@ -1231,16 +1237,16 @@ body {
 .styled-input:hover,
 .styled-select:hover {
     background: rgba(0, 0, 0, 0.4) !important;
-    border-color: rgba(59, 130, 246, 0.5) !important;
+    border-color: rgba(0, 100, 150, 0.5) !important;
 }
 
 .styled-input:focus,
 .styled-select:focus {
     background: rgba(0, 0, 0, 0.5) !important;
-    border-color: var(--primary-blue) !important;
+    border-color: var(--flydubai-blue) !important;
     box-shadow: 
-        0 0 0 3px rgba(59, 130, 246, 0.2),
-        0 4px 12px rgba(59, 130, 246, 0.1) !important;
+        0 0 0 3px var(--flydubai-blue-glow),
+        0 4px 12px rgba(0, 100, 150, 0.15) !important;
     outline: none !important;
 }
 
@@ -1251,7 +1257,7 @@ body {
 }
 
 .styled-select:active {
-    border-color: var(--primary-orange) !important;
+    border-color: var(--flydubai-orange) !important;
 }
 
 .styled-select option {
@@ -1261,12 +1267,12 @@ body {
 }
 
 .styled-select option:hover {
-    background: rgba(59, 130, 246, 0.2);
+    background: rgba(0, 100, 150, 0.2);
 }
 
 .styled-select option:checked {
-    background: rgba(249, 115, 22, 0.3);
-    color: var(--primary-orange-light);
+    background: rgba(255, 130, 0, 0.3);
+    color: var(--flydubai-orange-light);
 }
 
 
@@ -1300,12 +1306,12 @@ body {
     width: 0;
     height: 3px;
     border-radius: 3px;
-    background: var(--primary-blue);
+    background: var(--flydubai-orange);
     transition: width 0.25s ease;
 }
 
 .service-tab:hover {
-    background: rgba(59, 130, 246, 0.12);
+    background: rgba(0, 100, 150, 0.15);
     color: var(--text-main);
 }
 
@@ -1314,9 +1320,9 @@ body {
 }
 
 .service-tab.active {
-    background: rgba(59, 130, 246, 0.2);
+    background: rgba(255, 130, 0, 0.2);
     color: var(--text-main);
-    box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.35);
+    box-shadow: 0 0 0 1px rgba(255, 130, 0, 0.4);
 }
 
 .service-tab.active::after {
@@ -1343,10 +1349,10 @@ body {
 }
 
 .alert-info { 
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.08)); 
-    border-left-color: var(--primary-blue);
-    border: 1px solid rgba(59, 130, 246, 0.3); 
-    color: var(--primary-blue-light); 
+    background: linear-gradient(135deg, rgba(0, 100, 150, 0.18), rgba(0, 100, 150, 0.08)); 
+    border-left-color: var(--flydubai-blue);
+    border: 1px solid rgba(0, 100, 150, 0.35); 
+    color: var(--flydubai-blue-light); 
 }
 
 .alert-success { 
@@ -1400,14 +1406,14 @@ body {
     top: 0;
     bottom: 0;
     width: 3px;
-    background: linear-gradient(180deg, var(--primary-blue), var(--primary-orange));
+    background: linear-gradient(180deg, var(--flydubai-blue), var(--flydubai-orange));
     opacity: 0;
     transition: opacity 0.3s ease;
     transform: translateX(4px);
 }
 
 .segment-row:hover {
-    background: rgba(59, 130, 246, 0.1);
+    background: rgba(0, 100, 150, 0.12);
     transform: translateX(4px);
 }
 
@@ -1418,7 +1424,7 @@ body {
 .seg-code { 
     font-family: var(--font-code); 
     font-weight: 700; 
-    color: var(--primary-blue); 
+    color: var(--flydubai-blue-light); 
     font-size: 14px;
 }
 
@@ -1478,15 +1484,15 @@ body {
     left: 0;
     width: 4px;
     height: 100%;
-    background: linear-gradient(180deg, var(--primary-blue), var(--primary-orange));
+    background: linear-gradient(180deg, var(--flydubai-blue), var(--flydubai-orange));
     border-radius: 12px 0 0 12px;
-    opacity: 0.7;
+    opacity: 0.8;
     transition: opacity 0.3s ease;
 }
 
 .timeline-card:hover .card-context::before {
     opacity: 1;
-    box-shadow: 0 0 12px rgba(59, 130, 246, 0.5);
+    box-shadow: 0 0 12px var(--flydubai-orange-glow);
 }
 
 .context-row {
@@ -1510,7 +1516,7 @@ body {
 }
 
 .ctx-val.pnr { 
-    color: var(--warning-amber); 
+    color: var(--flydubai-orange); 
     font-family: var(--font-code); 
     letter-spacing: 1.5px; 
     font-weight: 800;
@@ -1528,17 +1534,17 @@ body {
     font-size: 13px;
     font-weight: 700;
     color: #fff;
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(249, 115, 22, 0.1));
+    background: linear-gradient(135deg, rgba(0, 100, 150, 0.25), rgba(255, 130, 0, 0.12));
     padding: 8px 14px;
     border-radius: 8px;
-    border: 1px solid rgba(59, 130, 246, 0.3);
+    border: 1px solid rgba(0, 100, 150, 0.35);
     transition: all 0.3s ease;
 }
 
 .pax-item:hover {
     transform: scale(1.05);
-    background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(249, 115, 22, 0.2));
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background: linear-gradient(135deg, rgba(0, 100, 150, 0.35), rgba(255, 130, 0, 0.2));
+    box-shadow: 0 4px 12px var(--flydubai-orange-glow);
 }
 
 
@@ -1578,8 +1584,8 @@ body {
 }
 
 .summary-card.info {
-    background: rgba(59, 130, 246, 0.15);
-    border-color: rgba(59, 130, 246, 0.4);
+    background: rgba(0, 100, 150, 0.18);
+    border-color: rgba(0, 100, 150, 0.4);
 }
 
 
@@ -1602,7 +1608,7 @@ body {
 }
 
 .autocomplete-dropdown::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-blue);
+    background: var(--flydubai-orange);
 }
 
 
@@ -1616,13 +1622,13 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, var(--primary-blue), var(--primary-orange));
+    background: linear-gradient(180deg, var(--flydubai-blue), var(--flydubai-orange));
     border-radius: 10px;
     border: 2px solid rgba(0, 0, 0, 0.2);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, var(--primary-blue-light), var(--primary-orange-light));
+    background: linear-gradient(180deg, var(--flydubai-blue-light), var(--flydubai-orange-light));
 }
 
 
@@ -1664,7 +1670,7 @@ body {
 
 .how-to-use-toggle:focus-visible,
 .swap-btn:focus-visible {
-    outline: 2px solid var(--primary-blue);
+    outline: 2px solid var(--flydubai-orange);
     outline-offset: 2px;
 }
 
@@ -1730,8 +1736,8 @@ body {
 .loading-spinner {
     width: 48px;
     height: 48px;
-    border: 4px solid rgba(59, 130, 246, 0.2);
-    border-top-color: var(--primary-blue);
+    border: 4px solid rgba(0, 100, 150, 0.25);
+    border-top-color: var(--flydubai-orange);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 20px auto;
@@ -1761,7 +1767,7 @@ body {
 .btn-glass:focus,
 .btn-primary:focus,
 .btn-hero:focus {
-    outline: 2px solid var(--primary-blue);
+    outline: 2px solid var(--flydubai-orange);
     outline-offset: 2px;
 }
 
@@ -1769,7 +1775,7 @@ body {
 .btn-glass:focus-visible,
 .btn-primary:focus-visible,
 .btn-hero:focus-visible {
-    outline: 2px solid var(--primary-blue);
+    outline: 2px solid var(--flydubai-orange);
     outline-offset: 2px;
 }
 
@@ -1791,7 +1797,7 @@ body {
     position: absolute;
     top: -40px;
     left: 0;
-    background: var(--primary-blue);
+    background: var(--flydubai-orange);
     color: white;
     padding: 8px;
     text-decoration: none;
