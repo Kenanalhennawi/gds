@@ -26,7 +26,7 @@ export const renderTimeline = (container, data) => {
         );
         
         summaryCard.innerHTML = `
-            <h2 style="margin-bottom:5px; color:#fff;">${summary.status}</h2>
+            <h2 style="margin-bottom:5px; color:var(--text-main);">${summary.status}</h2>
             <p style="color:var(--text-muted); font-size:14px;">${summary.description}</p>
         `;
         container.appendChild(summaryCard);
@@ -45,8 +45,8 @@ export const renderTimeline = (container, data) => {
         
         if (hasChanges) {
             card.style.borderLeft = "4px solid var(--neon-gold)";
-            card.style.boxShadow = "0 0 25px rgba(255, 193, 7, 0.3), 0 0 50px rgba(255, 200, 0, 0.1)";
-            card.style.background = "linear-gradient(135deg, rgba(255, 200, 0, 0.05), var(--glass))";
+            card.style.boxShadow = "0 4px 20px rgba(255, 130, 0, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.8) inset";
+            card.style.background = "linear-gradient(135deg, rgba(255, 130, 0, 0.06), var(--glass))";
         }
 
         const envelopeInfo = translateEnvelope(evt.envelope);
@@ -165,7 +165,7 @@ export const renderTimeline = (container, data) => {
 
         let changesHtml = "";
         if (hasChanges) {
-            changesHtml = `<div class="changes-section" style="margin-top:15px; padding:15px; background:rgba(251,191,36,0.1); border-radius:8px; border-left:3px solid var(--warning-amber);">
+            changesHtml = `<div class="changes-section" style="margin-top:15px; padding:15px; background:rgba(255,130,0,0.08); border-radius:8px; border-left:3px solid var(--warning-amber);">
                 <div style="font-weight:700; color:var(--warning-amber); margin-bottom:10px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
                     📋 What Happened:
                 </div>`;
@@ -180,7 +180,7 @@ export const renderTimeline = (container, data) => {
                     'status_change': '🔄'
                 }[change.type] || '•';
                 
-                changesHtml += `<div style="margin-bottom:8px; padding:8px; background:rgba(0,0,0,0.2); border-radius:4px; font-size:13px; line-height:1.5; border-left:2px solid var(--warning-amber);">
+                changesHtml += `<div style="margin-bottom:8px; padding:8px; background:rgba(0,100,150,0.05); border-radius:4px; font-size:13px; line-height:1.5; border-left:2px solid var(--warning-amber);">
                     <span style="margin-right:6px; font-size:16px;">${changeIcon}</span>
                     <span style="color:var(--text-main);">${change.description}</span>
                 </div>`;
@@ -279,13 +279,13 @@ export const renderTimeline = (container, data) => {
         const allTicketNumbers = [...new Set([...ticketNumbers, ...ssrTicketNumbers, ...segmentTicketNumbers])];
         
         if (allTicketNumbers.length > 0) {
-            html += `<div class="ticket-numbers-container" style="margin-top:15px; padding:15px; background:linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.08)); border-radius:8px; border-left:4px solid var(--success-green);">
+            html += `<div class="ticket-numbers-container" style="margin-top:15px; padding:15px; background:linear-gradient(135deg, rgba(5, 150, 105, 0.1), rgba(5, 150, 105, 0.05)); border-radius:8px; border-left:4px solid var(--success-green);">
                 <div style="font-weight:700; color:var(--success-green); margin-bottom:12px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
                     ✈️ E-Ticket Numbers:
                 </div>`;
             allTicketNumbers.forEach((ticketNum, idx) => {
                 html += `
-                    <div style="margin-bottom:8px; padding:10px; background:rgba(0,0,0,0.2); border-radius:6px; border:1px solid rgba(16, 185, 129, 0.3);">
+                    <div style="margin-bottom:8px; padding:10px; background:rgba(5, 150, 105, 0.08); border-radius:6px; border:1px solid rgba(5, 150, 105, 0.25);">
                         <div style="display:flex; align-items:center; gap:10px;">
                             <span style="font-size:18px;">🎫</span>
                             <div style="flex:1;">
@@ -311,7 +311,7 @@ export const renderTimeline = (container, data) => {
                 const statusInfo = ssr.status ? translateStatus(ssr.status) : null;
                 
                 html += `
-                    <div style="margin-bottom:8px; padding:10px; background:rgba(96,165,250,0.1); border-radius:6px; border-left:3px solid var(--info-blue); transition:all 0.3s ease;">
+                    <div style="margin-bottom:8px; padding:10px; background:rgba(0, 100, 150, 0.06); border-radius:6px; border-left:3px solid var(--info-blue); transition:all 0.3s ease;">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                             <strong style="color:var(--info-blue); font-size:12px;">SSR ${ssr.code}</strong>
                             <span style="font-size:11px; color:var(--text-muted);">${ssr.carrier} (${carrierName})</span>
@@ -323,7 +323,7 @@ export const renderTimeline = (container, data) => {
                             ${ssr.ticketNumber ? `<div style="margin-top:4px;"><strong style="color:var(--success-green);">E-Ticket Number:</strong> <span style="font-family:var(--font-code); font-weight:700; color:var(--success-green);">${ssr.ticketNumber}</span></div>` : ''}
                             ${explanation ? `<div style="margin-top:4px; color:var(--text-main); font-size:11px;"><strong>Explanation:</strong> ${explanation}</div>` : ''}
                         </div>
-                        ${ssr.details ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.8; background:rgba(0,0,0,0.2); padding:4px; border-radius:3px;">${ssr.details}</div>` : ''}
+                        ${ssr.details ? `<div style="font-size:11px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.9; background:rgba(0,100,150,0.06); padding:4px; border-radius:3px;">${ssr.details}</div>` : ''}
                     </div>
                 `;
             });
@@ -361,14 +361,14 @@ export const renderTimeline = (container, data) => {
                 }
                 
                 html += `
-                    <div style="margin-bottom:8px; padding:10px; background:rgba(74,222,128,0.1); border-radius:6px; border-left:3px solid var(--success-green);">
+                    <div style="margin-bottom:8px; padding:10px; background:rgba(5, 150, 105, 0.08); border-radius:6px; border-left:3px solid var(--success-green);">
                         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
                             <strong style="color:var(--success-green); font-size:12px;">${title}</strong>
                             <span style="font-size:11px; color:var(--text-muted);">${carrierDisplay}</span>
                         </div>
                         <div style="font-size:12px; color:var(--text-main); margin-top:4px;">${explanation}</div>
                         ${detailsHtml}
-                        <div style="font-size:10px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.8; background:rgba(0,0,0,0.2); padding:4px; border-radius:3px;">
+                        <div style="font-size:10px; color:var(--text-muted); margin-top:4px; font-family:var(--font-code); opacity:0.9; background:rgba(0,100,150,0.06); padding:4px; border-radius:3px;">
                             Raw: ${osi.message}
                         </div>
                     </div>
