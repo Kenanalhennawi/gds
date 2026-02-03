@@ -15,10 +15,30 @@ export const translateStatus = (code) => {
         US: { label: "Unable to Sell", class: "status-hx", icon: "✕" },
         SS: { label: "Sold", class: "status-hk", icon: "✓" },
         DK: { label: "Holding", class: "status-tk", icon: "⧖" },
-        NN: { label: "Not Requested", class: "status-tk", icon: "−" }
+        NN: { label: "Not Requested", class: "status-tk", icon: "−" },
+        CX: { label: "Cancelled/Exchange", class: "status-hx", icon: "✕" }
     };
     return map[c] || { label: code, class: "", icon: "•" };
 };
+
+/** All segment status codes for legend (code → { label, shortDesc }) */
+export const STATUS_LEGEND = [
+    { code: "HK", label: "Confirmed", shortDesc: "Segment confirmed by airline" },
+    { code: "KK", label: "Confirmed", shortDesc: "Segment confirmed (duplicate/alternate)" },
+    { code: "KL", label: "Confirmed", shortDesc: "Segment confirmed" },
+    { code: "SS", label: "Sold", shortDesc: "Segment sold" },
+    { code: "CH", label: "Change/Hold", shortDesc: "Modification or hold on the booking" },
+    { code: "CS", label: "Change Status", shortDesc: "Change pending" },
+    { code: "UC", label: "Unable Confirm", shortDesc: "Airline could not confirm (cancelled)" },
+    { code: "NN", label: "Not Requested", shortDesc: "Not yet requested/confirmed" },
+    { code: "NO", label: "No Action Taken", shortDesc: "No action taken (often cancelled)" },
+    { code: "CX", label: "Cancelled/Exchange", shortDesc: "Segment cancelled or exchanged" },
+    { code: "HX", label: "Cancelled", shortDesc: "Segment cancelled" },
+    { code: "XX", label: "Cancelled", shortDesc: "Segment cancelled" },
+    { code: "UN", label: "Cancelled (Airline)", shortDesc: "Cancelled by airline" },
+    { code: "TK", label: "Schedule Change", shortDesc: "Flight time/date changed" },
+    { code: "DK", label: "Holding", shortDesc: "On hold" }
+];
 
 const AIRLINES = {
 
