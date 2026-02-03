@@ -1,4 +1,4 @@
-import { translateAirline, translateCity, translateStatus, translateEnvelope, translateHeaderType, translateOSI } from "./translator.js";
+import { translateAirline, translateCity, translateStatus, translateEnvelope, translateHeaderType, translateOSI, STATUS_LEGEND } from "./translator.js";
 
 export const renderTimeline = (container, data) => {
     container.innerHTML = "";
@@ -28,24 +28,68 @@ export const renderTimeline = (container, data) => {
         };
         const whatHappenedSection = document.createElement("div");
         whatHappenedSection.className = "what-happened-global";
+        const listHtml = allChangesFlat.map(change => {
+            const icon = changeIcons[change.type] || '•';
+            return `<div class="what-happened-item" style="margin-bottom:10px; padding:10px; background:rgba(0,100,150,0.05); border-radius:6px; font-size:13px; line-height:1.5; border-left:2px solid var(--warning-amber);">
+                <span style="margin-right:8px; font-size:16px;">${icon}</span>
+                <span style="color:var(--text-main);">${change.description}</span>
+            </div>`;
+        }).join('');
         whatHappenedSection.innerHTML = `
-            <div class="changes-section changes-section-first" style="margin-top:0; margin-bottom:20px; padding:20px; background:rgba(255,130,0,0.08); border-radius:12px; border-left:4px solid var(--warning-amber);">
-                <div style="font-weight:700; color:var(--warning-amber); margin-bottom:14px; font-size:14px; text-transform:uppercase; letter-spacing:0.5px;">
-                    📋 What Happened
-                </div>
-                <div class="what-happened-list">
-                    ${allChangesFlat.map(change => {
-                        const icon = changeIcons[change.type] || '•';
-                        return `<div style="margin-bottom:10px; padding:10px; background:rgba(0,100,150,0.05); border-radius:6px; font-size:13px; line-height:1.5; border-left:2px solid var(--warning-amber);">
-                            <span style="margin-right:8px; font-size:16px;">${icon}</span>
-                            <span style="color:var(--text-main);">${change.description}</span>
-                        </div>`;
-                    }).join('')}
+            <div class="changes-section changes-section-first collapsible-section" style="margin-top:0; margin-bottom:20px; padding:20px; background:rgba(255,130,0,0.08); border-radius:12px; border-left:4px solid var(--warning-amber);">
+                <button type="button" class="collapsible-trigger" aria-expanded="true" aria-controls="what-happened-body">
+                    <span class="collapsible-arrow" aria-hidden="true">▼</span>
+                    <span class="collapsible-title">📋 What Happened</span>
+                    <span class="collapsible-count">${allChangesFlat.length} change${allChangesFlat.length !== 1 ? 's' : ''}</span>
+                </button>
+                <div id="what-happened-body" class="collapsible-body" style="margin-top:14px;">
+                    <div class="what-happened-list">${listHtml}</div>
                 </div>
             </div>
         `;
+        const trigger = whatHappenedSection.querySelector(".collapsible-trigger");
+        const body = whatHappenedSection.querySelector(".collapsible-body");
+        const arrow = whatHappenedSection.querySelector(".collapsible-arrow");
+        trigger.addEventListener("click", () => {
+            const open = body.classList.toggle("collapsible-body-closed");
+            trigger.setAttribute("aria-expanded", !open);
+            arrow.textContent = open ? "▶" : "▼";
+        });
         container.appendChild(whatHappenedSection);
     }
+
+    const statusLegendSection = document.createElement("div");
+    statusLegendSection.className = "status-legend-global";
+    statusLegendSection.innerHTML = `
+        <div class="status-legend-section collapsible-section" style="margin-bottom:20px; padding:20px; background:rgba(0,100,150,0.06); border-radius:12px; border-left:4px solid var(--flydubai-blue);">
+            <button type="button" class="collapsible-trigger" aria-expanded="false" aria-controls="status-legend-body">
+                <span class="collapsible-arrow collapsible-arrow-closed" aria-hidden="true">▶</span>
+                <span class="collapsible-title">📖 Segment status codes (NN, KK, CH, HK…)</span>
+            </button>
+            <div id="status-legend-body" class="collapsible-body collapsible-body-closed" style="margin-top:14px;">
+                <p class="status-legend-intro" style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">GDS segment status codes tell you if a flight is confirmed, on hold, or cancelled.</p>
+                <div class="status-legend-grid">
+                    ${STATUS_LEGEND.map(s => `
+                        <div class="status-legend-item">
+                            <code class="status-legend-code">${s.code}</code>
+                            <span class="status-legend-label">${s.label}</span>
+                            <span class="status-legend-desc">${s.shortDesc}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+    const legTrigger = statusLegendSection.querySelector(".collapsible-trigger");
+    const legBody = statusLegendSection.querySelector(".collapsible-body");
+    const legArrow = statusLegendSection.querySelector(".collapsible-arrow");
+    legTrigger.addEventListener("click", () => {
+        const open = legBody.classList.toggle("collapsible-body-closed");
+        legTrigger.setAttribute("aria-expanded", open);
+        legArrow.textContent = open ? "▼" : "▶";
+        legArrow.classList.toggle("collapsible-arrow-closed", open === false);
+    });
+    container.appendChild(statusLegendSection);
 
     if (summary && events.length > 0) {
         const summaryCard = document.createElement("div");
