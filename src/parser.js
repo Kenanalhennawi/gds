@@ -153,10 +153,13 @@ export const parseLog = (input) => {
             /^[A-Z]{3}\/EK$/i,   // TNR/EK
             /^EN\/TNR$/i,
             /^TNR\/EK$/i,
-            /^A\/MG$/i
+            /^A\/MG$/i,
+            /^Y\/EK$/i,          // Y/EK (fare class / airline context)
+            /^[A-Z]\/[A-Z]{2}$/, // single letter / 2 letters (e.g. Y/EK, fare/airline codes)
+            /^[A-Z]{2}\/[A-Z]$/  // 2 letters / single letter (e.g. EK/Y)
         ];
         const isLikelyNotPassenger = (raw, surname, given) => {
-            const u = raw.trim().toUpperCase();
+            const u = raw.trim().toUpperCase().replace(/^\d+/, '').trim();
             if (u.match(/[A-Z]{3}[A-Z]{3}/)) return true;
             if (nonPassengerPatterns.some(re => re.test(u))) return true;
             return false;
