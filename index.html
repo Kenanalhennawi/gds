@@ -42,11 +42,6 @@
                     </button>
                 </div>
             </nav>
-            <div class="actions">
-                <button id="btnClear" class="btn-glass" aria-label="Clear console and reset input" title="Clear Console">
-                    <span>Clear Console</span>
-                </button>
-            </div>
         </header>
 
         <main id="main" class="workspace">
@@ -62,11 +57,14 @@
                         placeholder="Paste raw GDS history, PNR logs, or EDIFACT messages here...&#10;&#10;Auto-analysis starts automatically as you type."
                         aria-label="GDS log input area"
                         aria-describedby="inputStatus"></textarea>
-                    <div class="panel-footer">
+                    <div class="panel-footer panel-footer-input">
                         <div class="input-status" id="inputStatus" role="status" aria-live="polite" aria-atomic="true">
                             <span class="status-dot" aria-hidden="true"></span>
                             <span>Ready - Auto-Analyzing</span>
                         </div>
+                        <button id="btnClear" class="btn-glass btn-clear-console" aria-label="Clear console and reset input" title="Clear Console">
+                            <span>Clear Console</span>
+                        </button>
                     </div>
                 </div>
             </section>
