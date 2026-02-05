@@ -184,13 +184,24 @@ export const parseLog = (input) => {
                 if (nonPassengerPatterns.some(re => re.test((surname + '/' + given).toUpperCase()))) continue;
             } else if (isLikelyNotPassenger(match[0], surname, given)) continue;
             let title = match[4] ? match[4].trim() : "";
-            if (title && /^(FZ|EK|QR|EY|TK|MS|SV|UA|AA|DL|AC)$/i.test(title)) title = "";
+            const airlineCodeAsTitle = /^(FZ|EK|QR|EY|TK|SV|UA|AA|DL|AC|BA|LH|AF|KL)$/i;
+            if (title && airlineCodeAsTitle.test(title)) title = "";
             
+            const canStripTitle = (remainder, fullName, t) => {
+                if (remainder.length < 2) return false;
+                if (fullName.length > 30) return true;
+                if (t === 'MS' || t === 'MR') {
+                    if (remainder.length < 4) return false;
+                    if (fullName.length === 7 && remainder.length === 5 && t === 'MS') return false;
+                }
+                return true;
+            };
+
             if (!title) {
                 for (const t of titles) {
                     if (given.toUpperCase().endsWith(t)) {
                         const remainder = given.substring(0, given.length - t.length).trim();
-                        if ((t === 'MS' || t === 'MR') && remainder.length < 6) continue;
+                        if (!canStripTitle(remainder, given, t)) continue;
                         title = t;
                         given = remainder;
                         break;
@@ -201,7 +212,7 @@ export const parseLog = (input) => {
                 for (const t of titles) {
                     if (surname.toUpperCase().endsWith(t)) {
                         const remainder = surname.substring(0, surname.length - t.length).trim();
-                        if ((t === 'MS' || t === 'MR') && remainder.length < 6) continue;
+                        if (!canStripTitle(remainder, surname, t)) continue;
                         title = t;
                         surname = remainder;
                         break;
