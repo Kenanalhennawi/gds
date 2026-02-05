@@ -171,7 +171,9 @@ export const parseLog = (input) => {
             if (!match[1] && match[0].match(/[A-Z]{3}[A-Z]{3}/)) continue;
             let surname = match[2].trim();
             let given = match[3].trim();
-            if (isLikelyNotPassenger(match[0], surname, given)) continue;
+            if (match[1] && surname.length >= 2 && given.length >= 2) {
+                /* Leading digit = passenger index (e.g. 1RASOARIMALALA/ERIKAMS); accept as passenger */
+            } else if (isLikelyNotPassenger(match[0], surname, given)) continue;
             let title = match[4] ? match[4].trim() : "";
             
             if (!title) {
