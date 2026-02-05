@@ -67,7 +67,7 @@ export const renderTimeline = (container, data) => {
                 <span class="collapsible-title">📖 Segment status codes (NN, KK, CH, HK…)</span>
             </button>
             <div id="status-legend-body" class="collapsible-body collapsible-body-closed" style="margin-top:14px;">
-                <p class="status-legend-intro" style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">GDS segment status codes tell you if a flight is confirmed, on hold, or cancelled.</p>
+                <p class="status-legend-intro" style="color:var(--text-muted); font-size:13px; margin-bottom:12px;">GDS segment status codes tell you if a flight is confirmed, on hold, or cancelled. Labels align with <strong>Flydubai Product &amp; Process Guide</strong> — Useful interline codes (REQUEST: LK, SS, DK, NN, LL, IN/IS, XX; RESPONSE: HK, KK, TK, UN, UC, KL, NO, HX).</p>
                 <div class="status-legend-grid">
                     ${STATUS_LEGEND.map(s => `
                         <div class="status-legend-item">
