@@ -67,9 +67,14 @@ export const parseLog = (input) => {
         };
         parseContextFromHeader(currentBlock, header, rawLine);
         
-        const timeMatch = rawLine.match(/\s+(\d{6})\s*$/);
+        let timeMatch = rawLine.match(/\s+(\d{6})\s*$/);
         if (timeMatch) {
             currentBlock.timestamp = timeMatch[1];
+        } else {
+            const anyTime = rawLine.match(/\s(\d{6})\s/);
+            if (anyTime && /^([0-1]\d|2[0-3])[0-5]\d[0-5]\d$/.test(anyTime[1])) {
+                currentBlock.timestamp = anyTime[1];
+            }
         }
     };
 
