@@ -192,7 +192,6 @@ export const parseLog = (input) => {
                 if (fullName.length > 30) return true;
                 if (t === 'MS' || t === 'MR') {
                     if (remainder.length < 4) return false;
-                    if (fullName.length === 7 && remainder.length === 5 && t === 'MS') return false;
                 }
                 return true;
             };
