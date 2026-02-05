@@ -168,8 +168,7 @@ export const parseLog = (input) => {
         const regex = /(\d+)?([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?/g;
         let match;
         while ((match = regex.exec(line)) !== null) {
-
-            if (match[0].match(/[A-Z]{3}[A-Z]{3}/)) continue;
+            if (!match[1] && match[0].match(/[A-Z]{3}[A-Z]{3}/)) continue;
             let surname = match[2].trim();
             let given = match[3].trim();
             if (isLikelyNotPassenger(match[0], surname, given)) continue;
@@ -267,7 +266,7 @@ export const parseLog = (input) => {
         }
 
 
-        const segSlashStatusMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4})([A-Z]?)\s*(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d{0,2})(?:\/|$|\s)/);
+        const segSlashStatusMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4})([A-Z]?)\s*(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2,3}\d{0,2})(?:\/|$|\s)/);
         if (segSlashStatusMatch) {
             currentBlock.segments.push({
                 carrier: segSlashStatusMatch[1],
@@ -281,7 +280,7 @@ export const parseLog = (input) => {
             return;
         }
 
-        const segMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4})([A-Z]?)\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d*)/);
+        const segMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4})([A-Z]?)\s*([0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2,3}\d*)/);
         if (segMatch) {
             currentBlock.segments.push({
                 carrier: segMatch[1],
@@ -295,7 +294,7 @@ export const parseLog = (input) => {
             return;
         }
         
-        const segSlashMatch = line.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{6})\s+([A-Z]{2}\d*)$/);
+        const segSlashMatch = line.match(/^([A-Z0-9]{2})(\d{1,4})([A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{6})\s+([A-Z]{2,3}\d*)$/);
         if (segSlashMatch) {
             const route = segSlashMatch[7];
             currentBlock.segments.push({
@@ -313,7 +312,7 @@ export const parseLog = (input) => {
             return;
         }
         
-        const segSlashSeparatedMatch = line.match(/^([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{2}\d*)$/);
+        const segSlashSeparatedMatch = line.match(/^([A-Z0-9]{2})(\d{1,4}[A-Z]?)\/([A-Z0-9]{2})(\d{1,4}[A-Z]?)(\d{2}[A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{3})\s+([A-Z]{2,3}\d*)$/);
         if (segSlashSeparatedMatch) {
             currentBlock.segments.push({
                 carrier: segSlashSeparatedMatch[1],
@@ -327,7 +326,7 @@ export const parseLog = (input) => {
         }
 
 
-        const segWithDayPrefixMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)([MTWFS][0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d*)(?:\s*\.\d+\.)?/);
+        const segWithDayPrefixMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)([MTWFS][0-9]{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2,3}\d*)(?:\s*\.\d+\.)?/);
         if (segWithDayPrefixMatch) {
             currentBlock.segments.push({
                 carrier: segWithDayPrefixMatch[1],
@@ -368,7 +367,7 @@ export const parseLog = (input) => {
         }
 
 
-        const segWithDotsMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)\s+(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2}\d*)(?:\s*\.\d+\.)?/);
+        const segWithDotsMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)\s+(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2,3}\d*)(?:\s*\.\d+\.)?/);
         if (segWithDotsMatch) {
             currentBlock.segments.push({
                 carrier: segWithDotsMatch[1],
