@@ -1,43 +1,49 @@
+/** Segment status labels aligned with Flydubai Product & Process Guide (Interline codes). */
 export const translateStatus = (code) => {
     const c = (code || "").substring(0, 2).toUpperCase();
     const map = {
-        HK: { label: "Confirmed", class: "status-hk", icon: "✓" },
-        KK: { label: "Confirmed", class: "status-hk", icon: "✓" },
-        KL: { label: "Confirmed", class: "status-hk", icon: "✓" },
-        TK: { label: "Schedule Change", class: "status-tk", icon: "⚠" },
+        HK: { label: "Holding confirmed", class: "status-hk", icon: "✓" },
+        KK: { label: "Confirmation from other airline", class: "status-hk", icon: "✓" },
+        KL: { label: "Confirmed from waitlist", class: "status-hk", icon: "✓" },
+        TK: { label: "Status change", class: "status-tk", icon: "⚠" },
         CH: { label: "Change/Hold", class: "status-tk", icon: "🔄" },
         CS: { label: "Change Status", class: "status-tk", icon: "🔄" },
-        UN: { label: "Cancelled (Airline)", class: "status-hx", icon: "✕" },
-        UC: { label: "Unable Confirm", class: "status-hx", icon: "✕" },
-        HX: { label: "Cancelled", class: "status-hx", icon: "✕" },
-        XX: { label: "Cancelled", class: "status-hx", icon: "✕" },
-        NO: { label: "No Action Taken", class: "status-hx", icon: "−" },
+        UN: { label: "Unable, flight does not operate/cancelled", class: "status-hx", icon: "✕" },
+        UC: { label: "Unable to accept request / RBD not confirmed", class: "status-hx", icon: "✕" },
+        HX: { label: "Have cancelled", class: "status-hx", icon: "✕" },
+        XX: { label: "Cancellation", class: "status-hx", icon: "✕" },
+        NO: { label: "No action has been taken", class: "status-hx", icon: "−" },
         US: { label: "Unable to Sell", class: "status-hx", icon: "✕" },
-        SS: { label: "Sold", class: "status-hk", icon: "✓" },
-        DK: { label: "Holding", class: "status-tk", icon: "⧖" },
-        NN: { label: "Not Requested", class: "status-tk", icon: "−" },
+        SS: { label: "Sell and report / Sold", class: "status-hk", icon: "✓" },
+        DK: { label: "Guaranteed sell / Holding", class: "status-tk", icon: "⧖" },
+        NN: { label: "Normal sell request", class: "status-tk", icon: "−" },
+        LK: { label: "Guaranteed sell", class: "status-hk", icon: "✓" },
+        LL: { label: "Waitlist (FZ do not support)", class: "status-tk", icon: "−" },
         CX: { label: "Cancelled/Exchange", class: "status-hx", icon: "✕" }
     };
     return map[c] || { label: code, class: "", icon: "•" };
 };
 
-/** All segment status codes for legend (code → { label, shortDesc }) */
+/** All segment status codes for legend — aligned with Flydubai Interline (REQUEST/RESPONSE). */
 export const STATUS_LEGEND = [
-    { code: "HK", label: "Confirmed", shortDesc: "Segment confirmed by airline" },
-    { code: "KK", label: "Confirmed", shortDesc: "Segment confirmed (duplicate/alternate)" },
-    { code: "KL", label: "Confirmed", shortDesc: "Segment confirmed" },
-    { code: "SS", label: "Sold", shortDesc: "Segment sold" },
+    { code: "HK", label: "Holding confirmed", shortDesc: "Response: space confirmed by airline (Flydubai Interline)" },
+    { code: "KK", label: "Confirmation from other airline", shortDesc: "Response: confirmed by other airline (Flydubai Interline)" },
+    { code: "KL", label: "Confirmed from waitlist", shortDesc: "Response: confirmed from waitlist (FZ do not support)" },
+    { code: "SS", label: "Sell and report / Sold", shortDesc: "Request: sell and report; or response: segment sold" },
+    { code: "NN", label: "Normal sell request", shortDesc: "Request: normal sell request (Flydubai Interline)" },
+    { code: "LK", label: "Guaranteed sell", shortDesc: "Request: guaranteed sell" },
+    { code: "DK", label: "Guaranteed sell / Holding", shortDesc: "Request: guaranteed sell; or response: on hold" },
+    { code: "LL", label: "Waitlist", shortDesc: "Request: waitlist (FZ do not support)" },
+    { code: "XX", label: "Cancellation", shortDesc: "Request: cancellation; or response: cancelled" },
+    { code: "TK", label: "Status change", shortDesc: "Response: status change (also schedule change)" },
+    { code: "UN", label: "Unable", shortDesc: "Response: unable, flight does not operate/cancelled" },
+    { code: "UC", label: "Unable to accept request", shortDesc: "Response: unable to accept / RBD not confirmed from waitlist" },
+    { code: "NO", label: "No action has been taken", shortDesc: "Response: no action has been taken" },
+    { code: "HX", label: "Have cancelled", shortDesc: "Response: have cancelled (Flydubai Interline)" },
     { code: "CH", label: "Change/Hold", shortDesc: "Modification or hold on the booking" },
     { code: "CS", label: "Change Status", shortDesc: "Change pending" },
-    { code: "UC", label: "Unable Confirm", shortDesc: "Airline could not confirm (cancelled)" },
-    { code: "NN", label: "Not Requested", shortDesc: "Not yet requested/confirmed" },
-    { code: "NO", label: "No Action Taken", shortDesc: "No action taken (often cancelled)" },
     { code: "CX", label: "Cancelled/Exchange", shortDesc: "Segment cancelled or exchanged" },
-    { code: "HX", label: "Cancelled", shortDesc: "Segment cancelled" },
-    { code: "XX", label: "Cancelled", shortDesc: "Segment cancelled" },
-    { code: "UN", label: "Cancelled (Airline)", shortDesc: "Cancelled by airline" },
-    { code: "TK", label: "Schedule Change", shortDesc: "Flight time/date changed" },
-    { code: "DK", label: "Holding", shortDesc: "On hold" }
+    { code: "US", label: "Unable to Sell", shortDesc: "Unable to sell" }
 ];
 
 const AIRLINES = {
