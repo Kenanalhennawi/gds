@@ -278,9 +278,21 @@ export const parseLog = (input) => {
         const foundPaxes = extractPassengers(line);
         if (foundPaxes.length > 0) {
             currentBlock.passengers.push(...foundPaxes);
-            return;
         }
 
+        const segGluedRouteMatch = line.match(/([A-Z0-9]{2})(\d{1,4})([A-Z]?)([0-9]{2}[A-Z]{3})\s+([A-Z]{6})(?:\s+([A-Z]{2,3}\d*))?(?:\s|$|\/)/);
+        if (segGluedRouteMatch) {
+            currentBlock.segments.push({
+                carrier: segGluedRouteMatch[1],
+                flight: segGluedRouteMatch[2],
+                fareClass: segGluedRouteMatch[3] || '',
+                date: segGluedRouteMatch[4],
+                from: segGluedRouteMatch[5].substring(0, 3),
+                to: segGluedRouteMatch[5].substring(3, 6),
+                status: segGluedRouteMatch[6] || ''
+            });
+            return;
+        }
 
         const segSlashStatusMatch = line.match(/([A-Z0-9]{2})\s*(\d{1,4})([A-Z]?)\s*(\d{2}[A-Z]{3})\s+([A-Z]{3})([A-Z]{3})\s+([A-Z]{2,3}\d{0,2})(?:\/|$|\s)/);
         if (segSlashStatusMatch) {
