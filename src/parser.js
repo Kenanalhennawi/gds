@@ -167,20 +167,27 @@ export const parseLog = (input) => {
 
         const regex = /(\d+)?([A-Z\s]+)\/([A-Z\s]+)(?:\s+([A-Z]{1,6}))?/g;
         let match;
+        const knownAirlineSuffix = /\s+(FZ|EK|QR|EY|TK|MS|SV|UA|AA|DL|AC|BA|LH|AF|KL|WY|GF|RJ|B6|NK|FR|U2|W6|SQ|MH|CX|NH|JL|KE|OZ|AI|QF|NZ)$/i;
         while ((match = regex.exec(line)) !== null) {
             if (!match[1] && match[0].match(/[A-Z]{3}[A-Z]{3}/)) continue;
             let surname = match[2].trim();
             let given = match[3].trim();
-            if (match[1] && surname.length >= 2 && given.length >= 2) {
-                /* Leading digit = passenger index (e.g. 1RASOARIMALALA/ERIKAMS); accept as passenger */
+            given = given.replace(knownAirlineSuffix, '').trim();
+            const leadingNum = match[1] ? parseInt(match[1], 10) : null;
+            const looksLikePaxIndex = match[1] && match[1].length <= 2 && leadingNum >= 1 && leadingNum <= 99;
+            if (looksLikePaxIndex && surname.length >= 2 && given.length >= 2) {
+                if (nonPassengerPatterns.some(re => re.test((surname + '/' + given).toUpperCase()))) continue;
             } else if (isLikelyNotPassenger(match[0], surname, given)) continue;
             let title = match[4] ? match[4].trim() : "";
+            if (title && /^(FZ|EK|QR|EY|TK|MS|SV|UA|AA|DL|AC)$/i.test(title)) title = "";
             
             if (!title) {
                 for (const t of titles) {
                     if (given.toUpperCase().endsWith(t)) {
+                        const remainder = given.substring(0, given.length - t.length).trim();
+                        if ((t === 'MS' || t === 'MR') && remainder.length < 6) continue;
                         title = t;
-                        given = given.substring(0, given.length - t.length).trim();
+                        given = remainder;
                         break;
                     }
                 }
@@ -188,8 +195,10 @@ export const parseLog = (input) => {
             if (!title) {
                 for (const t of titles) {
                     if (surname.toUpperCase().endsWith(t)) {
+                        const remainder = surname.substring(0, surname.length - t.length).trim();
+                        if ((t === 'MS' || t === 'MR') && remainder.length < 6) continue;
                         title = t;
-                        surname = surname.substring(0, surname.length - t.length).trim();
+                        surname = remainder;
                         break;
                     }
                 }
