@@ -1,6 +1,9 @@
 /** Segment status labels aligned with Flydubai Product & Process Guide (Interline codes). */
 export const translateStatus = (code) => {
-    const c = (code || "").substring(0, 2).toUpperCase();
+    const raw = (code || "").toUpperCase();
+    const c3 = raw.substring(0, 3);
+    const c = raw.substring(0, 2);
+    if (c3 === "ASC") return { label: "Automatic Schedule Change", class: "status-tk", icon: "⚠" };
     const map = {
         HK: { label: "Holding confirmed", class: "status-hk", icon: "✓" },
         KK: { label: "Confirmation from other airline", class: "status-hk", icon: "✓" },
@@ -43,7 +46,8 @@ export const STATUS_LEGEND = [
     { code: "CH", label: "Change/Hold", shortDesc: "Modification or hold on the booking" },
     { code: "CS", label: "Change Status", shortDesc: "Change pending" },
     { code: "CX", label: "Cancelled/Exchange", shortDesc: "Segment cancelled or exchanged" },
-    { code: "US", label: "Unable to Sell", shortDesc: "Unable to sell" }
+    { code: "US", label: "Unable to Sell", shortDesc: "Unable to sell" },
+    { code: "ASC", label: "Automatic Schedule Change", shortDesc: "Airline has automatically changed the flight schedule" }
 ];
 
 const AIRLINES = {
