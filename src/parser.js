@@ -16,7 +16,7 @@ const cleanText = (text) => {
 
     clean = clean.replace(/(SSR\s+TKNE[^S]*\.\d{13}[A-Z]\d+)\s+(?=SSR)/gi, "$1\n");
 
-    clean = clean.replace(/([A-Z0-9])(QP|QK|QD|HDQ|SWI|TRL|AKA|NAR|DVD)/g, "$1\n$2");
+    clean = clean.replace(/([A-Z0-9])(QP|QK|QD|HDQ|SWI|TRL|AKA|ASC|NAR|DVD|NCO)/g, "$1\n$2");
 
 
     clean = clean.replace(/([A-Z]{2}\d{1,4}[A-Z]?[MTWFS]?\d{2}[A-Z]{3}\s+[A-Z]{3}[A-Z]{3}\s+[A-Z]{2}\d+\s*\.\d+\.)\s+(?=[A-Z]{2}\d)/g, "$1\n");
@@ -252,7 +252,11 @@ export const parseLog = (input) => {
         }
 
         if (!currentBlock) {
-            if (line.length > 4) startNewBlock('UNK', 'FRAGMENT', line);
+            if (line.length > 4) {
+                startNewBlock('UNK', 'FRAGMENT', line);
+                const ht = line.match(/^(TRL|AKA|ASC|NAR|DVD|NCO)\s*/);
+                if (ht) currentBlock.headerType = ht[1];
+            }
             else return; 
         }
 
