@@ -145,6 +145,7 @@ export const renderTimeline = (container, data) => {
         if (headerInfo && !evt.context.office) sourceName = headerInfo;
 
         let headerTypeHtml = "";
+        let ascResultHtml = "";
         if (evt.headerType) {
             const headerInfo = translateHeaderType(evt.headerType);
             if (headerInfo) {
@@ -152,6 +153,12 @@ export const renderTimeline = (container, data) => {
                     <span class="ctx-label">Message Type:</span> 
                     <span class="ctx-val" title="${headerInfo.desc}">${headerInfo.title}</span>
                 </div>`;
+                if (evt.headerType === 'ASC') {
+                    ascResultHtml = `<div class="alert-box alert-info" style="margin-bottom:12px;">
+                        <strong>Automatic Schedule Change</strong><br>
+                        ${headerInfo.desc} Review the segment(s) below for affected flights.
+                    </div>`;
+                }
             }
         }
 
@@ -160,12 +167,13 @@ export const renderTimeline = (container, data) => {
         
         if (hasContext) {
             contextHtml = `<div class="card-context">
+                ${ascResultHtml}
                 <div class="context-row">
                     <span class="ctx-label">Detected Type:</span> 
                     <span class="ctx-val">GDS_HISTORY</span>
                 </div>
                 <div class="context-row">
-                    <span class="ctx-label">Message Type:</span> 
+                    <span class="ctx-label">Envelope:</span> 
                     <span class="ctx-val" title="${actionDesc}">${action}</span>
                 </div>`;
             
