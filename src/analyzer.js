@@ -1,9 +1,10 @@
 import { translateStatus } from "./translator.js";
 
 const statusWithLabel = (code) => {
-    const c = (code || "").substring(0, 2).toUpperCase();
-    const t = translateStatus(c);
-    return t.label ? `${c} (${t.label})` : c;
+    const t = translateStatus(code);
+    const raw = (code || "").toUpperCase();
+    const displayCode = raw.substring(0, 3) === "ASC" ? raw.substring(0, 3) : raw.substring(0, 2);
+    return t.label ? `${displayCode} (${t.label})` : (code || "");
 };
 
 const segmentKey = (seg) => {
@@ -22,8 +23,10 @@ const isCancelled = (status) => {
 };
 
 const isScheduleChange = (status) => {
-    const s = (status || "").substring(0, 2).toUpperCase();
-    return ['TK', 'DK'].includes(s);
+    const raw = (status || "").toUpperCase();
+    const s2 = raw.substring(0, 2);
+    const s3 = raw.substring(0, 3);
+    return ['TK', 'DK'].includes(s2) || s3 === 'ASC';
 };
 
 const isChangeStatus = (status) => {
@@ -131,7 +134,7 @@ export const analyzeBookingChanges = (events) => {
                             segment: currSeg,
                             previousStatus: prevStatus,
                             newStatus: currStatus,
-                            description: `Segment ${currSeg.carrier}${currSeg.flight} (${currSeg.from} → ${currSeg.to}) was cancelled. Status changed from ${statusWithLabel(prevStatus)} to ${statusWithLabel(currStatus)}.`
+                            description: `Segment ${currSeg.carrier}${currSeg.flight} (${currSeg.from} → ${currSeg.to}) was cancelled. Status changed from ${statusWithLabel(prevSeg.status)} to ${statusWithLabel(currSeg.status)}.`
                         });
                     }
 
@@ -151,7 +154,7 @@ export const analyzeBookingChanges = (events) => {
                             segment: currSeg,
                             previousStatus: prevStatus,
                             newStatus: currStatus,
-                            description: `Segment ${currSeg.carrier}${currSeg.flight} (${currSeg.from} → ${currSeg.to}) was reissued. Status changed from ${statusWithLabel(prevStatus)} to ${statusWithLabel(currStatus)} (confirmed).`
+                            description: `Segment ${currSeg.carrier}${currSeg.flight} (${currSeg.from} → ${currSeg.to}) was reissued. Status changed from ${statusWithLabel(prevSeg.status)} to ${statusWithLabel(currSeg.status)} (confirmed).`
                         });
                     }
 
@@ -161,7 +164,7 @@ export const analyzeBookingChanges = (events) => {
                             segment: currSeg,
                             previousStatus: prevStatus,
                             newStatus: currStatus,
-                            description: `Segment ${currSeg.carrier}${currSeg.flight} (${currSeg.from} → ${currSeg.to}) status changed from ${statusWithLabel(prevStatus)} to ${statusWithLabel(currStatus)}.`
+                            description: `Segment ${currSeg.carrier}${currSeg.flight} (${currSeg.from} → ${currSeg.to}) status changed from ${statusWithLabel(prevSeg.status)} to ${statusWithLabel(currSeg.status)}.`
                         });
                     }
                 }
